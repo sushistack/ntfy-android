@@ -1,0 +1,308 @@
+<title>ntfy-android · Sprint Flow</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0E1117;
+    color: #E8EAF0;
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    padding: 40px 32px 80px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #7A8394;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+  }
+
+  /* ── Epic block ── */
+  .epic {
+    margin-bottom: 48px;
+  }
+
+  .epic-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #3A4150;
+    margin-bottom: 14px;
+  }
+
+  /* ── Flow row ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    row-gap: 12px;
+  }
+
+  .arrow {
+    color: #2A3340;
+    padding: 0 10px;
+    font-size: 16px;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  /* ── Group (parallel bracket) ── */
+  .group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .group-bracket {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border: 1px solid #1E2530;
+    border-radius: 5px;
+    background: #12171F;
+    flex-wrap: wrap;
+  }
+
+  .group-sep {
+    width: 1px;
+    height: 20px;
+    background: #1E2530;
+    flex-shrink: 0;
+  }
+
+  /* ── Chip ── */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    cursor: default;
+    transition: filter 0.15s;
+  }
+  .chip:hover { filter: brightness(1.25); }
+
+  .chip-id {
+    font-size: 10px;
+    font-weight: 400;
+    opacity: 0.7;
+  }
+
+  /* Epic colors */
+  .e0 { background: rgba(77,158,255,0.14); color: #6BB8FF; border: 1px solid rgba(77,158,255,0.28); }
+  .e1 { background: rgba(61,214,140,0.12); color: #5DE8A0; border: 1px solid rgba(61,214,140,0.28); }
+  .e2 { background: rgba(255,107,53,0.12); color: #FF8A60; border: 1px solid rgba(255,107,53,0.28); }
+  .e3 { background: rgba(245,197,66,0.10); color: #F5C542; border: 1px solid rgba(245,197,66,0.25); }
+  .e4 { background: rgba(167,139,250,0.12); color: #C4B5FD; border: 1px solid rgba(167,139,250,0.28); }
+
+  /* ── Review PR annotation ── */
+  .pr-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-top: 8px;
+    row-gap: 8px;
+  }
+
+  .pr-spacer {
+    flex-shrink: 0;
+  }
+
+  .pr-tag {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: #3A4150;
+    padding: 2px 7px;
+    border: 1px solid #1E2530;
+    border-radius: 3px;
+    white-space: nowrap;
+    margin: 0 2px;
+  }
+
+  .pr-arrow {
+    color: #1E2530;
+    padding: 0 8px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #1A2030;
+    margin: 40px 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chip { transition: none; }
+  }
+</style>
+
+<h1>ntfy-android · 실행 순서 & PR 묶음</h1>
+
+<!-- ══════════════ EPIC 0 ══════════════ -->
+<div class="epic">
+  <div class="epic-label">Epic 0 · Data Foundation</div>
+  <div class="flow">
+    <div class="chip e0"><span class="chip-id">0.1</span> Migration</div>
+    <div class="arrow">→</div>
+    <div class="chip e0"><span class="chip-id">0.2</span> DAO Sort</div>
+  </div>
+  <div class="pr-row">
+    <div class="pr-spacer" style="width:0"></div>
+    <div class="pr-tag">PR-A: 0.1 + 0.2</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ══════════════ EPIC 1 ══════════════ -->
+<div class="epic">
+  <div class="epic-label">Epic 1 · Visual Foundation</div>
+  <div class="flow">
+    <div class="group">
+      <div class="group-bracket">
+        <div class="chip e1"><span class="chip-id">1.1</span> Colors</div>
+        <div class="group-sep"></div>
+        <div class="chip e1"><span class="chip-id">1.2</span> Tokens</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="chip e1"><span class="chip-id">1.3</span> Theme Switch</div>
+    <div class="arrow">→</div>
+    <div class="chip e1"><span class="chip-id">1.4</span> a11y</div>
+  </div>
+  <div class="pr-row">
+    <div class="pr-tag">PR-B: 1.1 + 1.2</div>
+    <div class="pr-arrow">→</div>
+    <div class="pr-tag">PR-C: 1.3 + 1.4</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ══════════════ EPIC 2 ══════════════ -->
+<div class="epic">
+  <div class="epic-label">Epic 2 · Notification Card</div>
+  <div class="flow">
+    <div class="chip e2"><span class="chip-id">2.1</span> Card Shell</div>
+    <div class="arrow">→</div>
+    <div class="group">
+      <div class="group-bracket">
+        <div class="chip e2"><span class="chip-id">2.2</span> Accent Bar</div>
+        <div class="group-sep"></div>
+        <div class="chip e2"><span class="chip-id">2.3a</span> Header</div>
+        <div class="group-sep"></div>
+        <div class="chip e2"><span class="chip-id">2.3b</span> Delete</div>
+        <div class="group-sep"></div>
+        <div class="chip e2"><span class="chip-id">2.5</span> Mark Read</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="group">
+      <div class="group-bracket">
+        <div class="chip e2"><span class="chip-id">2.4</span> Tag Row</div>
+        <div class="group-sep"></div>
+        <div class="chip e2"><span class="chip-id">2.6</span> Skeleton</div>
+      </div>
+    </div>
+  </div>
+  <div class="pr-row">
+    <div class="pr-tag">PR-D: 2.1</div>
+    <div class="pr-arrow">→</div>
+    <div class="pr-tag">PR-E: 2.2 + 2.3a + 2.3b + 2.5</div>
+    <div class="pr-arrow">→</div>
+    <div class="pr-tag">PR-F: 2.4 + 2.6</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ══════════════ EPIC 3 ══════════════ -->
+<div class="epic">
+  <div class="epic-label">Epic 3 · Structured Rendering &nbsp;(E2 완료 후)</div>
+  <div class="flow">
+    <div class="chip e3"><span class="chip-id">3.0</span> Golden Corpus</div>
+    <div class="arrow">→</div>
+    <div class="chip e3"><span class="chip-id">3.1</span> Detection</div>
+    <div class="arrow">→</div>
+    <div class="group">
+      <div class="group-bracket">
+        <div class="chip e3"><span class="chip-id">3.2</span> Meter</div>
+        <div class="group-sep"></div>
+        <div class="chip e3"><span class="chip-id">3.3</span> KV</div>
+        <div class="group-sep"></div>
+        <div class="chip e3"><span class="chip-id">3.4</span> List</div>
+        <div class="group-sep"></div>
+        <div class="chip e3"><span class="chip-id">3.5</span> Chart</div>
+        <div class="group-sep"></div>
+        <div class="chip e3"><span class="chip-id">3.6a</span> MD</div>
+        <div class="group-sep"></div>
+        <div class="chip e3"><span class="chip-id">3.6b</span> MD Sec</div>
+        <div class="group-sep"></div>
+        <div class="chip e3"><span class="chip-id">3.7</span> Sections</div>
+        <div class="group-sep"></div>
+        <div class="chip e3"><span class="chip-id">3.8</span> Heuristic</div>
+      </div>
+    </div>
+  </div>
+  <div class="pr-row">
+    <div class="pr-tag">PR-G: 3.0 + 3.1</div>
+    <div class="pr-arrow">→</div>
+    <div class="pr-tag">PR-H: 3.2~3.8 (렌더러 2개씩 묶음)</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ══════════════ EPIC 4 ══════════════ -->
+<div class="epic">
+  <div class="epic-label">Epic 4 · Feed Shell &nbsp;(E0 + E2 완료 후)</div>
+  <div class="flow">
+    <div class="chip e4"><span class="chip-id">4.1</span> Feed Surface</div>
+    <div class="arrow">→</div>
+    <div class="group">
+      <div class="group-bracket">
+        <div class="chip e4"><span class="chip-id">4.2</span> Pagination</div>
+        <div class="group-sep"></div>
+        <div class="chip e4"><span class="chip-id">4.3</span> States</div>
+        <div class="group-sep"></div>
+        <div class="chip e4"><span class="chip-id">4.4</span> Topic Chip</div>
+        <div class="group-sep"></div>
+        <div class="chip e4"><span class="chip-id">4.5</span> Swipe</div>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="group">
+      <div class="group-bracket">
+        <div class="chip e4"><span class="chip-id">4.6</span> Drawer</div>
+        <div class="group-sep"></div>
+        <div class="chip e4"><span class="chip-id">4.7</span> Sub Rows</div>
+        <div class="group-sep"></div>
+        <div class="chip e4"><span class="chip-id">4.8</span> FAB</div>
+        <div class="group-sep"></div>
+        <div class="chip e4"><span class="chip-id">4.9</span> Optimistic</div>
+      </div>
+    </div>
+  </div>
+  <div class="pr-row">
+    <div class="pr-tag">PR-I: 4.1</div>
+    <div class="pr-arrow">→</div>
+    <div class="pr-tag">PR-J: 4.2~4.5</div>
+    <div class="pr-arrow">→</div>
+    <div class="pr-tag">PR-K: 4.6~4.9</div>
+  </div>
+</div>
