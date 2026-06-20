@@ -1,0 +1,95 @@
+# generated: 2026-06-21
+# last_updated: 2026-06-21
+# project: ntfy-android
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: {project-root}/_bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-06-21
+last_updated: 2026-06-21
+project: ntfy-android
+project_key: NOKEY
+tracking_system: file-system
+story_location: "{project-root}/_bmad-output/implementation-artifacts"
+
+development_status:
+  # Epic 0: Data foundation — server sequence ordering
+  epic-0: backlog
+  0-1-add-sequenceid-to-the-message-schema-with-migration: backlog
+  0-2-populate-sequenceid-on-receive-and-order-the-dao-query: backlog
+  epic-0-retrospective: optional
+
+  # Epic 1: Themeable visual foundation (tokens + light/dark + a11y primitives)
+  epic-1: backlog
+  1-1-color-token-resources-light-dark: backlog
+  1-2-non-color-token-resources-literal-tag-palettes: backlog
+  1-3-light-dark-system-theme-switch: backlog
+  1-4-reduced-motion-accessibility-primitives: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: Redesigned notification card (adapter-agnostic binder)
+  epic-2: backlog
+  2-1-adapter-agnostic-card-shell-body-slot: backlog
+  2-2-priority-accent-bar-all-five-priorities: backlog
+  2-3a-card-header-static-content-badge-title-unread-dot: backlog
+  2-3b-x-delete-with-token-styled-confirm-dialog: backlog
+  2-4-categorized-tag-row-timestamp: backlog
+  2-5-tap-to-mark-read: backlog
+  2-6-card-loading-skeleton-new-arrival-animation-deep-link-highlight: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: Structured message rendering (card body)
+  epic-3: backlog
+  3-0-parser-parity-golden-corpus: backlog
+  3-1-card-detection-dispatch-safe-fallback: backlog
+  3-2-inline-meter-component: backlog
+  3-3-kv-block-renderer: backlog
+  3-4-list-block-renderer: backlog
+  3-5-chart-block-renderer-hand-drawn-canvas: backlog
+  3-6a-markdown-renderer-styles: backlog
+  3-6b-markdown-link-image-security: backlog
+  3-7-sections-block-renderer-mixed-ordered: backlog
+  3-8-heuristic-kv-fallback-untagged-key-value: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Single-feed app shell & navigation
+  epic-4: backlog
+  4-1-single-feed-surface-ordered-reusing-the-card-binder: backlog
+  4-2-feed-pagination-arrival-animation-wiring: backlog
+  4-3-feed-states-loading-empty-disconnected: backlog
+  4-4-all-vs-per-topic-feed-topic-chip: backlog
+  4-5-swipe-to-delete-mark-read: backlog
+  4-6-navigation-drawer-app-bar-no-bottom-nav: backlog
+  4-7-drawer-subscription-rows-context-menu: backlog
+  4-8-publish-fab-bottom-sheet: backlog
+  4-9-optimistic-send-pending-failed-retry-card: backlog
+  epic-4-retrospective: optional
