@@ -57,3 +57,8 @@ proguard-project.txt
 # Android Studio/IDEA
 *.iml
 .idea
+
+# bmad
+_bmad
+.agents
+.claude
