@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+
+  "iconCases": [
+    { "id": "icon-exact-cpu",         "input": { "key": "cpu" },                                "expected": "⚙" },
+    { "id": "icon-exact-disk",        "input": { "key": "disk" },                               "expected": "💾" },
+    { "id": "icon-exact-memory",      "input": { "key": "memory" },                             "expected": "🧠" },
+    { "id": "icon-exact-mem",         "input": { "key": "mem" },                                "expected": "🧠" },
+    { "id": "icon-exact-ram",         "input": { "key": "ram" },                                "expected": "🧠" },
+    { "id": "icon-exact-load",        "input": { "key": "load" },                               "expected": "📈" },
+    { "id": "icon-exact-uptime",      "input": { "key": "uptime" },                             "expected": "⏱" },
+    { "id": "icon-exact-status",      "input": { "key": "status" },                             "expected": "●" },
+    { "id": "icon-exact-name",        "input": { "key": "name" },                               "expected": "●" },
+    { "id": "icon-exact-error",       "input": { "key": "error" },                              "expected": "✕" },
+    { "id": "icon-exact-warning",     "input": { "key": "warning" },                            "expected": "⚠" },
+    { "id": "icon-exact-temp",        "input": { "key": "temp" },                               "expected": "🌡" },
+    { "id": "icon-exact-temperature", "input": { "key": "temperature" },                        "expected": "🌡" },
+    { "id": "icon-exact-version",     "input": { "key": "version" },                            "expected": "#" },
+    { "id": "icon-exact-exit",        "input": { "key": "exit" },                               "expected": "⏎" },
+    { "id": "icon-exact-net",         "input": { "key": "net" },                                "expected": "⇅" },
+    { "id": "icon-exact-network",     "input": { "key": "network" },                            "expected": "⇅" },
+    { "id": "icon-exact-services",    "input": { "key": "services" },                           "expected": "❏" },
+    { "id": "icon-exact-service",     "input": { "key": "service" },                            "expected": "❏" },
+    { "id": "icon-exact-agent",       "input": { "key": "agent" },                              "expected": "▶" },
+    { "id": "icon-exact-host",        "input": { "key": "host" },                               "expected": "🖥" },
+    { "id": "icon-exact-ping",        "input": { "key": "ping" },                               "expected": "◎" },
+    { "id": "icon-exact-speed",       "input": { "key": "speed" },                              "expected": "▶" },
+
+    { "id": "icon-norm-uppercase-cpu",    "input": { "key": "CPU" },                            "expected": "⚙" },
+    { "id": "icon-norm-mixed-Disk",       "input": { "key": "Disk" },                           "expected": "💾" },
+    { "id": "icon-norm-uppercase-MEMORY", "input": { "key": "MEMORY" },                         "expected": "🧠" },
+    { "id": "icon-norm-uppercase-LOAD",   "input": { "key": "LOAD" },                           "expected": "📈" },
+
+    { "id": "icon-override-icon-field",   "input": { "key": "cpu", "icon": "agent" },           "expected": "▶" },
+    { "id": "icon-override-icon-over-key","input": { "key": "disk", "icon": "ping" },            "expected": "◎" },
+    { "id": "icon-override-icon-unknown", "input": { "key": "cpu", "icon": "UNKNOWN_XYZ" },     "expected": "·" },
+
+    { "id": "icon-first-word-load-avg",          "input": { "key": "Load Avg" },      "expected": "📈" },
+    { "id": "icon-first-word-cpu-usage",         "input": { "key": "CPU Usage" },     "expected": "⚙" },
+    { "id": "icon-first-word-disk-io",           "input": { "key": "Disk I/O" },      "expected": "💾" },
+    { "id": "icon-first-word-memory-used",       "input": { "key": "Memory Used" },   "expected": "🧠" },
+    { "id": "icon-first-word-net-speed",         "input": { "key": "Net Speed" },     "expected": "⇅" },
+    { "id": "icon-first-word-status-name",        "input": { "key": "status name" },   "expected": "●" },
+
+    { "id": "icon-fallback-unknown-key",  "input": { "key": "foobar" },                         "expected": "·" },
+    { "id": "icon-fallback-blank-key",    "input": { "key": "" },                               "expected": "·" },
+    { "id": "icon-fallback-whitespace",   "input": { "key": "   " },                            "expected": "·" },
+    { "id": "icon-fallback-unknown-multi","input": { "key": "Unknown Thing" },                  "expected": "·" }
+  ],
+
+  "meterCases": [
+    { "id": "meter-boundary-64",  "input": { "value": 64.0 }, "expected": "ok" },
+    { "id": "meter-boundary-65",  "input": { "value": 65.0 }, "expected": "warning" },
+    { "id": "meter-boundary-89",  "input": { "value": 89.0 }, "expected": "warning" },
+    { "id": "meter-boundary-90",  "input": { "value": 90.0 }, "expected": "critical" },
+    { "id": "meter-boundary-91",  "input": { "value": 91.0 }, "expected": "critical" },
+
+    { "id": "meter-low-zero",     "input": { "value": 0.0 },  "expected": "ok" },
+    { "id": "meter-low-10",       "input": { "value": 10.0 }, "expected": "ok" },
+    { "id": "meter-mid-50",       "input": { "value": 50.0 }, "expected": "ok" },
+    { "id": "meter-warn-70",      "input": { "value": 70.0 }, "expected": "warning" },
+    { "id": "meter-warn-80",      "input": { "value": 80.0 }, "expected": "warning" },
+    { "id": "meter-crit-95",      "input": { "value": 95.0 }, "expected": "critical" },
+    { "id": "meter-crit-100",     "input": { "value": 100.0 },"expected": "critical" }
+  ],
+
+  "cardGateCases": [
+    { "id": "gate-pass-kv",        "input": { "tags": ["card"], "body": "{\"type\":\"kv\",\"rows\":[]}" },          "expected": "structured" },
+    { "id": "gate-pass-list",      "input": { "tags": ["card"], "body": "{\"type\":\"list\",\"items\":[]}" },       "expected": "structured" },
+    { "id": "gate-pass-chart",     "input": { "tags": ["card"], "body": "{\"type\":\"chart\",\"data\":[]}" },       "expected": "structured" },
+    { "id": "gate-pass-sections",  "input": { "tags": ["card"], "body": "{\"type\":\"sections\",\"blocks\":[]}" },  "expected": "structured" },
+
+    { "id": "gate-fail-no-tag",           "input": { "tags": [],          "body": "{\"type\":\"kv\",\"rows\":[]}" },          "expected": "fallback" },
+    { "id": "gate-fail-wrong-tag",        "input": { "tags": ["cards"],   "body": "{\"type\":\"kv\",\"rows\":[]}" },          "expected": "fallback" },
+    { "id": "gate-fail-uppercase-tag",    "input": { "tags": ["Card"],    "body": "{\"type\":\"kv\",\"rows\":[]}" },          "expected": "fallback" },
+    { "id": "gate-fail-invalid-json",     "input": { "tags": ["card"],    "body": "not json" },                               "expected": "fallback" },
+    { "id": "gate-fail-json-array",       "input": { "tags": ["card"],    "body": "[\"type\",\"kv\"]" },                      "expected": "fallback" },
+    { "id": "gate-fail-json-string",      "input": { "tags": ["card"],    "body": "\"kv\"" },                                 "expected": "fallback" },
+    { "id": "gate-fail-json-number",      "input": { "tags": ["card"],    "body": "42" },                                     "expected": "fallback" },
+    { "id": "gate-fail-missing-type",     "input": { "tags": ["card"],    "body": "{\"rows\":[]}" },                          "expected": "fallback" },
+    { "id": "gate-fail-unknown-type",     "input": { "tags": ["card"],    "body": "{\"type\":\"unknown\",\"rows\":[]}" },      "expected": "fallback" },
+    { "id": "gate-fail-markdown-toplevel","input": { "tags": ["card"],    "body": "{\"type\":\"markdown\",\"text\":\"hi\"}" }, "expected": "fallback" },
+    { "id": "gate-pass-extra-tags",       "input": { "tags": ["card","service:github"], "body": "{\"type\":\"kv\",\"rows\":[]}" }, "expected": "structured" },
+    { "id": "gate-fail-empty-body",       "input": { "tags": ["card"],    "body": "" },                                       "expected": "fallback" },
+    { "id": "gate-fail-null-type",        "input": { "tags": ["card"],    "body": "{\"type\":null}" },                        "expected": "fallback" }
+  ],
+
+  "markdownDestinationCases": [
+    { "id": "md-link-http-live",          "input": { "kind": "link", "destination": "http://example.com" },          "expected": "live" },
+    { "id": "md-link-https-live",         "input": { "kind": "link", "destination": "https://example.com" },         "expected": "live" },
+    { "id": "md-link-mailto-live",        "input": { "kind": "link", "destination": "mailto:user@example.com" },     "expected": "live" },
+    { "id": "md-link-javascript-inert",   "input": { "kind": "link", "destination": "javascript:alert(1)" },         "expected": "inert" },
+    { "id": "md-link-data-inert",         "input": { "kind": "link", "destination": "data:text/html,<h1>hi</h1>" },  "expected": "inert" },
+    { "id": "md-link-file-inert",         "input": { "kind": "link", "destination": "file:///etc/passwd" },          "expected": "inert" },
+    { "id": "md-link-custom-scheme-inert","input": { "kind": "link", "destination": "myapp://open/item/1" },         "expected": "inert" },
+    { "id": "md-link-scheme-relative-inert","input": { "kind": "link", "destination": "//example.com/path" },        "expected": "inert" },
+    { "id": "md-link-relative-inert",     "input": { "kind": "link", "destination": "/path/to/page" },               "expected": "inert" },
+    { "id": "md-link-blank-inert",        "input": { "kind": "link", "destination": "" },                            "expected": "inert" },
+    { "id": "md-link-malformed-inert",    "input": { "kind": "link", "destination": "not a url at all" },            "expected": "inert" },
+    { "id": "md-link-ftp-inert",          "input": { "kind": "link", "destination": "ftp://files.example.com" },     "expected": "inert" },
+
+    { "id": "md-img-http-render",         "input": { "kind": "image", "destination": "http://example.com/img.png" },  "expected": "render" },
+    { "id": "md-img-https-render",        "input": { "kind": "image", "destination": "https://example.com/img.png" }, "expected": "render" },
+    { "id": "md-img-javascript-drop",     "input": { "kind": "image", "destination": "javascript:void(0)" },          "expected": "drop" },
+    { "id": "md-img-data-drop",           "input": { "kind": "image", "destination": "data:image/png;base64,abc" },   "expected": "drop" },
+    { "id": "md-img-file-drop",           "input": { "kind": "image", "destination": "file:///sdcard/photo.jpg" },    "expected": "drop" },
+    { "id": "md-img-relative-drop",       "input": { "kind": "image", "destination": "/images/photo.jpg" },           "expected": "drop" },
+    { "id": "md-img-scheme-relative-drop","input": { "kind": "image", "destination": "//cdn.example.com/img.png" },   "expected": "drop" },
+    { "id": "md-img-content-drop",        "input": { "kind": "image", "destination": "content://media/external/1" },  "expected": "drop" },
+    { "id": "md-img-blank-drop",          "input": { "kind": "image", "destination": "" },                            "expected": "drop" },
+    { "id": "md-img-custom-drop",         "input": { "kind": "image", "destination": "myapp://image/42" },            "expected": "drop" },
+    { "id": "md-img-mailto-drop",         "input": { "kind": "image", "destination": "mailto:user@example.com" },     "expected": "drop" }
+  ],
+
+  "shapeCases": [
+    { "id": "shape-empty-body",           "input": { "body": "" },                                                    "expected": "paragraph" },
+    { "id": "shape-single-line-plain",    "input": { "body": "Hello world" },                                         "expected": "paragraph" },
+    { "id": "shape-single-line-colon",    "input": { "body": "CPU: 50%" },                                            "expected": "paragraph" },
+    { "id": "shape-single-line-whitespace","input": { "body": "   " },                                                "expected": "paragraph" },
+
+    { "id": "shape-kv-two-lines",         "input": { "body": "CPU: 50%\nMemory: 30%" },                               "expected": "heuristic-kv" },
+    { "id": "shape-kv-three-lines",       "input": { "body": "CPU: 50%\nMemory: 30%\nDisk: 80%" },                    "expected": "heuristic-kv" },
+    { "id": "shape-kv-value-with-colon",  "input": { "body": "Status: ok: running\nVersion: 1.2.3" },                 "expected": "heuristic-kv" },
+    { "id": "shape-kv-empty-value",       "input": { "body": "CPU:\nMemory: 30%" },                                   "expected": "heuristic-kv" },
+    { "id": "shape-kv-with-blank-lines",  "input": { "body": "CPU: 50%\n\nMemory: 30%" },                             "expected": "heuristic-kv" },
+
+    { "id": "shape-para-no-key-before-colon","input": { "body": ": no key here\nMemory: 30%" },                       "expected": "paragraph" },
+    { "id": "shape-para-mixed-kv-plain",  "input": { "body": "CPU: 50%\nThis is a sentence without colon" },          "expected": "paragraph" },
+    { "id": "shape-para-multiline-plain", "input": { "body": "Line one\nLine two\nLine three" },                       "expected": "paragraph" },
+    { "id": "shape-para-one-kv-one-plain","input": { "body": "CPU: 50%\nJust plain text" },                           "expected": "paragraph" }
+  ]
+}
