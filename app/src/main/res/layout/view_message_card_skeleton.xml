@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Skeleton card placeholder — matches the final Story 2.1 card geometry:
+    - Squared CardView shell (0dp radius), surface colour, 1dp border, shadow_elev_1
+    - 4dp left priority-accent bar placeholder
+    - header band (badge placeholder + title placeholder + unread-dot gap)
+    - body lines (2 representative lines)
+    - tag/chip row placeholder + timestamp area
+
+  Accessibility: importantForAccessibility="noHideDescendants" on the root;
+  all children are non-focusable/non-clickable so TalkBack skips this entirely.
+  No content descriptions, no live-region behaviour.
+-->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/skeleton_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="0dp"
+    android:layout_marginStart="6dp"
+    android:layout_marginEnd="6dp"
+    android:layout_marginBottom="1dp"
+    android:clickable="false"
+    android:focusable="false"
+    android:importantForAccessibility="noHideDescendants"
+    android:foreground="@drawable/card_shell_background"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="@dimen/shadow_elev_1"
+    app:cardMaxElevation="@dimen/shadow_elev_1"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="false"
+    app:cardBackgroundColor="@color/surface">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="true"
+        android:clipToPadding="true">
+
+        <!-- Priority accent bar placeholder: 4dp wide, same geometry as real card -->
+        <View
+            android:id="@+id/skeleton_priority_accent"
+            android:layout_width="@dimen/card_priority_accent_width"
+            android:layout_height="0dp"
+            android:background="@color/surface_2"
+            android:importantForAccessibility="no"
+            android:focusable="false"
+            app:layout_constraintBottom_toBottomOf="@+id/skeleton_body"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/skeleton_body" />
+
+        <!-- Body area mirrors card_body geometry -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/skeleton_body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:focusable="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/skeleton_priority_accent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingEnd="6dp">
+
+            <!-- Header band: badge placeholder + title placeholder -->
+            <View
+                android:id="@+id/skeleton_header_badge"
+                android:layout_width="40dp"
+                android:layout_height="18dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
+                android:background="@color/surface_2"
+                android:importantForAccessibility="no"
+                android:focusable="false"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/skeleton_header_title"
+                android:layout_width="0dp"
+                android:layout_height="18dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="52dp"
+                android:layout_marginTop="4dp"
+                android:background="@color/surface_2"
+                android:importantForAccessibility="no"
+                android:focusable="false"
+                app:layout_constraintStart_toEndOf="@+id/skeleton_header_badge"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Timestamp placeholder -->
+            <View
+                android:id="@+id/skeleton_timestamp"
+                android:layout_width="100dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="6dp"
+                android:background="@color/surface_2"
+                android:importantForAccessibility="no"
+                android:focusable="false"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/skeleton_header_badge" />
+
+            <!-- Body line 1: full width -->
+            <View
+                android:id="@+id/skeleton_body_line1"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/surface_2"
+                android:importantForAccessibility="no"
+                android:focusable="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/skeleton_timestamp" />
+
+            <!-- Body line 2: ~70% width -->
+            <View
+                android:id="@+id/skeleton_body_line2"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="72dp"
+                android:layout_marginTop="6dp"
+                android:background="@color/surface_2"
+                android:importantForAccessibility="no"
+                android:focusable="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/skeleton_body_line1" />
+
+            <!-- Tag/chip row placeholder (two chip shapes) -->
+            <View
+                android:id="@+id/skeleton_chip1"
+                android:layout_width="56dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/surface_2"
+                android:importantForAccessibility="no"
+                android:focusable="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/skeleton_body_line2" />
+
+            <View
+                android:id="@+id/skeleton_chip2"
+                android:layout_width="40dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/surface_2"
+                android:importantForAccessibility="no"
+                android:focusable="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/skeleton_chip1"
+                app:layout_constraintTop_toBottomOf="@+id/skeleton_body_line2" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

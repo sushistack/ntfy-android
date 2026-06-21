@@ -21,7 +21,6 @@ import io.heckel.ntfy.util.Log
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import io.heckel.ntfy.util.MarkwonFactory
 
@@ -29,7 +28,7 @@ class DetailAdapter(
     private val activity: Activity,
     private val lifecycleScope: CoroutineScope,
     private val repository: Repository,
-    private val onClick: (Notification) -> Unit,
+    private val onClick: (Notification) -> Boolean,
     private val onLongClick: (Notification) -> Unit,
     private val onMarkReadCallback: ((Notification) -> Unit)? = null,
     private val onDeleteRequestCallback: ((Notification) -> Unit)? = null,
@@ -74,7 +73,7 @@ class DetailAdapter(
         lifecycleScope: CoroutineScope,
         repository: Repository,
     ): MessageCardActions = object : MessageCardActions {
-        override fun onClick(notification: Notification) = this@DetailAdapter.onClick(notification)
+        override fun onClick(notification: Notification): Boolean = this@DetailAdapter.onClick(notification)
         override fun onLongClick(notification: Notification) = this@DetailAdapter.onLongClick(notification)
 
         override fun onDownloadAttachment(notification: Notification) {
@@ -99,7 +98,7 @@ class DetailAdapter(
                 if (!deleted) throw Exception("no rows deleted")
                 val newAttachment = attachment.copy(contentUri = null, progress = ATTACHMENT_PROGRESS_DELETED)
                 val newNotification = notification.copy(attachment = newAttachment)
-                GlobalScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch(Dispatchers.IO) {
                     repository.updateNotification(newNotification)
                 }
             } catch (e: Exception) {

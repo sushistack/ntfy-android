@@ -26,6 +26,8 @@ import androidx.core.net.toUri
 import androidx.core.view.allViews
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.heckel.ntfy.R
 import io.heckel.ntfy.db.*
@@ -34,6 +36,8 @@ import io.heckel.ntfy.msg.DownloadType
 import io.heckel.ntfy.msg.NotificationService
 import io.heckel.ntfy.msg.NotificationService.Companion.ACTION_COPY
 import io.heckel.ntfy.msg.NotificationService.Companion.ACTION_VIEW
+import io.heckel.ntfy.ui.CardTagFormatter.categorize
+import io.heckel.ntfy.ui.CardTagFormatter.formatAbsoluteTimestamp
 import io.heckel.ntfy.ui.design.GlowToken
 import io.heckel.ntfy.ui.design.resolveGlow
 import io.heckel.ntfy.util.*
@@ -57,6 +61,10 @@ class MessageCardBinder(
     private var markReadPending: Boolean = false
 
     private val cardView: androidx.cardview.widget.CardView = itemView.findViewById(R.id.detail_item_card)
+
+    // Story 2.6: effect controller manages transient animations and resets.
+    private val effectController: CardEffectController = CardEffectController(itemView, cardView)
+
     private val priorityAccentView: View = itemView.findViewById(R.id.card_priority_accent)
     // Story 2.3a: new header views
     private val headerBadgeView: TextView = itemView.findViewById(R.id.card_header_badge)
@@ -66,7 +74,9 @@ class MessageCardBinder(
     private val titleView: TextView = itemView.findViewById(R.id.detail_item_title_text)
     private val messageView: TextView = itemView.findViewById(R.id.detail_item_message_text)
     private val iconView: ImageView = itemView.findViewById(R.id.detail_item_icon)
-    private val tagsView: TextView = itemView.findViewById(R.id.detail_item_tags_text)
+    // Story 2.4: meta row — tag chip host and absolute timestamp
+    private val tagChipGroup: ChipGroup = itemView.findViewById(R.id.card_tag_chip_group)
+    private val metaTimestampView: TextView = itemView.findViewById(R.id.card_meta_timestamp)
     private val deleteButton: ImageButton = itemView.findViewById(R.id.card_delete_button)
     private val menuButton: ImageButton = itemView.findViewById(R.id.detail_item_menu_button)
     private val attachmentImageView: ImageView = itemView.findViewById(R.id.detail_item_attachment_image)
@@ -80,18 +90,23 @@ class MessageCardBinder(
         notification: Notification,
         topicName: String?,
         selected: Boolean,
+        bindState: CardBindState = CardBindState(),
     ) {
+        // Story 2.6: cancel any in-flight animators and restore baseline before every bind.
+        effectController.resetTransient()
+
         // Reset per-holder state so recycled views target the new notification only.
-        if (boundNotificationId != notification.id) {
-            boundNotificationId = notification.id
-            markReadPending = false
-        }
+        // markReadPending is cleared unconditionally: Room may rebind the same ID (e.g. an
+        // attachment download completes) while the notification is still unread, and the
+        // pending guard must not survive across any rebind.
+        boundNotificationId = notification.id
+        markReadPending = false
 
         val context = itemView.context
-        val unmatchedTags = unmatchedTags(splitTags(notification.tags))
         val message = maybeAppendActionErrors(formatMessage(notification), notification)
 
-        dateView.text = formatDateShort(notification.timestamp)
+        // Legacy date view kept for any future callers; hidden in Story 2.4 meta row design.
+        dateView.visibility = View.GONE
         if (notification.isMarkdown()) {
             messageView.autoLinkMask = 0
             markwon.setMarkdown(messageView, message.toString())
@@ -104,18 +119,30 @@ class MessageCardBinder(
             // Click & Long-click listeners on the text as well, because "autoLink=web" makes them
             // clickable, and so we cannot rely on the underlying card to perform the action.
             // See https://github.com/binwiederhier/ntfy/issues/226
-            actions.onClick(notification)
+            val selectionHandled = actions.onClick(notification)
+            // Mirror the card-surface mark-read logic so that tapping the body text (which
+            // intercepts the cardView click via autoLink) also clears the unread state.
+            if (!selectionHandled) {
+                val markRead = actions.onMarkRead
+                if (markRead != null && notification.notificationId != 0 && !markReadPending) {
+                    markReadPending = true
+                    markRead(notification)
+                }
+            }
         }
         messageView.setOnLongClickListener {
             actions.onLongClick(notification); true
         }
         cardView.setOnClickListener {
-            actions.onClick(notification)
-            // Tap-to-read: only for unread notifications; guard duplicate in-flight dispatches.
-            val markRead = actions.onMarkRead
-            if (markRead != null && notification.notificationId != 0 && !markReadPending) {
-                markReadPending = true
-                markRead(notification)
+            val selectionHandled = actions.onClick(notification)
+            // Tap-to-read: only when host is not in selection/action mode, notification is
+            // unread, and no dispatch is already in-flight (AC 2, AC 5 of Story 2-5).
+            if (!selectionHandled) {
+                val markRead = actions.onMarkRead
+                if (markRead != null && notification.notificationId != 0 && !markReadPending) {
+                    markReadPending = true
+                    markRead(notification)
+                }
             }
         }
         cardView.setOnLongClickListener { actions.onLongClick(notification); true }
@@ -132,34 +159,54 @@ class MessageCardBinder(
         } else {
             titleView.visibility = View.GONE
         }
-        if (unmatchedTags.isNotEmpty()) {
-            tagsView.visibility = View.VISIBLE
-            tagsView.text = context.getString(R.string.detail_item_tags, unmatchedTags.joinToString(", "))
+        renderMetaRow(context, notification, topicName)
+
+        // Story 2.6: persistent presentation state — static deep-link emphasis overrides
+        // the normal background but does not clobber selected/priority state.
+        val normalBackgroundColor = if (selected) {
+            Colors.cardSelectedBackgroundColor(context)
         } else {
-            tagsView.visibility = View.GONE
+            Colors.cardBackgroundColor(context)
         }
-        if (selected) {
-            cardView.setCardBackgroundColor(Colors.cardSelectedBackgroundColor(context))
-        } else {
-            cardView.setCardBackgroundColor(Colors.cardBackgroundColor(context))
+        when (bindState.presentation) {
+            is CardPresentation.StaticDeepLinkEmphasis -> {
+                effectController.applyStaticDeepLinkEmphasis(context, normalBackgroundColor)
+            }
+            else -> {
+                cardView.setCardBackgroundColor(normalBackgroundColor)
+            }
         }
 
         val attachment = notification.attachment
         val attachmentFileStat = maybeFileStat(context, attachment?.contentUri)
         val iconFileStat = maybeFileStat(context, notification.icon?.contentUri)
 
-        renderHeader(context, notification)
+        renderHeader(context, notification, message)
         renderPriority(context, notification)
         resetCardButtons()
         maybeRenderMenu(context, notification, attachmentFileStat)
         maybeRenderAttachment(context, notification, attachmentFileStat)
         maybeRenderIcon(context, notification, iconFileStat)
         maybeRenderActions(context, notification)
+
+        // Story 2.6: one-shot transient effects — dispatched after all persistent state is
+        // applied so the animator starts from the correct final position/background.
+        when (val eff = bindState.effect) {
+            is CardEffect.NewArrival -> effectController.playArrival(context, eff.stableId, eff.consumed)
+            is CardEffect.DeepLinkPulse -> effectController.playDeepLinkPulse(context, normalBackgroundColor, eff.consumed)
+            is CardEffect.None -> { /* no-op */ }
+        }
     }
 
     fun reset() {
+        // Story 2.6: cancel animators and restore baseline before recycling.
+        effectController.resetTransient()
         boundNotificationId = null
         markReadPending = false
+        // Story 2.4: clear dynamic chip children and listeners to prevent recycler leakage
+        tagChipGroup.removeAllViews()
+        metaTimestampView.text = null
+        dateView.visibility = View.GONE
         // Header reset (Story 2.3a)
         headerBadgeView.text = null
         headerBadgeView.backgroundTintList = null
@@ -186,17 +233,135 @@ class MessageCardBinder(
         menuButton.visibility = View.GONE
         priorityAccentView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
         priorityAccentView.setLayerType(View.LAYER_TYPE_NONE, null)
+        actionsWrapperView.visibility = View.GONE
         resetCardButtons()
+    }
+
+    private fun renderMetaRow(context: Context, notification: Notification, topicName: String?) {
+        // Always clear dynamic children before re-binding (AC 6 — recycler state reset)
+        tagChipGroup.removeAllViews()
+
+        metaTimestampView.text = formatAbsoluteTimestamp(notification.timestamp)
+
+        val cardTags = categorize(notification.tags, topicName)
+        val cardClickAction: () -> Unit = { actions.onClick(notification) }
+
+        // Topic chip
+        if (cardTags.topic != null) {
+            tagChipGroup.addView(buildChip(context,
+                text = cardTags.topic,
+                bgColor = ContextCompat.getColor(context, R.color.topic_chip_bg),
+                textColor = ContextCompat.getColor(context, R.color.topic_chip_text),
+                cardClickAction))
+        }
+
+        // Service chips
+        val serviceBg = ContextCompat.getColor(context, R.color.tag_service_bg)
+        val serviceText = ContextCompat.getColor(context, R.color.tag_service_text)
+        for (label in cardTags.service) {
+            tagChipGroup.addView(buildChip(context, label, serviceBg, serviceText, cardClickAction))
+        }
+
+        // General chips: first two visible; remainder behind +N more
+        val bgColors = context.resources.obtainTypedArray(R.array.tag_general_backgrounds)
+        val textColors = context.resources.obtainTypedArray(R.array.tag_general_texts)
+        val general = cardTags.general
+
+        val visibleCount = minOf(general.size, GENERAL_TAG_COLLAPSE_COUNT)
+        for (i in 0 until visibleCount) {
+            val gt = general[i]
+            tagChipGroup.addView(buildChip(
+                context,
+                gt.name,
+                bgColors.getColor(gt.paletteIndex, 0),
+                textColors.getColor(gt.paletteIndex, 0),
+                cardClickAction,
+            ))
+        }
+        bgColors.recycle()
+        textColors.recycle()
+
+        // +N more button (when 3 or more general tags)
+        if (general.size > GENERAL_TAG_COLLAPSE_COUNT) {
+            val remaining = general.subList(visibleCount, general.size)
+            val moreButton = buildMoreButton(context, remaining, cardClickAction)
+            tagChipGroup.addView(moreButton)
+        }
+    }
+
+    private fun buildChip(
+        context: Context,
+        text: String,
+        bgColor: Int,
+        textColor: Int,
+        cardClickAction: () -> Unit,
+    ): Chip {
+        return Chip(context).apply {
+            this.text = text
+            chipCornerRadius = context.resources.getDimension(R.dimen.radius_full)
+            textSize = context.resources.getDimension(R.dimen.text_caption) / context.resources.displayMetrics.scaledDensity
+            chipBackgroundColor = ColorStateList.valueOf(bgColor)
+            setTextColor(textColor)
+            isCheckable = false
+            isClickable = true
+            isFocusable = true
+            // Stop chip tap from bubbling into the card click/mark-read action (AC 11)
+            setOnClickListener { /* consume; no card action */ }
+            setOnLongClickListener { /* consume */ true }
+        }
+    }
+
+    private fun buildMoreButton(
+        context: Context,
+        remaining: List<CardTagFormatter.GeneralTag>,
+        cardClickAction: () -> Unit,
+    ): Chip {
+        // Resolve colors eagerly; TypedArray must not outlive this call (AC 5 expansion).
+        val bgArray = context.resources.obtainTypedArray(R.array.tag_general_backgrounds)
+        val textArray = context.resources.obtainTypedArray(R.array.tag_general_texts)
+        val resolvedBg = IntArray(6) { bgArray.getColor(it, 0) }
+        val resolvedText = IntArray(6) { textArray.getColor(it, 0) }
+        bgArray.recycle()
+        textArray.recycle()
+
+        val n = remaining.size
+        return Chip(context).apply {
+            text = context.getString(R.string.notification_card_tags_more, n)
+            chipCornerRadius = context.resources.getDimension(R.dimen.radius_full)
+            textSize = context.resources.getDimension(R.dimen.text_caption) / context.resources.displayMetrics.scaledDensity
+            chipBackgroundColor = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.surface_2))
+            setTextColor(ContextCompat.getColor(context, R.color.muted))
+            isCheckable = false
+            isClickable = true
+            isFocusable = true
+            setOnClickListener {
+                // Reveal remaining general chips; remove this button (AC 5)
+                tagChipGroup.removeView(this)
+                for (gt in remaining) {
+                    tagChipGroup.addView(buildChip(
+                        context,
+                        gt.name,
+                        resolvedBg[gt.paletteIndex],
+                        resolvedText[gt.paletteIndex],
+                        cardClickAction,
+                    ))
+                }
+            }
+            setOnLongClickListener { true }
+        }
     }
 
     private fun renderPriority(context: Context, notification: Notification) {
         // Priority accent bar: fill color + optional dark-mode glow. Always reset both on every bind.
-        val accentColorRes = accentColorResForPriority(notification.priority)
+        // Normalize through toPriority() so invalid values consistently resolve to P3, matching
+        // the badge path in renderHeader().
+        val priority = toPriority(notification.priority)
+        val accentColorRes = accentColorResForPriority(priority)
         priorityAccentView.setBackgroundColor(ContextCompat.getColor(context, accentColorRes))
-        applyPriorityGlow(context, notification.priority)
+        applyPriorityGlow(context, priority)
     }
 
-    private fun renderHeader(context: Context, notification: Notification) {
+    private fun renderHeader(context: Context, notification: Notification, bodyFallback: CharSequence) {
         val priority = toPriority(notification.priority)
         val spec = badgeSpecForPriority(priority)
 
@@ -205,11 +370,12 @@ class MessageCardBinder(
         headerBadgeView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, spec.backgroundColorRes))
         headerBadgeView.setTextColor(ContextCompat.getColor(context, spec.textColorRes))
 
-        // Header title: non-blank title → formatTitle, else body fallback → formatMessage (AC 3, 4)
+        // Header title: non-blank title → formatTitle, else pre-computed body fallback (AC 3, 4).
+        // bodyFallback already includes maybeAppendActionErrors so header and body are consistent.
         headerTitleView.text = if (notification.title.isNotBlank()) {
             formatTitle(notification)
         } else {
-            formatMessage(notification)
+            bodyFallback
         }
 
         // Unread dot: visible only when notificationId != 0 (AC 5, 6, 7)
@@ -545,6 +711,8 @@ class MessageCardBinder(
     companion object {
         const val TAG = "NtfyMessageCardBinder"
         const val IMAGE_PREVIEW_MAX_BYTES = 5 * 1024 * 1024
+        // Show first 2 general tags collapsed; 3+ triggers +N more button (AC 5)
+        const val GENERAL_TAG_COLLAPSE_COUNT = 2
 
         /**
          * Pure mapping from (already-normalized) priority int to BadgeSpec.

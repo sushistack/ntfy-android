@@ -181,4 +181,58 @@ class NotificationDaoTest {
         assertEquals("id-ZZZ", result[0].id) // lexicographically greater id comes first
         assertEquals("id-AAA", result[1].id)
     }
+
+    // ── markAsRead(id) ──────────────────────────────────────────────────────────
+
+    @Test
+    fun markAsRead_sets_notificationId_to_zero_for_unread_row() {
+        val unread = makeNotification("id-unread", sequenceId = "seq-1", timestamp = 1000L)
+            .copy(notificationId = 42)
+        dao.add(unread)
+
+        dao.markAsRead("id-unread")
+
+        assertEquals(0, dao.get("id-unread")!!.notificationId)
+    }
+
+    @Test
+    fun markAsRead_does_not_touch_already_read_row() {
+        val alreadyRead = makeNotification("id-read", sequenceId = "seq-1", timestamp = 1000L)
+            .copy(notificationId = 0)
+        dao.add(alreadyRead)
+
+        dao.markAsRead("id-read")
+
+        assertEquals(0, dao.get("id-read")!!.notificationId)
+    }
+
+    @Test
+    fun markAsRead_does_not_affect_other_rows_with_same_sequence_id() {
+        val target = makeNotification("id-target", sequenceId = "shared-seq", timestamp = 1000L)
+            .copy(notificationId = 10)
+        val other = makeNotification("id-other", sequenceId = "shared-seq", timestamp = 2000L)
+            .copy(notificationId = 20)
+        dao.add(target)
+        dao.add(other)
+
+        dao.markAsRead("id-target")
+
+        assertEquals(0, dao.get("id-target")!!.notificationId)
+        assertEquals(20, dao.get("id-other")!!.notificationId) // unchanged
+    }
+
+    @Test
+    fun markAsRead_does_not_affect_row_with_different_id() {
+        val target = makeNotification("id-A", sequenceId = "seq-A", timestamp = 1000L)
+            .copy(notificationId = 5)
+        val unrelated = makeNotification("id-B", sequenceId = "seq-B", timestamp = 2000L)
+            .copy(notificationId = 7)
+        dao.add(target)
+        dao.add(unrelated)
+
+        dao.markAsRead("id-A")
+
+        assertEquals(0, dao.get("id-A")!!.notificationId)
+        assertEquals(7, dao.get("id-B")!!.notificationId) // unchanged
+    }
 }

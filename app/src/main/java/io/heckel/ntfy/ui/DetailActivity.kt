@@ -304,7 +304,7 @@ class DetailActivity : AppCompatActivity(), NotificationFragment.NotificationSet
 
         // Update main list based on viewModel (& its datasource/livedata)
         val noEntriesText: View = findViewById(R.id.detail_no_notifications)
-        val onNotificationClick = { n: Notification -> onNotificationClick(n) }
+        val onNotificationClick = { n: Notification -> onNotificationClick(n) }  // returns Boolean
         val onNotificationLongClick = { n: Notification -> onNotificationLongClick(n) }
         val onNotificationMarkRead = { n: Notification -> onNotificationMarkRead(n) }
         val onNotificationDeleteRequest = { n: Notification -> onNotificationDeleteRequest(n) }
@@ -934,13 +934,15 @@ class DetailActivity : AppCompatActivity(), NotificationFragment.NotificationSet
         dialog.show()
     }
 
-    private fun onNotificationClick(notification: Notification) {
+    private fun onNotificationClick(notification: Notification): Boolean {
         if (actionMode != null) {
             handleActionModeClick(notification)
+            return true  // selection consumed the tap; binder must not also mark-read
         }
         // Outside action mode, card tap only triggers mark-read via onNotificationMarkRead.
         // URL-open and clipboard-copy are no longer triggered by a whole-card tap; explicit
         // links and action buttons remain independently clickable through child listeners.
+        return false
     }
 
     private fun onNotificationMarkRead(notification: Notification) {

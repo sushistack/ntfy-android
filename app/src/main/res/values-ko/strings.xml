@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Notification card priority badge labels (Story 2.3a) -->
+    <string name="notification_card_badge_min">최소</string>
+    <string name="notification_card_badge_low">낮음</string>
+    <string name="notification_card_badge_normal">보통</string>
+    <string name="notification_card_badge_high">높음</string>
+    <string name="notification_card_badge_max">긴급</string>
+
     <string name="detail_how_to_link">자세한 설명은 ntfy.sh와 docs 페이지에서 찾으실 수 있습니다.</string>
     <string name="common_priority_high_name">우선순위 높음</string>
     <string name="main_menu_notifications_disabled_forever">알림 음소거됨</string>

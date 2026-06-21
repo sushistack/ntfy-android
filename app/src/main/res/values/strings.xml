@@ -1,6 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
            tools:ignore="MissingTranslation">
 
+    <!-- Notification card priority badge labels (Story 2.3a) — naturally cased for translators;
+         uppercase rendering is applied at presentation time by the badge TextView. -->
+    <string name="notification_card_badge_min">Min</string>
+    <string name="notification_card_badge_low">Low</string>
+    <string name="notification_card_badge_normal">Normal</string>
+    <string name="notification_card_badge_high">High</string>
+    <string name="notification_card_badge_max">Urgent</string>
+    <!-- Story 2.4: +N more expansion control for collapsed general tags -->
+    <string name="notification_card_tags_more">+%1$d more</string>
+
     <!-- Common strings -->
     <string name="common_button_next">Next</string>
     <string name="common_button_add">Add</string>
@@ -227,6 +237,12 @@
     </string>
     <string name="detail_action_mode_delete_dialog_permanently_delete">Delete permanently</string>
     <string name="detail_action_mode_delete_dialog_cancel">Cancel</string>
+
+    <!-- Single-notification delete confirmation (Story 2.3b) -->
+    <string name="notification_delete_dialog_message">Delete this notification?</string>
+    <string name="notification_delete_dialog_delete">Delete</string>
+    <string name="notification_delete_dialog_cancel">Cancel</string>
+    <string name="card_delete_button_content_description">Delete notification</string>
 
     <!-- Detail settings -->
     <string name="detail_settings_title">Subscription settings</string>
@@ -566,4 +582,10 @@
     <string name="client_certificate_dialog_error_wrong_password">Wrong password or invalid PKCS#12 file</string>
     <string name="client_certificate_dialog_error_invalid_p12_password">Invalid password or corrupted PKCS#12 file</string>
     <string name="client_certificate_dialog_error_invalid_url">Invalid service URL</string>
+
+    <!-- Story 2.6: accessibility announcement for newly arrived notifications (AC 3) -->
+    <plurals name="feed_new_notifications_arrival">
+        <item quantity="one">1 new notification</item>
+        <item quantity="other">%d new notifications</item>
+    </plurals>
 </resources>

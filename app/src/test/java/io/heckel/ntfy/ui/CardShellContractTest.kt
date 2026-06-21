@@ -140,7 +140,9 @@ class CardShellContractTest {
             "detail_item_menu_button",
             "detail_item_icon",
             "detail_item_attachment_image",
-            "detail_item_tags_text",
+            // Story 2.4: tag row replaced with chip group + timestamp
+            "card_tag_chip_group",
+            "card_meta_timestamp",
             "detail_item_attachment_file_box",
             "detail_item_attachment_file_icon",
             "detail_item_attachment_file_info",

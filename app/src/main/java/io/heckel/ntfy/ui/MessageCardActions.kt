@@ -8,7 +8,11 @@ import io.heckel.ntfy.db.Notification
  * Keeps the binder free of Activity/Repository/CoroutineScope references.
  */
 interface MessageCardActions {
-    fun onClick(notification: Notification)
+    /**
+     * Returns true if the click was consumed by selection/action-mode logic so the binder
+     * knows to skip the tap-to-read dispatch (AC 5 of Story 2-5).
+     */
+    fun onClick(notification: Notification): Boolean
     fun onLongClick(notification: Notification)
     fun onDownloadAttachment(notification: Notification)
     fun onCancelDownload(notification: Notification)
