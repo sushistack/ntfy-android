@@ -48,12 +48,9 @@
                 app:title="@string/settings_general_language_title"/>
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/settings_appearance_header">
-        <ListPreference
+        <io.heckel.ntfy.ui.ThemeSegmentedPreference
                 app:key="@string/settings_general_dark_mode_key"
-                app:title="@string/settings_general_dark_mode_title"
-                app:entries="@array/settings_general_dark_mode_entries"
-                app:entryValues="@array/settings_general_dark_mode_values"
-                app:defaultValue="-1"/>
+                app:title="@string/settings_general_dark_mode_title" />
         <SwitchPreferenceCompat
                 app:key="@string/settings_general_dynamic_colors_key"
                 app:title="@string/settings_general_dynamic_colors_title"

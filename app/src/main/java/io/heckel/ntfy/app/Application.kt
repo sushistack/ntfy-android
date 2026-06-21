@@ -3,6 +3,7 @@ package io.heckel.ntfy.app
 import android.app.Application
 import android.net.ConnectivityManager
 import android.net.Network
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.DynamicColors
 import io.heckel.ntfy.db.Repository
 import io.heckel.ntfy.service.SubscriberServiceManager
@@ -25,6 +26,10 @@ class Application : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // Authoritative theme initialization — must run before any Activity is created.
+        // For a fresh install, this persists Dark as the default and marks the preference initialized.
+        repository.initializeDefaultDarkMode()
+        AppCompatDelegate.setDefaultNightMode(repository.getDarkMode())
         if (repository.getDynamicColorsEnabled()) {
             DynamicColors.applyToActivitiesIfAvailable(this)
         }

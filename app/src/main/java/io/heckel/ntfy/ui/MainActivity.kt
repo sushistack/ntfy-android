@@ -25,7 +25,6 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.ActionMode
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -372,9 +371,6 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
 
         // Subscribe to control Firebase channel (so we can re-start the foreground service if it dies)
         messenger.subscribe(ApiService.CONTROL_TOPIC)
-
-        // Darrkkkk mode
-        AppCompatDelegate.setDefaultNightMode(repository.getDarkMode())
 
         // Background things
         schedulePeriodicPollWorker()

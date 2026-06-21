@@ -350,28 +350,13 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
                 }
             }
 
-            // Dark mode
+            // Dark mode — inline segmented control
             val darkModePrefId = context?.getString(R.string.settings_general_dark_mode_key) ?: return
-            val darkMode: ListPreference? = findPreference(darkModePrefId)
-            darkMode?.value = repository.getDarkMode().toString()
-            darkMode?.preferenceDataStore = object : PreferenceDataStore() {
-                override fun putString(key: String?, value: String?) {
-                    val darkModeValue = value?.toIntOrNull() ?: return
-                    repository.setDarkMode(darkModeValue)
-                    AppCompatDelegate.setDefaultNightMode(darkModeValue)
-
-                }
-                override fun getString(key: String?, defValue: String?): String {
-                    return repository.getDarkMode().toString()
-                }
-            }
-            darkMode?.summaryProvider = Preference.SummaryProvider<ListPreference> { pref ->
-                val darkModeValue = pref.value.toIntOrNull() ?: repository.getDarkMode()
-                when (darkModeValue) {
-                    AppCompatDelegate.MODE_NIGHT_NO -> getString(R.string.settings_general_dark_mode_summary_light)
-                    AppCompatDelegate.MODE_NIGHT_YES -> getString(R.string.settings_general_dark_mode_summary_dark)
-                    else -> getString(R.string.settings_general_dark_mode_summary_system)
-                }
+            val darkMode: ThemeSegmentedPreference? = findPreference(darkModePrefId)
+            darkMode?.setMode(repository.getDarkMode())
+            darkMode?.setOnModeChangedListener { mode ->
+                repository.setDarkMode(mode)
+                AppCompatDelegate.setDefaultNightMode(mode)
             }
 
             // Language

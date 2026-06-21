@@ -189,6 +189,10 @@ class Repository(private val sharedPrefs: SharedPreferences, database: Database)
         notificationDao.markAsReadBySequenceId(subscriptionId, sequenceId)
     }
 
+    fun markAsRead(id: String) {
+        notificationDao.markAsRead(id)
+    }
+
     fun markAsDeletedIfOlderThan(subscriptionId: Long, olderThanTimestamp: Long) {
         notificationDao.markAsDeletedIfOlderThan(subscriptionId, olderThanTimestamp)
     }
@@ -329,19 +333,46 @@ class Repository(private val sharedPrefs: SharedPreferences, database: Database)
     }
 
     fun setDarkMode(mode: Int) {
-        if (mode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
-            sharedPrefs.edit {
+        sharedPrefs.edit {
+            if (mode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
                 remove(SHARED_PREFS_DARK_MODE)
-            }
-        } else {
-            sharedPrefs.edit {
+            } else {
                 putInt(SHARED_PREFS_DARK_MODE, mode)
             }
+            // Mark that the user has explicitly set a theme (distinguishes from fresh install)
+            putBoolean(SHARED_PREFS_THEME_INITIALIZED, true)
         }
     }
 
     fun getDarkMode(): Int {
-        return sharedPrefs.getInt(SHARED_PREFS_DARK_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        val initialized = sharedPrefs.getBoolean(SHARED_PREFS_THEME_INITIALIZED, false)
+        return if (!initialized) {
+            // Fresh install: default to Dark
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            sharedPrefs.getInt(SHARED_PREFS_DARK_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        }
+    }
+
+    fun initializeDefaultDarkMode() {
+        val initialized = sharedPrefs.getBoolean(SHARED_PREFS_THEME_INITIALIZED, false)
+        if (!initialized) {
+            sharedPrefs.edit {
+                // Distinguish a genuine fresh install from an existing install upgrading to this
+                // version for the first time (which has no ThemeInitialized key yet).
+                // A pre-existing install will have other pref keys written by earlier versions.
+                // If no other keys exist, it is safe to assume a fresh install and default to Dark.
+                // Existing users who had an explicit Light/Dark choice retain it via the DarkMode key.
+                // Existing users who had System (DarkMode key absent) are preserved as System.
+                val isExistingInstall = sharedPrefs.contains(SHARED_PREFS_POLL_WORKER_VERSION)
+                    || sharedPrefs.contains(SHARED_PREFS_AUTO_DELETE_SECONDS)
+                    || sharedPrefs.contains(SHARED_PREFS_MIN_PRIORITY)
+                if (!isExistingInstall && !sharedPrefs.contains(SHARED_PREFS_DARK_MODE)) {
+                    putInt(SHARED_PREFS_DARK_MODE, AppCompatDelegate.MODE_NIGHT_YES)
+                }
+                putBoolean(SHARED_PREFS_THEME_INITIALIZED, true)
+            }
+        }
     }
 
     fun setDynamicColorsEnabled(enabled: Boolean) {
@@ -648,6 +679,7 @@ class Repository(private val sharedPrefs: SharedPreferences, database: Database)
         const val SHARED_PREFS_AUTO_DELETE_SECONDS = "AutoDelete"
         const val SHARED_PREFS_CONNECTION_PROTOCOL = "ConnectionProtocol"
         const val SHARED_PREFS_DARK_MODE = "DarkMode"
+        const val SHARED_PREFS_THEME_INITIALIZED = "ThemeInitialized"
         const val SHARED_PREFS_DYNAMIC_COLORS = "DynamicColors"
         const val SHARED_PREFS_BROADCAST_ENABLED = "BroadcastEnabled"
         const val SHARED_PREFS_UNIFIEDPUSH_ENABLED = "UnifiedPushEnabled"

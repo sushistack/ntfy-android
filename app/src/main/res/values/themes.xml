@@ -16,7 +16,7 @@
         <item name="colorOnError">@color/md_theme_onError</item>
         <item name="colorErrorContainer">@color/md_theme_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_onErrorContainer</item>
-        <item name="android:colorBackground">@color/md_theme_background</item>
+        <item name="android:colorBackground">@color/bg</item>
         <item name="colorOnBackground">@color/md_theme_onBackground</item>
         <item name="colorSurface">@color/md_theme_surface</item>
         <item name="colorOnSurface">@color/md_theme_onSurface</item>
@@ -125,5 +125,14 @@
     <style name="Animation.App.FullScreenDialog" parent="Animation.AppCompat.Dialog">
         <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
+    </style>
+
+    <!-- Shared focus-indicator overlay style.
+         Apply as style="@style/FocusIndicator" on any focusable View.
+         Uses foreground so it never replaces the component's own background, ripple, or shape.
+         Component-specific shape, focusability, labels, and content descriptions remain the
+         component's responsibility. -->
+    <style name="FocusIndicator">
+        <item name="android:foreground">@drawable/focus_indicator</item>
     </style>
 </resources>
