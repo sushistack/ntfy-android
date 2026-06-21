@@ -16,10 +16,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.heckel.ntfy.R
 import io.heckel.ntfy.app.Application
 import io.heckel.ntfy.db.Notification
+import io.heckel.ntfy.msg.ApiService
 import io.heckel.ntfy.ui.accessibility.ArrivalAnnouncer
 import io.heckel.ntfy.util.Log
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FeedActivity : AppCompatActivity(), DeleteSwipeConfirmFragment.Listener {
 
@@ -27,6 +30,7 @@ class FeedActivity : AppCompatActivity(), DeleteSwipeConfirmFragment.Listener {
         FeedViewModelFactory((application as Application).repository)
     }
     private val repository by lazy { (application as Application).repository }
+    private val api by lazy { ApiService(this) }
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var loadingContainer: View
@@ -61,8 +65,9 @@ class FeedActivity : AppCompatActivity(), DeleteSwipeConfirmFragment.Listener {
         disconnectedRetry = disconnectedContainer.findViewById(R.id.feed_disconnected_retry)
         fab = findViewById(R.id.feed_fab)
         fab.setOnClickListener {
-            PublishBottomSheet.newInstance(subscriptionTopic ?: "")
-                .show(supportFragmentManager, PublishBottomSheet.TAG)
+            val sheet = PublishBottomSheet.newInstance(subscriptionTopic ?: "")
+            sheet.setOutboxListener(buildOutboxListener())
+            sheet.show(supportFragmentManager, PublishBottomSheet.TAG)
         }
 
         applyFeedState(FeedState.Loading)
@@ -82,11 +87,15 @@ class FeedActivity : AppCompatActivity(), DeleteSwipeConfirmFragment.Listener {
             onDeleteRequestCallback = { notification -> viewModel.markAsDeleted(notification.id) },
             onMarkReadCallback = { notification -> markNotificationAsRead(notification) },
             onArrivalConsumedCallback = { id -> viewModel.consumeArrivedId(id) },
+            onRetryRequestCallback = { localId -> retryOptimistic(localId) },
+            onDiscardRequestCallback = { localId -> discardOptimistic(localId) },
         )
         recyclerView.adapter = adapter
 
         val swipeCallback = FeedSwipeCallback(
-            notificationAt = { position -> adapter.currentList.getOrNull(position)?.notification },
+            notificationAt = { position ->
+                (adapter.currentList.getOrNull(position) as? FeedItem.Server)?.notification
+            },
             onSwipeLeft = { notification, position -> showDeleteConfirm(notification.id, position) },
             onSwipeRight = { notification -> markNotificationAsRead(notification) },
         )
@@ -105,6 +114,7 @@ class FeedActivity : AppCompatActivity(), DeleteSwipeConfirmFragment.Listener {
         })
 
         observeFeed()
+        observeOutbox()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -124,18 +134,9 @@ class FeedActivity : AppCompatActivity(), DeleteSwipeConfirmFragment.Listener {
         }
 
         // Observe the merged feed (live page + paginated pages) and submit to adapter.
-        viewModel.feedItems.observe(this) { items ->
-            val arrivedIds = viewModel.newlyArrivedIds.value ?: emptySet()
-            adapter.setNewlyArrivedIds(arrivedIds)
-            adapter.submitList(items) {
-                handleDeepLink(items)
-            }
-            val state = if (items.isEmpty()) {
-                FeedState.Empty(isAllFeed = subscriptionId == ALL_SUBSCRIPTIONS_ID)
-            } else {
-                FeedState.HasContent
-            }
-            applyFeedState(state)
+        // Optimistic items from the outbox are prepended; re-merge on every server-list change.
+        viewModel.feedItems.observe(this) { serverItems: List<FeedItem> ->
+            submitMergedList(serverItems)
         }
 
         // Observe newly-arrived IDs to sync with adapter and fire accessibility announcement.
@@ -209,7 +210,7 @@ class FeedActivity : AppCompatActivity(), DeleteSwipeConfirmFragment.Listener {
         val targetId = deepLinkNotificationId ?: return
         if (deepLinkConsumed) return
 
-        val index = items.indexOfFirst { it.notification.id == targetId }
+        val index = items.indexOfFirst { (it as? FeedItem.Server)?.notification?.id == targetId }
         if (index < 0) return
 
         deepLinkConsumed = true
@@ -227,6 +228,85 @@ class FeedActivity : AppCompatActivity(), DeleteSwipeConfirmFragment.Listener {
     private fun showDeleteConfirm(notificationId: String, position: Int) {
         DeleteSwipeConfirmFragment.newInstance(notificationId, position)
             .show(supportFragmentManager, DeleteSwipeConfirmFragment.TAG)
+    }
+
+    // ── Optimistic outbox ───────────────────────────────────────────────────────
+
+    private fun observeOutbox() {
+        lifecycleScope.launch {
+            viewModel.outbox.collect {
+                submitMergedList(viewModel.feedItems.value ?: emptyList())
+            }
+        }
+    }
+
+    private fun submitMergedList(serverItems: List<FeedItem>) {
+        val optimisticItems = viewModel.outbox.value.map { FeedItem.Optimistic(it) }
+        // Optimistic cards always prepend at position 0 (AC 1, 6).
+        val merged = optimisticItems + serverItems.filterIsInstance<FeedItem.Server>()
+        val arrivedIds = viewModel.newlyArrivedIds.value ?: emptySet()
+        adapter.setNewlyArrivedIds(arrivedIds)
+        adapter.submitList(merged) {
+            handleDeepLink(merged)
+        }
+        val state = if (merged.isEmpty()) {
+            FeedState.Empty(isAllFeed = subscriptionId == ALL_SUBSCRIPTIONS_ID)
+        } else {
+            FeedState.HasContent
+        }
+        applyFeedState(state)
+    }
+
+    private fun buildOutboxListener(): OutboxListener = object : OutboxListener {
+        override fun onOptimisticEmit(msg: OptimisticMessage, job: Job) {
+            viewModel.addOptimistic(msg)
+            viewModel.registerOutboxJob(msg.localId, job)
+        }
+
+        override fun onOptimisticSuccess(localId: String) {
+            viewModel.removeOptimistic(localId)
+        }
+
+        override fun onOptimisticFailure(localId: String, cause: String) {
+            viewModel.updateOptimisticState(localId, SendState.Error(cause))
+        }
+    }
+
+    private fun retryOptimistic(localId: String) {
+        val msg = viewModel.outbox.value.firstOrNull { it.localId == localId } ?: return
+        viewModel.cancelOutboxJob(localId) // cancel any in-flight attempt before retrying
+        viewModel.updateOptimisticState(localId, SendState.Pending)
+        val job = lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val payload = msg.payload
+                val user = repository.getUser(payload.baseUrl)
+                api.publish(
+                    baseUrl  = payload.baseUrl,
+                    topic    = payload.topic,
+                    user     = user,
+                    message  = payload.message,
+                    title    = payload.title,
+                    priority = payload.priority,
+                    tags     = payload.tags,
+                    delay    = "",
+                )
+                withContext(Dispatchers.Main) { viewModel.removeOptimistic(localId) }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e // propagate cancellation; do not transition to Error state
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    viewModel.updateOptimisticState(localId, SendState.Error(e.message ?: getString(R.string.publish_sheet_error_unknown)))
+                }
+            }
+        }
+        viewModel.registerOutboxJob(localId, job)
+    }
+
+    private fun discardOptimistic(localId: String) {
+        NotificationDeleteConfirmation.show(this) {
+            viewModel.cancelOutboxJob(localId)
+            viewModel.removeOptimistic(localId)
+        }
     }
 
     // DeleteSwipeConfirmFragment.Listener

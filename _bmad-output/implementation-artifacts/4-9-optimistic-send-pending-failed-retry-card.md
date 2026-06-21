@@ -1,6 +1,10 @@
 # Story 4.9: Optimistic Send — Pending / Failed / Retry Card
 
-Status: ready-for-dev
+---
+baseline_commit: 414413aaa350157b5f0f045d8221ff67575b22b6
+---
+
+Status: done
 
 ## Story
 
@@ -48,52 +52,52 @@ so that I'm never left wondering whether my message actually went out.
 
 ## Tasks / Subtasks
 
-- [ ] Define `OptimisticMessage` presentation model (AC: 1–6)
-  - [ ] Create an in-memory value class `OptimisticMessage(localId: String, title: String, message: String, priority: Int, tags: List<String>, sendState: SendState)` where `SendState` is a sealed class: `Pending`, `Error(cause: String)`.
-  - [ ] Store the in-flight list in the feed's `ViewModel` (or a dedicated `OutboxViewModel`) as `MutableStateFlow<List<OptimisticMessage>>`; never write to Room.
-  - [ ] Assign a stable `localId` (e.g. `"local_${UUID}"`) so the adapter can identity-diff the list; never collide with server-assigned message IDs.
+- [x] Define `OptimisticMessage` presentation model (AC: 1–6)
+  - [x] Create an in-memory value class `OptimisticMessage(localId: String, title: String, message: String, priority: Int, tags: List<String>, sendState: SendState)` where `SendState` is a sealed class: `Pending`, `Error(cause: String)`.
+  - [x] Store the in-flight list in the feed's `ViewModel` (or a dedicated `OutboxViewModel`) as `MutableStateFlow<List<OptimisticMessage>>`; never write to Room.
+  - [x] Assign a stable `localId` (e.g. `"local_${UUID}"`) so the adapter can identity-diff the list; never collide with server-assigned message IDs.
 
-- [ ] Extend `MessageCardBinder` to accept optimistic state (AC: 1, 3, 6, 7)
-  - [ ] Add a sealed input type or nullable overload that accepts `OptimisticMessage` alongside `Notification`.
-  - [ ] When binding in `Pending` state: show a "Sending…" indeterminate `CircularProgressIndicator` (or `LinearProgressIndicator`) in/below the header, disable the whole-card tap-to-read listener, show the X button (which will call the discard callback).
-  - [ ] When binding in `Error` state: replace the progress indicator with an inline error bar — `@color/priority_max` text "Send failed", `@color/priority_urgent` icon, and a "Retry" `Button` styled as a text/outlined button.
-  - [ ] Header still renders title, message (as body), priority badge, and tags (from `OptimisticMessage` fields) so the user recognizes their message.
-  - [ ] Reset all transient state on every bind (follow the Story 2.6 reset contract).
+- [x] Extend `MessageCardBinder` to accept optimistic state (AC: 1, 3, 6, 7)
+  - [x] Add a sealed input type or nullable overload that accepts `OptimisticMessage` alongside `Notification`.
+  - [x] When binding in `Pending` state: show a "Sending…" indeterminate `CircularProgressIndicator` (or `LinearProgressIndicator`) in/below the header, disable the whole-card tap-to-read listener, show the X button (which will call the discard callback).
+  - [x] When binding in `Error` state: replace the progress indicator with an inline error bar — `@color/priority_max` text "Send failed", `@color/priority_urgent` icon, and a "Retry" `Button` styled as a text/outlined button.
+  - [x] Header still renders title, message (as body), priority badge, and tags (from `OptimisticMessage` fields) so the user recognizes their message.
+  - [x] Reset all transient state on every bind (follow the Story 2.6 reset contract).
 
-- [ ] Wire `PublishFragment` (the existing Story 4.8 bottom sheet) to the outbox (AC: 1–4)
-  - [ ] On Send tap: create an `OptimisticMessage(state=Pending)`, emit it to the feed's `outbox` flow, then proceed with the existing `lifecycleScope.launch(Dispatchers.IO)` HTTP call.
-  - [ ] On success (`api.publish()` returns without throwing): remove the `OptimisticMessage` from the outbox flow (the real server card arrives via the subscriber service as normal).
-  - [ ] On failure: update the `OptimisticMessage` in the outbox flow to `state=Error(cause=errorMessage)`.
-  - [ ] Do **not** change the existing `ApiService.publish()` signature; all state transitions happen in the caller.
+- [x] Wire `PublishFragment` (the existing Story 4.8 bottom sheet) to the outbox (AC: 1–4)
+  - [x] On Send tap: create an `OptimisticMessage(state=Pending)`, emit it to the feed's `outbox` flow, then proceed with the existing `lifecycleScope.launch(Dispatchers.IO)` HTTP call.
+  - [x] On success (`api.publish()` returns without throwing): remove the `OptimisticMessage` from the outbox flow (the real server card arrives via the subscriber service as normal).
+  - [x] On failure: update the `OptimisticMessage` in the outbox flow to `state=Error(cause=errorMessage)`.
+  - [x] Do **not** change the existing `ApiService.publish()` signature; all state transitions happen in the caller.
 
-- [ ] Wire Retry from the card binder callback (AC: 4)
-  - [ ] Add a narrow `onRetryRequested(localId: String)` callback to `MessageCardActions` (or equivalent binder callback interface).
-  - [ ] On retry: update `OptimisticMessage` back to `Pending`, re-issue the same `api.publish()` call with the stored payload.
-  - [ ] Store the original publish payload inside `OptimisticMessage` so retry has everything it needs without re-querying any UI fields (the bottom sheet is already dismissed).
+- [x] Wire Retry from the card binder callback (AC: 4)
+  - [x] Add a narrow `onRetryRequested(localId: String)` callback to `MessageCardActions` (or equivalent binder callback interface).
+  - [x] On retry: update `OptimisticMessage` back to `Pending`, re-issue the same `api.publish()` call with the stored payload.
+  - [x] Store the original publish payload inside `OptimisticMessage` so retry has everything it needs without re-querying any UI fields (the bottom sheet is already dismissed).
 
-- [ ] Wire X-discard (AC: 5)
-  - [ ] Reuse the existing `onDeleteRequested` callback path from Story 2.3b (`NotificationDeleteConfirmation`).
-  - [ ] On confirmed delete: remove the `OptimisticMessage` from the outbox flow; no `repository.markAsDeleted()` call.
-  - [ ] On pending discard: also cancel the in-flight HTTP job (invoke `cancelFn` / coroutine `Job.cancel()`).
+- [x] Wire X-discard (AC: 5)
+  - [x] Reuse the existing `onDeleteRequested` callback path from Story 2.3b (`NotificationDeleteConfirmation`).
+  - [x] On confirmed delete: remove the `OptimisticMessage` from the outbox flow; no `repository.markAsDeleted()` call.
+  - [x] On pending discard: also cancel the in-flight HTTP job (invoke `cancelFn` / coroutine `Job.cancel()`).
 
-- [ ] Feed adapter integration (AC: 1–2, 6)
-  - [ ] In the feed `RecyclerView` adapter (Story 4.1's adapter), combine the outbox flow with the server notifications list such that optimistic cards always appear at position 0.
-  - [ ] Use `DiffUtil` with `localId` as the stable ID so pending→error transitions animate in-place; the card does not jump.
-  - [ ] On success, the optimistic card is removed and the real card is inserted via the normal `DiffUtil` callback; no special "replace" logic is needed.
+- [x] Feed adapter integration (AC: 1–2, 6)
+  - [x] In the feed `RecyclerView` adapter (Story 4.1's adapter), combine the outbox flow with the server notifications list such that optimistic cards always appear at position 0.
+  - [x] Use `DiffUtil` with `localId` as the stable ID so pending→error transitions animate in-place; the card does not jump.
+  - [x] On success, the optimistic card is removed and the real card is inserted via the normal `DiffUtil` callback; no special "replace" logic is needed.
 
-- [ ] Add string resources (AC: 3, 7)
-  - [ ] `optimistic_send_pending` = "Sending…" (already localized via Weblate)
-  - [ ] `optimistic_send_failed` = "Send failed"
-  - [ ] `optimistic_send_retry` = "Retry"
-  - [ ] Add all three to `app/src/main/res/values/strings.xml` as localizable resources.
+- [x] Add string resources (AC: 3, 7)
+  - [x] `optimistic_send_pending` = "Sending…" (already localized via Weblate)
+  - [x] `optimistic_send_failed` = "Send failed"
+  - [x] `optimistic_send_retry` = "Retry"
+  - [x] Add all three to `app/src/main/res/values/strings.xml` as localizable resources.
 
-- [ ] Add focused tests (AC: 1–7)
-  - [ ] Unit test: `OptimisticMessage` state machine — Pending → Error → Pending (retry) → removed (success).
-  - [ ] Unit test: discard cancels the job and removes the item without a Room write.
-  - [ ] Binder test: in Pending state the card-click listener is absent; X-button listener is present.
-  - [ ] Binder test: in Error state the retry button listener fires `onRetryRequested`; card-click listener absent.
-  - [ ] Binder test: recycled holder resets all transient state (progress indicator hidden, no stale listener).
-  - [ ] Adapter test: optimistic card appears at index 0; is removed on outbox clear; DiffUtil does not crash on the mixed list.
+- [x] Add focused tests (AC: 1–7)
+  - [x] Unit test: `OptimisticMessage` state machine — Pending → Error → Pending (retry) → removed (success).
+  - [x] Unit test: discard cancels the job and removes the item without a Room write.
+  - [x] Binder test: in Pending state the card-click listener is absent; X-button listener is present.
+  - [x] Binder test: in Error state the retry button listener fires `onRetryRequested`; card-click listener absent.
+  - [x] Binder test: recycled holder resets all transient state (progress indicator hidden, no stale listener).
+  - [x] Adapter test: optimistic card appears at index 0; is removed on outbox clear; DiffUtil does not crash on the mixed list.
 
 ## Dev Notes
 
@@ -275,13 +279,48 @@ claude-sonnet-4-6
 
 - Python 3.11 resolver unavailable; customization resolved manually from base TOML (no team/user overrides present).
 - `PublishFragment.kt`, `ApiService.kt`, `Database.kt`, `Repository.kt`, and Epic 2/4 story artifacts read in full.
+- `FeedItem` changed from `data class` to `sealed class` — fixed all call sites in FeedViewModel, FeedAdapter, FeedActivity, and test files.
+- IDE showed hundreds of "Unresolved reference" errors throughout — all confirmed as IDE cache artifacts; Gradle `compileFdroidDebugKotlin` returned `BUILD SUCCESSFUL` with zero errors.
+- `buildBindState` required null guard for `String?` type; added early return `CardBindState()` for null notificationId.
+- Double `submitList` race (observeFeed + observeOutbox both calling submitList independently) — refactored to single `submitMergedList()` called by both observers.
+- Full test suite: 875 tests, 0 failures (`testFdroidDebugUnitTest BUILD SUCCESSFUL`).
 
 ### Completion Notes List
 
-- Ultimate context engine analysis completed — comprehensive developer guide created.
-- Optimistic-send state machine, outbox flow design, token compliance, binder extension contract, and recycling reset rules are all explicit.
-- Dependencies on Stories 2.1, 2.3b, 4.1, 4.8 are named with the exact consumed artifact.
+- All 7 ACs satisfied. Optimistic send is purely in-memory (no Room writes); outbox survives config changes via ViewModel but not process death (acceptable per spec).
+- `FeedItem` sealed class (`Server` / `Optimistic`) is the key architectural change enabling mixed RecyclerView lists with proper DiffUtil identity.
+- `PublishPayload` stored inside `OptimisticMessage` ensures retry has full payload after bottom sheet is dismissed.
+- `OutboxListener` interface bridges `PublishBottomSheet` → `FeedActivity` → `FeedViewModel` without Fragment-to-ViewModel coupling.
+- `outboxJobs` map in FeedViewModel keyed by `localId` allows in-flight coroutine cancellation on discard.
+- `submitMergedList()` in FeedActivity is the single merge point: `optimisticItems + serverItems.filterIsInstance<FeedItem.Server>()`.
 
 ### File List
 
+**New files:**
+- `app/src/main/java/io/heckel/ntfy/ui/OptimisticMessage.kt`
+- `app/src/test/java/io/heckel/ntfy/ui/OptimisticMessageStateMachineTest.kt`
+
+**Modified files:**
+- `app/src/main/java/io/heckel/ntfy/ui/FeedViewModel.kt`
+- `app/src/main/java/io/heckel/ntfy/ui/FeedAdapter.kt`
+- `app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt`
+- `app/src/main/java/io/heckel/ntfy/ui/MessageCardBinder.kt`
+- `app/src/main/java/io/heckel/ntfy/ui/MessageCardActions.kt`
+- `app/src/main/java/io/heckel/ntfy/ui/PublishBottomSheet.kt`
+- `app/src/main/res/layout/fragment_detail_item.xml`
+- `app/src/main/res/values/strings.xml`
+- `app/src/test/java/io/heckel/ntfy/ui/FeedAdapterTopicNameTest.kt`
+- `app/src/test/java/io/heckel/ntfy/ui/FeedArchitectureTest.kt`
+- `app/src/test/java/io/heckel/ntfy/ui/FeedSwipeCallbackTest.kt`
+- `app/src/test/java/io/heckel/ntfy/ui/TopicChipVisibilityContractTest.kt`
 - `_bmad-output/implementation-artifacts/4-9-optimistic-send-pending-failed-retry-card.md`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
+
+### Review Findings
+
+- [x] [Review][Patch] `retryOptimistic` 이전 job 미취소로 중복 publish 가능 [FeedActivity.kt:retryOptimistic] — fixed: `cancelOutboxJob` 선행 호출 추가
+- [x] [Review][Patch] `_outbox.value` read-modify-write 비원자적 [FeedViewModel.kt] — fixed: `_outbox.update { }` 패턴으로 변경
+- [x] [Review][Patch] `CancellationException` catch(Exception)으로 삼킴 [FeedActivity.kt:retryOptimistic] — fixed: CancellationException 먼저 rethrow
+- [x] [Review][Patch] `registerOutboxJob` 이전 job 미취소 덮어쓰기 [FeedViewModel.kt] — fixed: 기존 job cancel 후 등록
+- [x] [Review][Defer] `discardOptimistic`에서 "Delete this notification?" 문구 오용 — outbox 전용 확인 문구 추가는 UX polish 때 처리
+- [x] [Review][Defer] `lifecycleScope.launch { collect }` 패턴 (lifecycle-runtime-ktx 미포함으로 repeatOnLifecycle 불가) — dependency 추가 후 개선 권장

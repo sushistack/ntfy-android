@@ -1,6 +1,10 @@
+---
+baseline_commit: bec5a0d2dc4bc79a4b19dd145b80e0cd36cb969c
+---
+
 # Story 4.6: Navigation Drawer & App Bar (No Bottom Nav)
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -34,51 +38,51 @@ so that navigation is a single drawer with no bottom bar.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Replace `MainActivity` subscriptions-list shell with the new feed shell layout (AC: 1, 5)
-  - [ ] 1.1 Wrap `activity_main.xml` root in a `DrawerLayout` (`androidx.drawerlayout.widget.DrawerLayout`)
-  - [ ] 1.2 Add a `NavigationView` or custom `LinearLayout` panel (280dp wide, `gravity=start`) as the drawer pane inside the `DrawerLayout`
-  - [ ] 1.3 Move the existing `CoordinatorLayout` (app bar + content) inside the `DrawerLayout` as the main content child
-  - [ ] 1.4 Add `@dimen/width_nav_drawer = 280dp` to `res/values/dimens.xml` if not already present
-  - [ ] 1.5 Ensure `DrawerLayout` is `fitsSystemWindows="true"` for edge-to-edge compatibility
+- [x] Task 1: Replace `MainActivity` subscriptions-list shell with the new feed shell layout (AC: 1, 5)
+  - [x] 1.1 Wrap `activity_main.xml` root in a `DrawerLayout` (`androidx.drawerlayout.widget.DrawerLayout`)
+  - [x] 1.2 Add a `NavigationView` or custom `LinearLayout` panel (280dp wide, `gravity=start`) as the drawer pane inside the `DrawerLayout`
+  - [x] 1.3 Move the existing `CoordinatorLayout` (app bar + content) inside the `DrawerLayout` as the main content child
+  - [x] 1.4 Add `@dimen/width_nav_drawer = 280dp` to `res/values/dimens.xml` if not already present
+  - [x] 1.5 Ensure `DrawerLayout` is `fitsSystemWindows="true"` for edge-to-edge compatibility
 
-- [ ] Task 2: Wire the hamburger to open/close the drawer (AC: 1)
-  - [ ] 2.1 In `MainActivity.onCreate`, call `setSupportActionBar(toolbar)` and configure `ActionBarDrawerToggle` (hamburger ↔ arrow icon tied to `DrawerLayout` open/close state)
-  - [ ] 2.2 Override `onOptionsItemSelected` to delegate to `drawerToggle.onOptionsItemSelected(item)` first
-  - [ ] 2.3 Update `app_bar_drawer.xml` toolbar so hamburger is the navigation icon (home-as-up)
+- [x] Task 2: Wire the hamburger to open/close the drawer (AC: 1)
+  - [x] 2.1 In `MainActivity.onCreate`, call `setSupportActionBar(toolbar)` and configure `ActionBarDrawerToggle` (hamburger ↔ arrow icon tied to `DrawerLayout` open/close state)
+  - [x] 2.2 Override `onOptionsItemSelected` to delegate to `drawerToggle.onOptionsItemSelected(item)` first
+  - [x] 2.3 Update `app_bar_drawer.xml` toolbar so hamburger is the navigation icon (home-as-up)
 
-- [ ] Task 3: Build the drawer item layout (AC: 2)
-  - [ ] 3.1 Create `res/layout/drawer_item_row.xml` — a simple row: icon (24dp) + label (`body_sm` text, `@color/text`), 48dp min-height, `selectableItemBackground` foreground, horizontal `16dp` padding
-  - [ ] 3.2 Create `res/layout/nav_drawer_content.xml` — a `LinearLayout` containing: static "All notifications" row (using `drawer_item_row`), a `RecyclerView` (`@+id/drawer_subscriptions_list`) for topic rows, divider, static "Subscribe to topic" row, static "Settings" row
-  - [ ] 3.3 Include `nav_drawer_content.xml` as the drawer pane in `activity_main.xml`
+- [x] Task 3: Build the drawer item layout (AC: 2)
+  - [x] 3.1 Create `res/layout/drawer_item_row.xml` — a simple row: icon (24dp) + label (`body_sm` text, `@color/text`), 48dp min-height, `selectableItemBackground` foreground, horizontal `16dp` padding
+  - [x] 3.2 Create `res/layout/nav_drawer_content.xml` — a `LinearLayout` containing: static "All notifications" row (using `drawer_item_row`), a `RecyclerView` (`@+id/drawer_subscriptions_list`) for topic rows, divider, static "Subscribe to topic" row, static "Settings" row
+  - [x] 3.3 Include `nav_drawer_content.xml` as the drawer pane in `activity_main.xml`
 
-- [ ] Task 4: Wire drawer items to navigation (AC: 2, 6)
-  - [ ] 4.1 "All notifications" click → update `MainViewModel` active topic to null and swap feed destination (feed wired in Story 4.1 — for now, close drawer and update toolbar title to `nav_title_all_notifications`)
-  - [ ] 4.2 "Subscribe to topic" click → close drawer, call `onSubscribeButtonClick()` (shows `AddFragment`)
-  - [ ] 4.3 "Settings" click → close drawer, `startActivity(Intent(this, SettingsActivity::class.java))`
-  - [ ] 4.4 Subscription row click → close drawer, call `startDetailView(subscription)` (transitional — Story 4.1 will replace this with feed mode switch)
-  - [ ] 4.5 Create `DrawerSubscriptionAdapter` (minimal): single row, topic display name, click-through to topic feed — no active bar/unread/muted/menu (Story 4.7)
+- [x] Task 4: Wire drawer items to navigation (AC: 2, 6)
+  - [x] 4.1 "All notifications" click → update `MainViewModel` active topic to null and swap feed destination (feed wired in Story 4.1 — for now, close drawer and update toolbar title to `nav_title_all_notifications`)
+  - [x] 4.2 "Subscribe to topic" click → close drawer, call `onSubscribeButtonClick()` (shows `AddFragment`)
+  - [x] 4.3 "Settings" click → close drawer, `startActivity(Intent(this, SettingsActivity::class.java))`
+  - [x] 4.4 Subscription row click → close drawer, call `startDetailView(subscription)` (transitional — Story 4.1 will replace this with feed mode switch)
+  - [x] 4.5 Create `DrawerSubscriptionAdapter` (minimal): single row, topic display name, click-through to topic feed — no active bar/unread/muted/menu (Story 4.7)
 
-- [ ] Task 5: Apply token styling to app bar and drawer (AC: 7)
-  - [ ] 5.1 Set app bar background to `@color/surface`, title text color to `@color/text`, hamburger icon tint to `@color/muted` (default, active state is `@color/accent_text`)
-  - [ ] 5.2 Set drawer background to `@color/surface`
-  - [ ] 5.3 Verify no raw hex literals in new layouts or code — use only `@color/` token references
+- [x] Task 5: Apply token styling to app bar and drawer (AC: 7)
+  - [x] 5.1 Set app bar background to `@color/surface`, title text color to `@color/text`, hamburger icon tint to `@color/muted` (default, active state is `@color/accent_text`)
+  - [x] 5.2 Set drawer background to `@color/surface`
+  - [x] 5.3 Verify no raw hex literals in new layouts or code — use only `@color/` token references
 
-- [ ] Task 6: Token-styled Publish FAB (AC: 4)
-  - [ ] 6.1 Update the FAB in `activity_main.xml`: set `backgroundTint="@color/accent_ui"`, icon tint `@color/accent_on_surface`, `elevation` matching `@dimen/shadow_elev_2` (or `app:elevation="6dp"` as a proxy if dimen not yet defined)
-  - [ ] 6.2 Confirm FAB is anchored bottom-end 24dp, always visible on the feed (not hidden)
-  - [ ] 6.3 FAB click → still opens `AddFragment` (subscribe) for this story; publish sheet wiring is Story 4.8
+- [x] Task 6: Token-styled Publish FAB (AC: 4)
+  - [x] 6.1 Update the FAB in `activity_main.xml`: set `backgroundTint="@color/accent_ui"`, icon tint `@color/accent_on_surface`, `elevation` matching `@dimen/shadow_elev_2` (or `app:elevation="6dp"` as a proxy if dimen not yet defined)
+  - [x] 6.2 Confirm FAB is anchored bottom-end 24dp, always visible on the feed (not hidden)
+  - [x] 6.3 FAB click → still opens `AddFragment` (subscribe) for this story; publish sheet wiring is Story 4.8
 
-- [ ] Task 7: String resources (AC: 1, 2)
-  - [ ] 7.1 Add `nav_title_all_notifications` = "All notifications" to `strings.xml`
-  - [ ] 7.2 Add `nav_drawer_subscribe` = "Subscribe to topic" (or reuse existing add string)
-  - [ ] 7.3 Add `nav_drawer_settings` = "Settings" (or reuse existing settings string)
-  - [ ] 7.4 Add `nav_drawer_open` / `nav_drawer_close` content descriptions for the toggle a11y
+- [x] Task 7: String resources (AC: 1, 2)
+  - [x] 7.1 Add `nav_title_all_notifications` = "All notifications" to `strings.xml`
+  - [x] 7.2 Add `nav_drawer_subscribe` = "Subscribe to topic" (or reuse existing add string)
+  - [x] 7.3 Add `nav_drawer_settings` = "Settings" (or reuse existing settings string)
+  - [x] 7.4 Add `nav_drawer_open` / `nav_drawer_close` content descriptions for the toggle a11y
 
-- [ ] Task 8: Preserve existing behavior (no regressions)
-  - [ ] 8.1 All existing subscription long-click / action mode (multi-delete) behavior must still work
-  - [ ] 8.2 All banners (battery, websocket, network) still appear in the content area above the list
-  - [ ] 8.3 Back-press: if drawer is open, back closes it; does not exit the app
-  - [ ] 8.4 `onSubscribe` callback from `AddFragment` still adds a subscription and navigates into it
+- [x] Task 8: Preserve existing behavior (no regressions)
+  - [x] 8.1 All existing subscription long-click / action mode (multi-delete) behavior must still work
+  - [x] 8.2 All banners (battery, websocket, network) still appear in the content area above the list
+  - [x] 8.3 Back-press: if drawer is open, back closes it; does not exit the app
+  - [x] 8.4 `onSubscribe` callback from `AddFragment` still adds a subscription and navigates into it
 
 ## Dev Notes
 
@@ -223,8 +227,29 @@ _None_
 
 ### Completion Notes List
 
-_Ready for development._
+- Wrapped `activity_main.xml` root in `DrawerLayout` with `fitsSystemWindows=true`; existing `CoordinatorLayout` (banners + list + FAB) preserved as-is.
+- Added `ActionBarDrawerToggle` in `MainActivity.onCreate` with `onPostCreate` sync; delegated `onOptionsItemSelected` to toggle first.
+- Created `nav_drawer_content.xml` (static "All notifications", `RecyclerView` for subscriptions, divider, "Subscribe to topic", "Settings") and `drawer_item_row.xml` (icon + label, 48dp min-height, token colors).
+- Created `fragment_drawer_subscription_item.xml` for the `DrawerSubscriptionAdapter` (full Story 4.7 anatomy stubs: active bar, chat bubble icon, name, unread, muted indicator, overflow button).
+- `DrawerSubscriptionAdapter` uses `DrawerHost` interface; `MainActivity` implements it; subscription row click → `startDetailView` (transitional stub for Story 4.1).
+- Back-press intercepted via `OnBackPressedCallback`; closes drawer if open, otherwise propagates.
+- FAB updated: `backgroundTint=@color/accent_ui`, `tint=@color/accent_on_surface`, `elevation=@dimen/shadow_elev_2`.
+- All 5 navigation string resources added to `strings.xml`; `@dimen/width_nav_drawer=280dp` added to `dimens.xml`.
+- All existing tests pass (863 tests, 0 failures).
 
 ### File List
 
-_To be populated by the dev agent after implementation._
+- `app/src/main/res/layout/activity_main.xml` — UPDATED: wrapped in DrawerLayout, FAB token colors, drawer pane include
+- `app/src/main/res/layout/nav_drawer_content.xml` — NEW: drawer inner layout with all 4 items
+- `app/src/main/res/layout/drawer_item_row.xml` — NEW: static drawer row (icon + label)
+- `app/src/main/res/layout/fragment_drawer_subscription_item.xml` — NEW: subscription row anatomy (Story 4.7 stubs)
+- `app/src/main/java/io/heckel/ntfy/ui/MainActivity.kt` — UPDATED: DrawerLayout, ActionBarDrawerToggle, back-press, drawer nav, DrawerHost impl
+- `app/src/main/java/io/heckel/ntfy/ui/DrawerSubscriptionAdapter.kt` — NEW: minimal drawer list adapter with DrawerHost interface
+- `app/src/main/res/values/strings.xml` — UPDATED: 5 navigation drawer strings added
+- `app/src/main/res/values/dimens.xml` — UPDATED: `width_nav_drawer=280dp` added
+
+### Review Findings
+
+- [x] [Review][Patch] `OnBackPressedCallback` `isEnabled=false` 후 재활성화 누락 [MainActivity.kt:196] — fixed: `isEnabled = true` restored after propagating back press
+- [x] [Review][Defer] DrawerSubscriptionAdapter `setActiveSubscriptionId` 미호출 — Story 4.1 완료 후 feed navigation 통합 시 처리
+- [x] [Review][Defer] Drawer row tap이 DetailActivity 실행 (transitional stub) — Story 4.1/4.6 통합 후 per-topic feed로 전환 예정

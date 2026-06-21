@@ -1,6 +1,10 @@
+---
+baseline_commit: bec5a0d2dc4bc79a4b19dd145b80e0cd36cb969c
+---
+
 # Story 4.8: Publish FAB Bottom Sheet
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -24,53 +28,53 @@ So that I can send a message with the right fields, like web.
 
 ## Tasks / Subtasks
 
-- [ ] Create `fragment_publish_bottom_sheet.xml` layout (AC: 1, 4)
-  - [ ] BottomSheetDialogFragment layout with drag handle and title "Publish a message"
-  - [ ] Topic TextInputLayout + TextInputEditText (single-line)
-  - [ ] Title TextInputLayout + TextInputEditText (single-line, optional)
-  - [ ] Message TextInputLayout + TextInputEditText (4-row multiline)
-  - [ ] Priority chip row: 4 equal-width `Chip` views (Low/Normal/High/Urgent) in a `LinearLayout` or `ChipGroup` with equal weights
-  - [ ] Tags TextInputLayout + TextInputEditText (single-line, comma-separated, optional)
-  - [ ] Footer row: Close (ghost) + Send (filled) buttons
-  - [ ] Apply token styling: `@color/surface_2` bg, `@color/control_border` stroke, `@dimen/radius_sm`, `@color/focus_ring`
+- [x] Create `fragment_publish_bottom_sheet.xml` layout (AC: 1, 4)
+  - [x] BottomSheetDialogFragment layout with drag handle and title "Publish a message"
+  - [x] Topic TextInputLayout + TextInputEditText (single-line)
+  - [x] Title TextInputLayout + TextInputEditText (single-line, optional)
+  - [x] Message TextInputLayout + TextInputEditText (4-row multiline)
+  - [x] Priority chip row: 4 equal-width `Chip` views (Low/Normal/High/Urgent) in a `LinearLayout` or `ChipGroup` with equal weights
+  - [x] Tags TextInputLayout + TextInputEditText (single-line, comma-separated, optional)
+  - [x] Footer row: Close (ghost) + Send (filled) buttons
+  - [x] Apply token styling: `@color/surface_2` bg, `@color/control_border` stroke, `@dimen/radius_sm`, `@color/focus_ring`
 
-- [ ] Create `PublishBottomSheet.kt` (AC: 1, 2, 3, 5, 6)
-  - [ ] Extend `BottomSheetDialogFragment`
-  - [ ] Bind all views from `fragment_publish_bottom_sheet.xml`
-  - [ ] Implement 4-chip priority selection: only one selected at a time, default Normal (value=3)
-  - [ ] Apply per-priority tint on selection (Low→`muted`, Normal→`text`, High→`priority_high`, Urgent→`priority_max`)
-  - [ ] Validate: Send enabled only when both topic and message are non-empty
-  - [ ] On Send: call `ApiService.publish()` with topic, title, message, priority, tags on IO dispatcher
-  - [ ] On success: dismiss sheet; on failure: show inline error text
-  - [ ] Close button dismisses without sending
+- [x] Create `PublishBottomSheet.kt` (AC: 1, 2, 3, 5, 6)
+  - [x] Extend `BottomSheetDialogFragment`
+  - [x] Bind all views from `fragment_publish_bottom_sheet.xml`
+  - [x] Implement 4-chip priority selection: only one selected at a time, default Normal (value=3)
+  - [x] Apply per-priority tint on selection (Low→`muted`, Normal→`text`, High→`priority_high`, Urgent→`priority_max`)
+  - [x] Validate: Send enabled only when both topic and message are non-empty
+  - [x] On Send: call `ApiService.publish()` with topic, title, message, priority, tags on IO dispatcher
+  - [x] On success: dismiss sheet; on failure: show inline error text
+  - [x] Close button dismisses without sending
 
-- [ ] Implement `newInstance()` factory on `PublishBottomSheet` (AC: 7)
-  - [ ] Accept optional pre-fill args (e.g., `initialTopic: String = ""`) via Bundle
-  - [ ] `companion object { fun newInstance(...): PublishBottomSheet }`
+- [x] Implement `newInstance()` factory on `PublishBottomSheet` (AC: 7)
+  - [x] Accept optional pre-fill args (e.g., `initialTopic: String = ""`) via Bundle
+  - [x] `companion object { fun newInstance(...): PublishBottomSheet }`
 
-- [ ] Wire FAB click to open `PublishBottomSheet` (AC: 7)
-  - [ ] Identify the FAB defined in Story 4.6 (feed shell activity/fragment)
-  - [ ] In the feed host (Activity or Fragment from Story 4.6), `fab.setOnClickListener { PublishBottomSheet.newInstance(...).show(supportFragmentManager, TAG) }`
+- [x] Wire FAB click to open `PublishBottomSheet` (AC: 7)
+  - [x] Identify the FAB defined in Story 4.6 (feed shell activity/fragment)
+  - [x] In the feed host (Activity or Fragment from Story 4.6), `fab.setOnClickListener { PublishBottomSheet.newInstance(...).show(supportFragmentManager, TAG) }`
 
-- [ ] Add required string resources (AC: 1, 3)
-  - [ ] `publish_sheet_title` = "Publish a message"
-  - [ ] `publish_sheet_hint_topic` = "Topic"
-  - [ ] `publish_sheet_hint_title` = "Title (optional)"
-  - [ ] `publish_sheet_hint_message` = "Message"
-  - [ ] `publish_sheet_hint_tags` = "Tags (comma-separated, optional)"
-  - [ ] `publish_sheet_btn_close` = "Close"
-  - [ ] `publish_sheet_btn_send` = "Send"
-  - [ ] `publish_sheet_chip_low` = "Low"
-  - [ ] `publish_sheet_chip_normal` = "Normal"
-  - [ ] `publish_sheet_chip_high` = "High"
-  - [ ] `publish_sheet_chip_urgent` = "Urgent"
-  - [ ] `publish_sheet_error_send` = "Failed to send: %s"
+- [x] Add required string resources (AC: 1, 3)
+  - [x] `publish_sheet_title` = "Publish a message"
+  - [x] `publish_sheet_hint_topic` = "Topic"
+  - [x] `publish_sheet_hint_title` = "Title (optional)"
+  - [x] `publish_sheet_hint_message` = "Message"
+  - [x] `publish_sheet_hint_tags` = "Tags (comma-separated, optional)"
+  - [x] `publish_sheet_btn_close` = "Close"
+  - [x] `publish_sheet_btn_send` = "Send"
+  - [x] `publish_sheet_chip_low` = "Low"
+  - [x] `publish_sheet_chip_normal` = "Normal"
+  - [x] `publish_sheet_chip_high` = "High"
+  - [x] `publish_sheet_chip_urgent` = "Urgent"
+  - [x] `publish_sheet_error_send` = "Failed to send: %s"
 
-- [ ] Write unit/integration tests (AC: 2, 5, 6)
-  - [ ] Test: default priority chip is Normal (value=3) on open
-  - [ ] Test: selecting each chip updates `selectedPriority` and applies correct tint
-  - [ ] Test: Send button disabled when topic or message is empty
-  - [ ] Test: Send button enabled when both topic and message are non-empty
+- [x] Write unit/integration tests (AC: 2, 5, 6)
+  - [x] Test: default priority chip is Normal (value=3) on open
+  - [x] Test: selecting each chip updates `selectedPriority` and applies correct tint
+  - [x] Test: Send button disabled when topic or message is empty
+  - [x] Test: Send button enabled when both topic and message are non-empty
 
 ## Dev Notes
 
@@ -362,6 +366,35 @@ claude-sonnet-4-6
 
 ### Debug Log References
 
+- `DrawerSubscriptionAdapterTest` failure pre-exists on baseline commit (4-7 story regression, unrelated to 4-8)
+- `MainActivity.kt` KSP compile error pre-exists on baseline (DrawerSubscriptionAdapter ctor mismatch from 4-7)
+- FAB was not yet defined in `activity_feed.xml` by Story 4.6 (still ready-for-dev), so FAB was added here as part of wiring task
+
 ### Completion Notes List
 
+- Created `PublishBottomSheet` as a `BottomSheetDialogFragment` with 5 fields: Topic, Title, Message (4-row), Priority chips, Tags
+- ChipGroup uses `singleSelection=true` + `selectionRequired=true`; default is Normal (priority=3)
+- Per-priority tint applied programmatically in `applyAllChipTints()` using `ContextCompat.getColor` + `ColorStateList`
+- Send button disabled by default; `TextWatcher` on topic + message enables it only when both are non-empty
+- On Send: calls `ApiService.publish()` on IO dispatcher; success → dismiss, failure → inline error TextView
+- FAB (`feed_fab`) added to `activity_feed.xml` with `accent_ui` / `accent_on_surface` token colors
+- FAB click in `FeedActivity.onCreate` calls `PublishBottomSheet.newInstance(subscriptionTopic ?: "").show(...)`
+- 12 string resources added under `publish_sheet_*` namespace; existing `publish_dialog_*` keys untouched
+- 30 unit tests covering: priority defaults, chip constants, layout structure, token compliance, send validation, API call pattern, non-regression
+
 ### File List
+
+- `app/src/main/java/io/heckel/ntfy/ui/PublishBottomSheet.kt` — new BottomSheetDialogFragment
+- `app/src/main/res/layout/fragment_publish_bottom_sheet.xml` — bottom sheet layout
+- `app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt` — added FAB field + click → show PublishBottomSheet
+- `app/src/main/res/layout/activity_feed.xml` — added `feed_fab` FloatingActionButton
+- `app/src/main/res/values/strings.xml` — added 12 `publish_sheet_*` string keys
+- `app/src/test/java/io/heckel/ntfy/ui/PublishBottomSheetTest.kt` — 30 unit tests
+
+### Review Findings
+
+- [x] [Review][Defer] Priority chip 배경 색상 raw hex arithmetic 사용 (10% opacity 계산) — token 시스템 정비 시 @color/muted_10 등 token 추출 권장
+
+### Change Log
+
+- 2026-06-21: Story 4.8 implemented — Publish FAB bottom sheet with priority chips, token-styled fields, send validation, ApiService integration, and FAB wiring in FeedActivity
