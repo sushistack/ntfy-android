@@ -224,27 +224,58 @@
                 android:maxHeight="150dp"
                 android:scaleType="centerCrop"
                 android:visibility="visible"
-                app:layout_constraintBottom_toTopOf="@id/detail_item_tags_text"
+                app:layout_constraintBottom_toTopOf="@id/card_meta_row"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/detail_item_message_text"
                 app:shapeAppearanceOverlay="@style/roundedCornersImageView"
                 app:srcCompat="@drawable/ic_cancel_gray_24dp" />
 
-            <TextView
-                android:id="@+id/detail_item_tags_text"
+            <!--
+              Story 2.4 meta row: wrapping ChipGroup (tag host) constrained
+              start-to-start and end-to-start of timestamp; timestamp anchored
+              end-to-end. Timestamp stays visible even when tag host is GONE.
+            -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/card_meta_row"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="6dp"
                 android:layout_marginTop="2dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 app:layout_constraintBottom_toTopOf="@id/detail_item_attachment_file_box"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/detail_item_attachment_image"
-                tools:text="Tags: ssh, zfs" />
+                app:layout_constraintTop_toBottomOf="@id/detail_item_attachment_image">
+
+                <!-- Tag chip host: wraps left of timestamp -->
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/card_tag_chip_group"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:chipSpacingHorizontal="@dimen/spacing_1"
+                    app:chipSpacingVertical="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/card_meta_timestamp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0" />
+
+                <!-- Absolute timestamp: always end-anchored, caption/muted -->
+                <TextView
+                    android:id="@+id/card_meta_timestamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_caption"
+                    android:lineHeight="@dimen/leading_caption"
+                    android:textColor="@color/muted"
+                    android:paddingStart="@dimen/spacing_1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="2024-06-21 14:32:00" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/detail_item_attachment_file_box"
@@ -261,7 +292,7 @@
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/detail_item_tags_text">
+                app:layout_constraintTop_toBottomOf="@id/card_meta_row">
 
                 <ImageView
                     android:id="@+id/detail_item_attachment_file_icon"
