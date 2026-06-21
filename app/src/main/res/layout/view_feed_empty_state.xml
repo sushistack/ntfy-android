@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Empty state panel shown when the feed has finished loading and has zero messages.
+  Copy driven by FeedState.Empty(isAllFeed): host shows/hides feed_empty_body accordingly.
+  Visibility controlled exclusively by FeedActivity.applyFeedState().
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/feed_empty_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="@dimen/spacing_6"
+    android:background="@color/surface"
+    android:visibility="gone">
+
+    <ImageView
+        android:id="@+id/feed_empty_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_4"
+        android:src="@drawable/ic_sms_gray_48dp"
+        android:importantForAccessibility="no"
+        android:contentDescription="" />
+
+    <TextView
+        android:id="@+id/feed_empty_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:text="@string/empty_feed_all_title" />
+
+    <TextView
+        android:id="@+id/feed_empty_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_2"
+        android:textColor="@color/muted"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:text="@string/empty_feed_all_body"
+        android:visibility="gone" />
+
+</LinearLayout>

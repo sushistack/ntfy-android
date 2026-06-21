@@ -76,6 +76,13 @@
 
     <!-- Main activity: Action bar -->
     <string name="main_action_bar_title">Subscribed topics</string>
+
+    <!-- Main activity: Navigation drawer -->
+    <string name="nav_title_all_notifications">All notifications</string>
+    <string name="nav_drawer_subscribe">Subscribe to topic</string>
+    <string name="nav_drawer_settings">Settings</string>
+    <string name="nav_drawer_open">Open navigation drawer</string>
+    <string name="nav_drawer_close">Close navigation drawer</string>
     <string name="main_menu_connection_error">Connection error</string>
     <string name="main_menu_notifications_enabled">Notifications on</string>
     <string name="main_menu_notifications_disabled_forever">Notifications muted</string>
@@ -285,6 +292,22 @@
     <string name="publish_dialog_phone_call_hint">Phone call</string>
     <string name="publish_dialog_phone_call_placeholder">e.g. +1234567890</string>
     <string name="publish_dialog_docs_text">For examples and a detailed description of all publish features, please refer to the <a href="https://docs.ntfy.sh/publish/">documentation</a>.</string>
+
+    <!-- Publish bottom sheet (Story 4.8) -->
+    <string name="publish_sheet_title">Publish a message</string>
+    <string name="publish_sheet_hint_topic">Topic</string>
+    <string name="publish_sheet_hint_title">Title (optional)</string>
+    <string name="publish_sheet_hint_message">Message</string>
+    <string name="publish_sheet_hint_tags">Tags (comma-separated, optional)</string>
+    <string name="publish_sheet_label_priority">Priority</string>
+    <string name="publish_sheet_btn_close">Close</string>
+    <string name="publish_sheet_btn_send">Send</string>
+    <string name="publish_sheet_chip_low">Low</string>
+    <string name="publish_sheet_chip_normal">Normal</string>
+    <string name="publish_sheet_chip_high">High</string>
+    <string name="publish_sheet_chip_urgent">Urgent</string>
+    <string name="publish_sheet_error_send">Failed to send: %s</string>
+    <string name="publish_sheet_error_unknown">Unknown error</string>
 
     <!-- Message bar -->
     <string name="message_bar_hint">Type a message here</string>
@@ -591,4 +614,26 @@
         <item quantity="one">1 new notification</item>
         <item quantity="other">%d new notifications</item>
     </plurals>
+
+    <!-- Epic 4 feed state panels (Story 4.3) -->
+    <string name="empty_feed_all_title">아직 받은 알림이 없어요</string>
+    <string name="empty_feed_all_body">주제를 구독하면 첫 알림이 여기에 나타나요</string>
+    <string name="empty_feed_topic">이 주제에는 아직 알림이 없어요</string>
+    <string name="feed_state_disconnected">연결이 끊겼어요. 다시 연결하는 중…</string>
+    <string name="feed_state_retry">다시 시도</string>
+
+    <!-- Story 4.7: Drawer subscription row context menu + dialogs (AC: 5, 7–9) -->
+    <string name="drawer_sub_menu_mute">Mute</string>
+    <string name="drawer_sub_menu_unmute">Unmute</string>
+    <string name="drawer_sub_menu_rename">Rename</string>
+    <string name="drawer_sub_menu_clear">Clear</string>
+    <string name="drawer_sub_menu_unsubscribe">Unsubscribe</string>
+    <string name="drawer_sub_rename_hint">Display name (leave blank for default)</string>
+    <string name="drawer_sub_clear_dialog_message">Delete all notifications for this subscription?</string>
+    <string name="drawer_sub_clear_dialog_confirm">Delete</string>
+    <string name="drawer_sub_unsubscribe_dialog_message">Unsubscribe from this topic?</string>
+    <string name="drawer_sub_unsubscribe_dialog_confirm">Unsubscribe</string>
+    <string name="drawer_sub_muted_content_description">Notifications muted</string>
+    <string name="drawer_sub_overflow_content_description">More options</string>
+    <string name="feed_fab_publish_description">Publish message</string>
 </resources>

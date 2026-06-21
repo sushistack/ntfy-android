@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Loading state container: five skeleton cards stacked vertically.
+  Visibility is controlled exclusively by FeedActivity.applyFeedState().
+  importantForAccessibility="noHideDescendants" is set on each included skeleton.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/feed_loading_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:visibility="gone"
+    android:importantForAccessibility="noHideDescendants">
+
+    <include layout="@layout/view_message_card_skeleton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <include layout="@layout/view_message_card_skeleton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <include layout="@layout/view_message_card_skeleton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <include layout="@layout/view_message_card_skeleton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <include layout="@layout/view_message_card_skeleton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

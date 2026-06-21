@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Disconnected state panel — visually calmer than an error, clearly distinct from empty.
+  Retry button visible only when FeedState.Disconnected(isPageLoadFailure=true).
+  Retry callback is owned by the host (FeedActivity); panel does not touch Room/repo.
+  Visibility controlled exclusively by FeedActivity.applyFeedState().
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/feed_disconnected_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="@dimen/spacing_6"
+    android:background="@color/surface"
+    android:visibility="gone">
+
+    <ImageView
+        android:id="@+id/feed_disconnected_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_4"
+        android:src="@drawable/ic_notifications_off_white_outline_24dp"
+        android:importantForAccessibility="no"
+        android:contentDescription="" />
+
+    <TextView
+        android:id="@+id/feed_disconnected_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/muted"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:text="@string/feed_state_disconnected" />
+
+    <Button
+        android:id="@+id/feed_disconnected_retry"
+        style="?attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_3"
+        android:text="@string/feed_state_retry"
+        android:textColor="@color/text"
+        android:visibility="gone" />
+
+</LinearLayout>
