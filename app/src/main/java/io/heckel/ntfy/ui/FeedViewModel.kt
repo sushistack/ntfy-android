@@ -77,8 +77,9 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
         subscriptionMap = list.orEmpty().associate { it.id to it.topic }
         val current = _feedItems.value ?: emptyList()
         if (current.isNotEmpty()) {
+            val isAllFeed = activeSubscriptionId == ALL_SUBSCRIPTIONS_ID
             _feedItems.value = current.map { item ->
-                item.copy(topicName = subscriptionMap[item.notification.subscriptionId])
+                item.copy(topicName = if (isAllFeed) subscriptionMap[item.notification.subscriptionId] else null)
             }
         }
     }
@@ -125,9 +126,14 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
             .drop(minOf(livePage.size, _feedItems.value?.size ?: 0))
             .filter { item -> item.notification.id !in incomingIds }
 
-        val decoratedPage = livePage.map { n ->
-            FeedItem(n, subscriptionMap[n.subscriptionId])
+        // Per-topic feed: topicName = null so the chip is hidden (AC 4.4/AC2).
+        // All-feed: topicName = subscription display name so the chip is shown (AC 4.4/AC1).
+        val topicNameFor: (Notification) -> String? = if (activeSubscriptionId == ALL_SUBSCRIPTIONS_ID) {
+            { n -> subscriptionMap[n.subscriptionId] }
+        } else {
+            { _ -> null }
         }
+        val decoratedPage = livePage.map { n -> FeedItem(n, topicNameFor(n)) }
         _feedItems.value = decoratedPage + olderPages
 
         // Accumulate new arrivals (don't reset existing ones not yet consumed)
@@ -155,9 +161,10 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
                 }
 
                 val knownSnapshot = knownIds
+                val isAllFeed = activeSubscriptionId == ALL_SUBSCRIPTIONS_ID
                 val newItems = results
                     .filter { it.id !in knownSnapshot }
-                    .map { n -> FeedItem(n, subscriptionMap[n.subscriptionId]) }
+                    .map { n -> FeedItem(n, if (isAllFeed) subscriptionMap[n.subscriptionId] else null) }
 
                 kotlinx.coroutines.withContext(Dispatchers.Main) {
                     if (results.isEmpty()) {
