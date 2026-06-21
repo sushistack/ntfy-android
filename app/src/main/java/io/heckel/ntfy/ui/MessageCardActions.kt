@@ -1,0 +1,26 @@
+package io.heckel.ntfy.ui
+
+import io.heckel.ntfy.db.Attachment
+import io.heckel.ntfy.db.Notification
+
+/**
+ * Host-side callbacks for MessageCardBinder interactions.
+ * Keeps the binder free of Activity/Repository/CoroutineScope references.
+ */
+interface MessageCardActions {
+    fun onClick(notification: Notification)
+    fun onLongClick(notification: Notification)
+    fun onDownloadAttachment(notification: Notification)
+    fun onCancelDownload(notification: Notification)
+    fun onDeleteAttachment(notification: Notification, attachment: Attachment): Boolean
+
+    /** Called when the X button is tapped; host owns confirmation and deletion. */
+    fun onDeleteRequested(notification: Notification)
+
+    /**
+     * Called when the non-interactive card surface is tapped for an unread notification.
+     * Null means this host does not support tap-to-read (e.g., pending/optimistic cards).
+     */
+    val onMarkRead: ((notification: Notification) -> Unit)?
+        get() = null
+}

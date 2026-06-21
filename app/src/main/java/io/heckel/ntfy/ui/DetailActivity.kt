@@ -306,8 +306,10 @@ class DetailActivity : AppCompatActivity(), NotificationFragment.NotificationSet
         val noEntriesText: View = findViewById(R.id.detail_no_notifications)
         val onNotificationClick = { n: Notification -> onNotificationClick(n) }
         val onNotificationLongClick = { n: Notification -> onNotificationLongClick(n) }
+        val onNotificationMarkRead = { n: Notification -> onNotificationMarkRead(n) }
+        val onNotificationDeleteRequest = { n: Notification -> onNotificationDeleteRequest(n) }
 
-        adapter = DetailAdapter(this, lifecycleScope, repository, onNotificationClick, onNotificationLongClick)
+        adapter = DetailAdapter(this, lifecycleScope, repository, onNotificationClick, onNotificationLongClick, onNotificationMarkRead, onNotificationDeleteRequest)
         mainList = findViewById(R.id.detail_notification_list)
         mainList.adapter = adapter
         
@@ -935,20 +937,22 @@ class DetailActivity : AppCompatActivity(), NotificationFragment.NotificationSet
     private fun onNotificationClick(notification: Notification) {
         if (actionMode != null) {
             handleActionModeClick(notification)
-        } else if (notification.click != "") {
-            try {
-                startActivity(Intent(ACTION_VIEW, notification.click.toUri()))
-            } catch (e: Exception) {
-                Log.w(TAG, "Cannot open click URL", e)
-                runOnUiThread {
-                    Toast
-                        .makeText(this@DetailActivity, getString(R.string.detail_item_cannot_open_url, e.message), Toast.LENGTH_LONG)
-                        .show()
-                }
-            }
-        } else {
-            runOnUiThread {
-                copyToClipboard(this, "notification", decodeMessage(notification))
+        }
+        // Outside action mode, card tap only triggers mark-read via onNotificationMarkRead.
+        // URL-open and clipboard-copy are no longer triggered by a whole-card tap; explicit
+        // links and action buttons remain independently clickable through child listeners.
+    }
+
+    private fun onNotificationMarkRead(notification: Notification) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            repository.markAsRead(notification.id)
+        }
+    }
+
+    private fun onNotificationDeleteRequest(notification: Notification) {
+        NotificationDeleteConfirmation.show(this) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                repository.markAsDeleted(notification.id)
             }
         }
     }

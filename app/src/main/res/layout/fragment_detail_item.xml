@@ -1,210 +1,346 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Story 2.1 card shell contract:
+  - Outer CardView: zero radius, no compat padding, @color/surface, 1dp @color/border, shadow_elev_1
+  - card_priority_accent: 4dp wide full-height neutral placeholder (color assigned in Story 2.2)
+  - card_body: single ViewGroup hosting all message-body content (owned by Epic 2/3)
+  - Focus: whole-card single focusable target, 2dp @color/focus_ring foreground
+  Epic 3 renderers mount view_card_<type>.xml inside card_body; they never reopen this file.
+
+  Story 2.3a header contract:
+  - card_header: horizontal row — badge | flexible title | unread dot
+  - card_header_badge: priority badge (TextView, caption/uppercase/extra-bold, radius_badge corners)
+  - card_header_title: notification title or body fallback (body size/semibold, 1 line, end ellipsis)
+  - card_header_unread_dot: 8dp circle, @color/accent_ui, decorative/non-focusable
+  - Legacy detail_item_priority_image and detail_item_new_dot removed in this story.
+-->
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-                                   xmlns:tools="http://schemas.android.com/tools" style="@style/CardView"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/detail_item_card"
-    android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="0dp"
     android:layout_marginStart="6dp"
     android:layout_marginEnd="6dp"
     android:layout_marginBottom="1dp"
-    android:padding="3dp"
-    app:cardCornerRadius="3dp"
-    app:cardElevation="2dp"
-    app:cardMaxElevation="2dp"
-    app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true">
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="@drawable/card_shell_foreground"
+    android:background="@drawable/card_shell_background"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="@dimen/shadow_elev_1"
+    app:cardMaxElevation="@dimen/shadow_elev_1"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="false"
+    app:cardBackgroundColor="@android:color/transparent">
+
+    <!-- Root layout: accent bar pinned left, body fills remaining width -->
     <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/detail_item_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="?android:attr/selectableItemBackground"
-            android:focusable="true"
-            android:paddingBottom="6dp" android:paddingTop="6dp" android:paddingEnd="6dp">
-        <TextView
-                android:text="Sun, October 31, 2021, 10:43:12"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/detail_item_date_text"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="5dp" app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="12dp"/>
-        <TextView
-                android:layout_width="10dp"
-                android:layout_height="10dp" android:id="@+id/detail_item_new_dot"
-                android:layout_gravity="center"
-                android:background="@drawable/ic_circle"
-                android:gravity="center"
-                app:layout_constraintTop_toTopOf="@+id/detail_item_date_text"
-                app:layout_constraintBottom_toBottomOf="@+id/detail_item_date_text"
-                android:layout_marginTop="1dp"
-                app:layout_constraintStart_toEndOf="@id/detail_item_priority_image"
-                android:layout_marginStart="5dp"/>
-        <ImageButton
-                android:layout_width="28dp"
-                android:layout_height="26dp" app:srcCompat="@drawable/ic_more_horiz_gray_24dp"
-                android:id="@+id/detail_item_menu_button"
-                app:layout_constraintTop_toTopOf="parent"
-                android:background="?android:attr/selectableItemBackground" android:paddingTop="-5dp"
-                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="3dp"/>
-        <TextView
-                android:text="This is a very very very long message. It could be as long as 1024 charaters, which is a lot more than you'd think. No, really so far this message is barely 180 characters long. I can't believe how long 1024 bytes are. This is outrageous. Oh you know what, I think I won't type the whole thing. This seems a little too long for a sample text. Well, anyway, it was nice chatting. So far this message is about 400 bytes long. So maybe just double what you see and that's that."
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/detail_item_message_text"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:autoLink="web"
-                app:layout_constraintTop_toBottomOf="@id/detail_item_title_text"
-                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="12dp"
-                app:layout_constraintBottom_toTopOf="@id/detail_item_attachment_image" app:layout_constraintEnd_toStartOf="@id/detail_item_icon" android:layout_marginEnd="6dp"/>
-        <TextView
-                android:text="This is an optional title. It can also be a little longer but not too long."
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/detail_item_title_text"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:autoLink="web"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="12dp" android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@+id/detail_item_date_text" app:layout_constraintEnd_toStartOf="@id/detail_item_icon" android:layout_marginEnd="6dp" tools:layout_constraintEnd_toStartOf="@id/detail_item_icon"/>
-        <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp" app:srcCompat="@drawable/ic_priority_5_24dp"
-                android:id="@+id/detail_item_priority_image"
-                app:layout_constraintStart_toEndOf="@+id/detail_item_date_text"
-                app:layout_constraintTop_toTopOf="@+id/detail_item_date_text"
-                app:layout_constraintBottom_toBottomOf="@+id/detail_item_date_text" android:layout_marginStart="5dp"/>
-        <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" app:srcCompat="@drawable/ic_cancel_gray_24dp"
-                android:id="@+id/detail_item_attachment_image" app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@id/detail_item_message_text"
-                android:layout_marginStart="12dp" android:layout_marginEnd="6dp"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true" android:maxHeight="150dp" android:layout_marginTop="7dp"
-                app:shapeAppearanceOverlay="@style/roundedCornersImageView" android:visibility="visible"
-                android:layout_marginBottom="3dp" app:layout_constraintBottom_toTopOf="@id/detail_item_tags_text"/>
-        <TextView
-                android:text="Tags: ssh, zfs"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/detail_item_tags_text"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="12dp"
-                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="6dp"
-                app:layout_constraintTop_toBottomOf="@id/detail_item_attachment_image"
-                app:layout_constraintBottom_toTopOf="@id/detail_item_attachment_file_box"
-                app:layout_constraintHorizontal_bias="0.0" android:layout_marginTop="2dp"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="true"
+        android:clipToPadding="true">
+
+        <!-- Priority accent bar: 4dp wide, constrained to full card_body height -->
+        <View
+            android:id="@+id/card_priority_accent"
+            android:layout_width="@dimen/card_priority_accent_width"
+            android:layout_height="0dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="@+id/card_body"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/card_body" />
+
+        <!-- card_body: body-content host; Epic 3 mounts structured renderers here -->
         <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" app:layout_constraintTop_toBottomOf="@id/detail_item_tags_text"
-                android:id="@+id/detail_item_attachment_file_box" app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" android:layout_marginStart="12dp" android:layout_marginEnd="6dp"
-                android:visibility="visible" android:layout_marginTop="2dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true" android:focusable="true" android:padding="4dp" android:paddingStart="0dp">
-            <ImageView
+            android:id="@+id/card_body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/card_priority_accent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingBottom="6dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="6dp">
+
+            <!-- Story 2.3a: card header row — badge | flexible title | unread dot -->
+            <LinearLayout
+                android:id="@+id/card_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="2dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/card_delete_button"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- Priority badge: caption size, uppercase, extra-bold, radius_badge corners -->
+                <TextView
+                    android:id="@+id/card_header_badge"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" app:srcCompat="@drawable/ic_cancel_gray_24dp"
-                    android:id="@+id/detail_item_attachment_file_icon" app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/detail_item_attachment_file_info" android:layout_marginEnd="5dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-            />
-            <TextView
-                    android:text="attachment.jpg\n58 MB, not downloaded, expires 1/2/2022 10:30 PM"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="@dimen/text_caption"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:background="@drawable/card_badge_background"
+                    android:importantForAccessibility="yes"
+                    tools:text="NORMAL"
+                    tools:textColor="@color/text"
+                    tools:backgroundTint="@color/surface_2" />
+
+                <!-- Title: body size, semibold, primary text, 1 line, end ellipsis -->
+                <TextView
+                    android:id="@+id/card_header_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/detail_item_attachment_file_info"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    app:layout_constraintStart_toEndOf="@+id/detail_item_attachment_file_icon"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/detail_item_attachment_file_icon"
-                    app:layout_constraintBottom_toBottomOf="@+id/detail_item_attachment_file_icon"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_weight="1"
+                    android:textSize="@dimen/text_body"
+                    android:textStyle="bold"
+                    android:textColor="@color/text"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    tools:text="This is a notification title" />
+
+                <!-- Unread dot: 8dp circle, accent_ui, decorative/non-focusable -->
+                <View
+                    android:id="@+id/card_header_unread_dot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/card_unread_dot"
+                    android:importantForAccessibility="no"
+                    android:focusable="false"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <!-- Legacy content preserved below — IDs unchanged for binder compatibility -->
+
+            <TextView
+                android:id="@+id/detail_item_date_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginStart="12dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_header"
+                tools:text="Sun, October 31, 2021, 10:43:12" />
+
+            <!-- X delete button: 48dp touch target, token-tinted, destructive state uses priority_max -->
+            <ImageButton
+                android:id="@+id/card_delete_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="0dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/card_delete_button_content_description"
+                android:focusable="true"
+                android:clickable="true"
+                android:padding="12dp"
+                app:srcCompat="@drawable/ic_card_delete_24dp"
+                app:tint="@color/card_delete_button_tint"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Legacy attachment menu button: retained for body attachment actions -->
+            <ImageButton
+                android:id="@+id/detail_item_menu_button"
+                android:layout_width="28dp"
+                android:layout_height="26dp"
+                android:layout_marginEnd="3dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:paddingTop="-5dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_more_horiz_gray_24dp" />
+
+            <TextView
+                android:id="@+id/detail_item_title_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/detail_item_attachment_file_box"
-                android:id="@+id/detail_item_actions_wrapper"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="6dp"
+                android:autoLink="web"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/detail_item_icon"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="4dp"
-                android:visibility="gone"
-                android:padding="0dp" android:layout_marginStart="4dp" android:layout_marginTop="4dp">
+                app:layout_constraintTop_toBottomOf="@+id/detail_item_date_text"
+                tools:text="This is an optional title." />
 
-            <com.google.android.material.button.MaterialButton
-                    android:text="Bing it"
-                    style="?attr/borderlessButtonStyle"
+            <TextView
+                android:id="@+id/detail_item_message_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="6dp"
+                android:autoLink="web"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="?android:attr/textColorPrimary"
+                app:layout_constraintBottom_toTopOf="@id/detail_item_attachment_image"
+                app:layout_constraintEnd_toStartOf="@id/detail_item_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/detail_item_title_text"
+                tools:text="This is a notification message." />
+
+            <ImageView
+                android:id="@+id/detail_item_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:adjustViewBounds="true"
+                android:maxHeight="40dp"
+                android:maxWidth="40dp"
+                android:padding="0dp"
+                android:scaleType="fitStart"
+                android:visibility="visible"
+                android:layout_marginEnd="6dp"
+                app:layout_constraintBottom_toBottomOf="@+id/detail_item_message_text"
+                app:layout_constraintEnd_toStartOf="@id/card_delete_button"
+                app:layout_constraintTop_toTopOf="@+id/detail_item_date_text"
+                app:srcCompat="@drawable/ic_notification" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/detail_item_attachment_image"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="6dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginBottom="3dp"
+                android:adjustViewBounds="true"
+                android:maxHeight="150dp"
+                android:scaleType="centerCrop"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@id/detail_item_tags_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/detail_item_message_text"
+                app:shapeAppearanceOverlay="@style/roundedCornersImageView"
+                app:srcCompat="@drawable/ic_cancel_gray_24dp" />
+
+            <TextView
+                android:id="@+id/detail_item_tags_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="6dp"
+                android:layout_marginTop="2dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintBottom_toTopOf="@id/detail_item_attachment_file_box"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/detail_item_attachment_image"
+                tools:text="Tags: ssh, zfs" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/detail_item_attachment_file_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="6dp"
+                android:layout_marginTop="2dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"
+                android:paddingStart="0dp"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/detail_item_tags_text">
+
+                <ImageView
+                    android:id="@+id/detail_item_attachment_file_icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/button2" tools:layout_editor_absoluteY="4dp" tools:layout_editor_absoluteX="171dp" android:textSize="14sp" tools:visibility="visible"/>
-            <com.google.android.material.button.MaterialButton
-                    android:text="Google it"
-                    style="?attr/borderlessButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/button3" tools:visibility="visible" tools:layout_editor_absoluteY="52dp" tools:layout_editor_absoluteX="4dp" android:textSize="14sp"/>
-            <com.google.android.material.button.MaterialButton
-                    android:text="DuckDuckGo it"
-                    style="?attr/borderlessButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/button1" tools:visibility="visible" tools:layout_editor_absoluteY="4dp" tools:layout_editor_absoluteX="4dp" android:textSize="14sp" android:layout_margin="0dp"/>
-            <androidx.constraintlayout.helper.widget.Flow
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/detail_item_attachment_file_info"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_cancel_gray_24dp" />
+
+                <TextView
+                    android:id="@+id/detail_item_attachment_file_info"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="?android:attr/textColorPrimary"
+                    app:layout_constraintBottom_toBottomOf="@+id/detail_item_attachment_file_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/detail_item_attachment_file_icon"
+                    app:layout_constraintTop_toTopOf="@+id/detail_item_attachment_file_icon"
+                    tools:text="attachment.jpg\n58 MB, not downloaded" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/detail_item_actions_wrapper"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="4dp"
+                android:padding="0dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/detail_item_attachment_file_box">
+
+                <androidx.constraintlayout.helper.widget.Flow
                     android:id="@+id/detail_item_actions_flow"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:flow_wrapMode="chain2"
+                    android:layout_margin="0dp"
+                    android:padding="0dp"
+                    app:flow_firstHorizontalBias="0"
+                    app:flow_firstHorizontalStyle="packed"
+                    app:flow_firstVerticalBias="0"
+                    app:flow_firstVerticalStyle="packed"
+                    app:flow_horizontalAlign="start"
+                    app:flow_horizontalBias="0"
+                    app:flow_horizontalGap="0dp"
                     app:flow_horizontalStyle="packed"
+                    app:flow_maxElementsWrap="3"
+                    app:flow_verticalAlign="top"
                     app:flow_verticalBias="0"
                     app:flow_verticalGap="0dp"
                     app:flow_verticalStyle="packed"
-                    app:flow_verticalAlign="top"
-                    app:flow_horizontalBias="0"
-                    app:flow_horizontalGap="0dp"
-                    app:flow_horizontalAlign="start"
-                    app:flow_firstHorizontalBias="0"
-                    app:flow_firstVerticalBias="0"
-                    app:flow_firstHorizontalStyle="packed"
-                    app:flow_firstVerticalStyle="packed"
-                    app:flow_maxElementsWrap="3"
-                    android:layout_margin="0dp"
-                    android:padding="0dp"
-                    app:constraint_referenced_ids="button1,button2,button3"/>
+                    app:flow_wrapMode="chain2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <TextView
+            <TextView
+                android:id="@+id/detail_item_padding_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="4dp"
-                android:id="@+id/detail_item_padding_bottom"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/detail_item_actions_wrapper" app:layout_constraintBottom_toBottomOf="parent"/>
-        <ImageView
+                app:layout_constraintTop_toBottomOf="@id/detail_item_actions_wrapper" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline2"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                app:srcCompat="@drawable/ic_notification"
-                android:id="@+id/detail_item_icon"
-                android:visibility="visible"
-                android:maxHeight="40dp"
-                android:maxWidth="40dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitStart"
-                android:padding="0dp"
-                app:layout_constraintTop_toTopOf="@+id/detail_item_date_text"
-                app:layout_constraintBottom_toBottomOf="@+id/detail_item_message_text"
-                app:layout_constraintEnd_toStartOf="@id/detail_item_menu_button"
-                android:layout_marginEnd="6dp"/>
-        <androidx.constraintlayout.widget.Guideline android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/guideline2" app:layout_constraintGuide_begin="27dp" android:orientation="horizontal"/>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="27dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.cardview.widget.CardView>

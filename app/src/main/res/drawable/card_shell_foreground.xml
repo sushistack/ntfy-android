@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Card shell foreground: ripple on press + focus ring on keyboard/D-pad focus.
+     Focus ring is inset by 1dp so its inner edge sits just inside the 1dp border,
+     preserving the border visibility when focused. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:attr/colorControlHighlight">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+            <corners android:radius="0dp" />
+        </shape>
+    </item>
+    <item>
+        <selector>
+            <item android:state_focused="true">
+                <!-- 1dp inset keeps focus ring inside the 1dp border (AC 2) -->
+                <inset
+                    android:insetLeft="@dimen/card_border_width"
+                    android:insetTop="@dimen/card_border_width"
+                    android:insetRight="@dimen/card_border_width"
+                    android:insetBottom="@dimen/card_border_width">
+                    <shape android:shape="rectangle">
+                        <stroke
+                            android:width="@dimen/card_focus_ring_width"
+                            android:color="@color/focus_ring" />
+                        <corners android:radius="0dp" />
+                    </shape>
+                </inset>
+            </item>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@android:color/transparent" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</ripple>

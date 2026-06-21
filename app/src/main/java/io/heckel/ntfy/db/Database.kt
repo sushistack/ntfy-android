@@ -162,7 +162,7 @@ data class Notification(
     @ColumnInfo(name = "deleted") val deleted: Boolean,
     @ColumnInfo(name = "serverSequence") val serverSequence: Long?,
 ) {
-    @Ignore val event: String = ApiService.EVENT_MESSAGE // In-memory event type (message, message_delete, message_clear)
+    @Ignore var event: String = ApiService.EVENT_MESSAGE
 
     constructor(
         id: String,
@@ -636,6 +636,9 @@ interface NotificationDao {
 
     @Query("UPDATE notification SET notificationId = 0 WHERE subscriptionId = :subscriptionId AND sequenceId = :sequenceId")
     fun markAsReadBySequenceId(subscriptionId: Long, sequenceId: String)
+
+    @Query("UPDATE notification SET notificationId = 0 WHERE id = :id AND notificationId != 0")
+    fun markAsRead(id: String)
 
     @Query("UPDATE notification SET deleted = 1 WHERE id = :notificationId")
     fun markAsDeleted(notificationId: String)

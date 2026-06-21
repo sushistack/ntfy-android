@@ -59,11 +59,18 @@ class CardShellContractTest {
     }
 
     @Test
-    fun `card background color is surface token`() {
+    fun `card background uses surface token or card_shell_background drawable`() {
         val doc = loadShellXml()
         val card = doc.findById("detail_item_card") ?: fail("detail_item_card not found")
-        val bg = (card as Element).getAttribute("app:cardBackgroundColor")
-        assertEquals("Card background must use @color/surface token", "@color/surface", bg)
+        val cardBg = (card as Element).getAttribute("app:cardBackgroundColor")
+        val viewBg = card.getAttribute("android:background")
+        // Acceptable: cardBackgroundColor=@color/surface, OR transparent card + card_shell_background drawable
+        val usesDirectSurface = cardBg == "@color/surface"
+        val usesShellDrawable = viewBg == "@drawable/card_shell_background"
+        assertTrue(
+            "Card must use @color/surface or @drawable/card_shell_background for background; got cardBg=$cardBg bg=$viewBg",
+            usesDirectSurface || usesShellDrawable
+        )
     }
 
     @Test
@@ -124,14 +131,12 @@ class CardShellContractTest {
     }
 
     @Test
-    fun `legacy message body view IDs are preserved`() {
+    fun `body and interaction view IDs are preserved`() {
         val doc = loadShellXml()
         val requiredIds = listOf(
             "detail_item_date_text",
             "detail_item_message_text",
             "detail_item_title_text",
-            "detail_item_priority_image",
-            "detail_item_new_dot",
             "detail_item_menu_button",
             "detail_item_icon",
             "detail_item_attachment_image",
@@ -143,7 +148,47 @@ class CardShellContractTest {
             "detail_item_actions_flow",
         )
         for (id in requiredIds) {
-            assertNotNull("Legacy view ID '$id' must be preserved in shell layout", doc.findById(id))
+            assertNotNull("View ID '$id' must be present in shell layout", doc.findById(id))
         }
+    }
+
+    // Story 2.3a: header contract
+    @Test
+    fun `card_header_badge exists in layout`() {
+        val doc = loadShellXml()
+        assertNotNull("card_header_badge must exist", doc.findById("card_header_badge"))
+    }
+
+    @Test
+    fun `card_header_title exists with maxLines 1 and ellipsize end`() {
+        val doc = loadShellXml()
+        val title = doc.findById("card_header_title") ?: fail("card_header_title not found")
+        assertEquals("card_header_title must be single line", "1", (title as Element).getAttribute("android:maxLines"))
+        assertEquals("card_header_title must ellipsize end", "end", title.getAttribute("android:ellipsize"))
+    }
+
+    @Test
+    fun `card_header_unread_dot exists and is 8dp x 8dp`() {
+        val doc = loadShellXml()
+        val dot = doc.findById("card_header_unread_dot") ?: fail("card_header_unread_dot not found")
+        assertEquals("dot width must be 8dp", "8dp", (dot as Element).getAttribute("android:layout_width"))
+        assertEquals("dot height must be 8dp", "8dp", dot.getAttribute("android:layout_height"))
+    }
+
+    @Test
+    fun `card_header_unread_dot is non-focusable and decorative`() {
+        val doc = loadShellXml()
+        val dot = doc.findById("card_header_unread_dot") ?: fail("card_header_unread_dot not found")
+        val focusable = (dot as Element).getAttribute("android:focusable")
+        val a11y = dot.getAttribute("android:importantForAccessibility")
+        assertTrue("dot must not be focusable", focusable.isEmpty() || focusable == "false")
+        assertEquals("dot must be non-important for accessibility", "no", a11y)
+    }
+
+    @Test
+    fun `legacy priority_image and new_dot are absent from layout`() {
+        val doc = loadShellXml()
+        assertNull("detail_item_priority_image must be removed in Story 2.3a", doc.findById("detail_item_priority_image"))
+        assertNull("detail_item_new_dot must be removed in Story 2.3a", doc.findById("detail_item_new_dot"))
     }
 }

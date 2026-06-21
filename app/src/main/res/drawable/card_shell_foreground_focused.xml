@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Focus ring: 2dp @color/focus_ring border drawn as foreground on focus -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <stroke
+        android:width="@dimen/card_focus_ring_width"
+        android:color="@color/focus_ring" />
+    <corners android:radius="0dp" />
+</shape>
