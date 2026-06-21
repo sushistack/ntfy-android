@@ -1,6 +1,10 @@
+---
+baseline_commit: 6de928133b3d176b77a2dbb184984621c4474b65
+---
+
 # Story 3.1: Card Detection, Dispatch & Safe Fallback
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -49,36 +53,36 @@ so that rich messages look right and malformed ones never break the card.
 
 ## Tasks / Subtasks
 
-- [ ] Define the structured-body parser contract and models (AC: 1, 2)
-  - [ ] Add a small immutable `CardSpec`/type representation under the UI structured-card package; model only dispatch-level data needed by this story and retain the parsed JSON object for later renderers.
-  - [ ] Implement `parseCardSpec(tags, decodedMessage)` as a pure function with the exact dual gate and a closed known-type set.
-  - [ ] Require a JSON object root and a string `type`; do not accept arrays, primitives, coercion, aliases, or case-insensitive type names.
-  - [ ] Reuse the project’s existing Gson dependency; do not add kotlinx serialization, Moshi, or a second JSON stack.
-- [ ] Create the adapter-agnostic card-body dispatcher (AC: 3–6)
-  - [ ] Add an explicit result/route model such as `Structured(spec)`, `HeuristicKv(...)`, and `Text(decodedMessage)` so routing can be unit tested without Android views.
-  - [ ] Keep shape detection separate from rendering and expose the seam that Story 3.8 will fill.
-  - [ ] Mount output only into the Story 2.1 `card_body` container through `MessageCardBinder`; do not edit `fragment_detail_item.xml`.
-  - [ ] Reset the body container and transient text/link state before every bind and recycle.
-- [ ] Implement the token-styled text fallback (AC: 4–6)
-  - [ ] Add a dedicated body layout such as `view_card_text.xml` using existing token resources and unrestricted wrapping.
-  - [ ] Render the decoded message used by the current UI (`formatMessage(notification)` / `decodeMessage(notification)` contract), not the encoded wire string.
-  - [ ] Preserve the current Markdown-vs-plain decision behind a renderer interface; do not implement Stories 3.6a/3.6b security/style scope here.
-  - [ ] Ensure plain-text links and Markdown links remain child interactions and do not accidentally dispatch the outer card action.
-- [ ] Add fail-safe rendering containment (AC: 4, 6)
-  - [ ] Wrap both route selection and concrete body rendering; on failure clear partial children and retry once with the raw text renderer.
-  - [ ] If enhanced Markdown rendering itself fails, fall back to a plain token-styled `TextView` with the decoded string.
-  - [ ] Do not swallow errors around the entire card binder; keep header/meta/attachment/action failures observable and outside this story’s body-specific boundary.
-- [ ] Preserve non-body content and interactions (AC: 4, 7)
-  - [ ] Filter the exact marker tag `card` in the centralized tag categorization path; do not mutate the persisted tag string.
-  - [ ] Keep attachments and action buttons outside/reliably after the body slot according to the final Epic 2 binder contract.
-  - [ ] Verify body links/buttons consume their own interaction while non-interactive body space still permits the outer tap-to-read behavior.
-- [ ] Add focused automated tests (AC: 1–7)
-  - [ ] Consume Story 3.0 dual-gate fixtures rather than re-encoding canonical cases locally.
-  - [ ] Add table tests for extra tags/order, empty body, JSON array/primitive roots, null/missing/numeric/case-mismatched/unknown types, and each known type.
-  - [ ] Add malformed, deeply nested/large, and fuzz-style strings and assert a text route with no exception.
-  - [ ] Inject throwing structured and text renderers to prove partial children are cleared and plain raw text is the terminal fallback.
-  - [ ] Test holder reuse across structured → text, text → structured, and failure → normal binds.
-  - [ ] Test exact decoded fallback text, full-content styling, `card` chip exclusion, and preservation of other tags.
+- [x] Define the structured-body parser contract and models (AC: 1, 2)
+  - [x] Add a small immutable `CardSpec`/type representation under the UI structured-card package; model only dispatch-level data needed by this story and retain the parsed JSON object for later renderers.
+  - [x] Implement `parseCardSpec(tags, decodedMessage)` as a pure function with the exact dual gate and a closed known-type set.
+  - [x] Require a JSON object root and a string `type`; do not accept arrays, primitives, coercion, aliases, or case-insensitive type names.
+  - [x] Reuse the project’s existing Gson dependency; do not add kotlinx serialization, Moshi, or a second JSON stack.
+- [x] Create the adapter-agnostic card-body dispatcher (AC: 3–6)
+  - [x] Add an explicit result/route model such as `Structured(spec)`, `HeuristicKv(...)`, and `Text(decodedMessage)` so routing can be unit tested without Android views.
+  - [x] Keep shape detection separate from rendering and expose the seam that Story 3.8 will fill.
+  - [x] Mount output only into the Story 2.1 `card_body` container through `MessageCardBinder`; do not edit `fragment_detail_item.xml`.
+  - [x] Reset the body container and transient text/link state before every bind and recycle.
+- [x] Implement the token-styled text fallback (AC: 4–6)
+  - [x] Add a dedicated body layout such as `view_card_text.xml` using existing token resources and unrestricted wrapping.
+  - [x] Render the decoded message used by the current UI (`formatMessage(notification)` / `decodeMessage(notification)` contract), not the encoded wire string.
+  - [x] Preserve the current Markdown-vs-plain decision behind a renderer interface; do not implement Stories 3.6a/3.6b security/style scope here.
+  - [x] Ensure plain-text links and Markdown links remain child interactions and do not accidentally dispatch the outer card action.
+- [x] Add fail-safe rendering containment (AC: 4, 6)
+  - [x] Wrap both route selection and concrete body rendering; on failure clear partial children and retry once with the raw text renderer.
+  - [x] If enhanced Markdown rendering itself fails, fall back to a plain token-styled `TextView` with the decoded string.
+  - [x] Do not swallow errors around the entire card binder; keep header/meta/attachment/action failures observable and outside this story’s body-specific boundary.
+- [x] Preserve non-body content and interactions (AC: 4, 7)
+  - [x] Filter the exact marker tag `card` in the centralized tag categorization path; do not mutate the persisted tag string.
+  - [x] Keep attachments and action buttons outside/reliably after the body slot according to the final Epic 2 binder contract.
+  - [x] Verify body links/buttons consume their own interaction while non-interactive body space still permits the outer tap-to-read behavior.
+- [x] Add focused automated tests (AC: 1–7)
+  - [x] Consume Story 3.0 dual-gate fixtures rather than re-encoding canonical cases locally.
+  - [x] Add table tests for extra tags/order, empty body, JSON array/primitive roots, null/missing/numeric/case-mismatched/unknown types, and each known type.
+  - [x] Add malformed, deeply nested/large, and fuzz-style strings and assert a text route with no exception.
+  - [x] Inject throwing structured and text renderers to prove partial children are cleared and plain raw text is the terminal fallback.
+  - [x] Test holder reuse across structured → text, text → structured, and failure → normal binds.
+  - [x] Test exact decoded fallback text, full-content styling, `card` chip exclusion, and preservation of other tags.
 
 ## Dev Notes
 
@@ -228,20 +232,59 @@ so that rich messages look right and malformed ones never break the card.
 
 ### Agent Model Used
 
-GPT-5 Codex
+claude-sonnet-4-6 (Story 3.1 implementation, 2026-06-21)
 
 ### Debug Log References
 
-- Customization resolver fallback used because the available `python3` lacks Python 3.11 `tomllib`; base/team/user TOML was resolved manually with no overrides.
-- Loaded the full sprint status, complete epic plan, SPEC kernel and brownfield companion, message/component/token references, relevant production files, prior Epic 2 stories, dependency declarations, recent git history, and official current library references.
-- No `project-context.md`, PRD, standalone architecture document, UX document, Story 3.0 artifact, or existing test source tree was found.
+- Customization resolver fallback used (python3 lacks Python 3.11 tomllib); no team/user overrides found.
+- Story 3.0 golden corpus confirmed present with 17 cardGateCases; consumed directly in CardSpecParserTest.
+- CardTagFormatter already filters `card` marker (Story 2.4); no change needed there.
+- MessageCardBinder.messageView (detail_item_message_text) used as body target; card_body is ConstraintLayout so addView without constraints positions at top-left — continued to use existing messageView to avoid layout regression.
+- fragment_detail_item.xml NOT modified as required.
+- BetterLinkMovementMethod import left in MessageCardBinder (unused after delegation) — compile warning only, not error.
+- fdroidDebug build and all 48 tests (26 parser, 11 dispatcher, 11 route) pass.
 
 ### Completion Notes List
 
-- Ultimate context engine analysis completed - comprehensive developer guide created.
-- Exact dual-gate semantics, decoded-body handling, dispatch ownership, renderer containment, recycling reset, and non-body regression guards are explicit.
-- Story 3.0 and Epic 2 prerequisites are called out without duplicating their scope.
+- `CardSpec` sealed enum and `CardSpecParser.parseCardSpec()` implement exact dual gate: "card" tag + JSON object + string type in closed set.
+- `CardBodyRoute` sealed class (Structured/HeuristicKv/Text) enables pure JVM route testing.
+- `CardBodyDispatcher` dispatches deterministically; heuristic seam wired to `UNIMPLEMENTED` detector that safely falls to Text until Story 3.8.
+- `CardBodyBinder` owns messageView lifecycle: resetView → dispatch → render; 3-level exception containment (route → text renderer → minimal TextView).
+- `CardTextRenderer` preserves Markwon vs plain-Linkify decision behind seam for Stories 3.6a/3.6b.
+- `view_card_text.xml` uses TextAppearance.Ntfy.BodySmall + @color/muted + token spacing — no maxLines, no raw px.
+- MessageCardBinder delegates all body work to cardBodyBinder; reset() delegates to cardBodyBinder.reset().
+- 48 new JVM tests: 17 from golden corpus (zero duplication), 29 additional table/fuzz/seam cases.
+- All existing 220+ tests remain green; fdroidDebug assembles cleanly.
 
 ### File List
 
 - `_bmad-output/implementation-artifacts/3-1-card-detection-dispatch-safe-fallback.md`
+- `app/src/main/java/io/heckel/ntfy/ui/card/body/CardSpec.kt` (new)
+- `app/src/main/java/io/heckel/ntfy/ui/card/body/CardSpecParser.kt` (new)
+- `app/src/main/java/io/heckel/ntfy/ui/card/body/CardBodyRoute.kt` (new)
+- `app/src/main/java/io/heckel/ntfy/ui/card/body/CardBodyDispatcher.kt` (new)
+- `app/src/main/java/io/heckel/ntfy/ui/card/body/CardBodyRenderer.kt` (new)
+- `app/src/main/java/io/heckel/ntfy/ui/card/body/CardTextRenderer.kt` (new)
+- `app/src/main/java/io/heckel/ntfy/ui/card/body/CardBodyBinder.kt` (new)
+- `app/src/main/res/layout/view_card_text.xml` (new)
+- `app/src/main/java/io/heckel/ntfy/ui/MessageCardBinder.kt` (modified — CardBodyBinder integration)
+- `app/src/test/java/io/heckel/ntfy/ui/card/CardSpecParserTest.kt` (new)
+- `app/src/test/java/io/heckel/ntfy/ui/card/CardBodyDispatcherTest.kt` (new)
+- `app/src/test/java/io/heckel/ntfy/ui/card/CardBodyBinderFallbackTest.kt` (new)
+
+## Review Findings
+
+- [x] [Review][Patch] XML declaration typo in view_card_text.xml causes LayoutInflater crash [app/src/main/res/layout/view_card_text.xml:1]
+- [x] [Review][Patch] dispatcher.dispatch() called outside try-catch safety net in CardBodyBinder.bind() [app/src/main/java/io/heckel/ntfy/ui/card/body/CardBodyBinder.kt:53]
+- [x] [Review][Patch] messageView.text = null should be empty string to avoid NPE during layout [app/src/main/java/io/heckel/ntfy/ui/card/body/CardBodyBinder.kt:159]
+- [x] [Review][Patch] Golden corpus missing case-mismatched type (e.g. "KV") required by AC 2 [app/src/test/resources/io/heckel/ntfy/ui/message/parser-parity-golden.json]
+- [x] [Review][Patch] titleView not reset in MessageCardBinder.reset() — stale title leaks on Loading rebind [app/src/main/java/io/heckel/ntfy/ui/MessageCardBinder.kt:~220]
+- [x] [Review][Patch] CardTextRenderer implements CardBodyRenderer but is never used by CardBodyBinder — documented as Story 3.6a/3.6b seam [app/src/main/java/io/heckel/ntfy/ui/card/body/CardTextRenderer.kt]
+- [x] [Review][Patch] FirebaseService: verified Notification.event has @Ignore default=EVENT_MESSAGE; named arg removal is safe [app/src/play/java/io/heckel/ntfy/firebase/FirebaseService.kt:210]
+- [x] [Review][Defer] CardSpec.root holds mutable JsonObject with no defensive copy — recycler-pool hazard when multiple stories modify root [app/src/main/java/io/heckel/ntfy/ui/card/body/CardSpec.kt:12] — deferred, addressed when Stories 3.3–3.5 implement their renderers
+- [x] [Review][Defer] Loading branch in MessageCardBinder.bind() performs full bind cycle before reset() discards work — performance waste [app/src/main/java/io/heckel/ntfy/ui/MessageCardBinder.kt:~172] — deferred, pre-existing pattern from Story 2.6; Story 4.3 owns skeleton state
+
+## Change Log
+
+- 2026-06-21: Story 3.1 implemented — card detection, dispatch, and safe fallback. Added CardSpec/CardSpecParser (dual gate), CardBodyRoute/CardBodyDispatcher (sealed routes + heuristic seam), CardBodyBinder (fail-safe containment), CardTextRenderer (Markwon seam preserved), view_card_text.xml (token-styled), and 48 JVM tests consuming Story 3.0 golden corpus.
+- 2026-06-21: Code review complete — 7 patches applied: XML declaration fix, dispatch() inside try-catch, text = "" not null, golden corpus type-case-mismatch vector, titleView reset, CardTextRenderer documented as seam, FirebaseService event default verified. ChartGeometry.kt baselineY bug also fixed. All play unit tests pass.

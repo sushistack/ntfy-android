@@ -1,5 +1,5 @@
 # generated: 2026-06-21
-# last_updated: 2026-06-21
+# last_updated: 2026-06-21 (story 3-1 done)
 # project: ntfy-android
 # project_key: NOKEY
 # tracking_system: file-system
@@ -71,8 +71,8 @@ development_status:
   # Epic 3: Structured message rendering (card body)
   epic-3: in-progress
   3-0-parser-parity-golden-corpus: done
-  3-1-card-detection-dispatch-safe-fallback: review
-  3-2-inline-meter-component: in-progress
+  3-1-card-detection-dispatch-safe-fallback: done
+  3-2-inline-meter-component: review
   3-3-kv-block-renderer: ready-for-dev
   3-4-list-block-renderer: in-progress
   3-5-chart-block-renderer-hand-drawn-canvas: in-progress

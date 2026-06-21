@@ -1,6 +1,10 @@
 # Story 3.5: `chart` Block Renderer (Hand-Drawn Canvas)
 
-Status: ready-for-dev
+---
+baseline_commit: c216fdb4668cc8f069c7f15adc33b10986d579ed
+---
+
+Status: in-progress
 
 ## Story
 

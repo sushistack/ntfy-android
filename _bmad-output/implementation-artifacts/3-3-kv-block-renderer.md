@@ -1,6 +1,10 @@
+---
+baseline_commit: c216fdb4668cc8f069c7f15adc33b10986d579ed
+---
+
 # Story 3.3: `kv` Block Renderer
 
-Status: ready-for-dev
+Status: in-progress
 
 ## Story
 

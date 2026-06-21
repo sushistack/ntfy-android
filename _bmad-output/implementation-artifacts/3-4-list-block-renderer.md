@@ -1,6 +1,10 @@
 # Story 3.4: `list` Block Renderer
 
-Status: ready-for-dev
+---
+baseline_commit: c216fdb4668cc8f069c7f15adc33b10986d579ed
+---
+
+Status: in-progress
 
 ## Story
 
