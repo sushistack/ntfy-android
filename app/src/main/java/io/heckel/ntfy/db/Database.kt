@@ -161,8 +161,9 @@ data class Notification(
     @Embedded(prefix = "attachment_") val attachment: Attachment?,
     @ColumnInfo(name = "deleted") val deleted: Boolean,
     @ColumnInfo(name = "serverSequence") val serverSequence: Long?,
-    @Ignore val event: String = ApiService.EVENT_MESSAGE, // In-memory event type (message, message_delete, message_clear)
 ) {
+    @Ignore val event: String = ApiService.EVENT_MESSAGE // In-memory event type (message, message_delete, message_clear)
+
     constructor(
         id: String,
         subscriptionId: Long,
@@ -183,7 +184,7 @@ data class Notification(
     ) : this(
         id, subscriptionId, timestamp, sequenceId, title, message, contentType, encoding,
         notificationId, priority, tags, click, icon, actions, attachment, deleted,
-        serverSequence = null, event = ApiService.EVENT_MESSAGE
+        serverSequence = null
     )
 }
 
