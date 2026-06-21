@@ -78,11 +78,12 @@ class CardBodyDispatcherTest {
     // -------------------------------------------------------------------------
 
     @Test
-    fun `unimplemented heuristic seam returns Text not HeuristicKv`() {
-        // Default dispatcher uses UNIMPLEMENTED detector → always false → Text
+    fun `UNIMPLEMENTED detector returns Text not HeuristicKv`() {
+        // Inject UNIMPLEMENTED explicitly; default is now the real Story 3.8 detector.
+        val dispatcher = CardBodyDispatcher(heuristicKvDetector = CardBodyDispatcher.HeuristicKvDetector.UNIMPLEMENTED)
         val multiline = "key1: value1\nkey2: value2"
-        val route = defaultDispatcher.dispatch(emptyList(), multiline)
-        assertTrue("Unimplemented seam must not produce HeuristicKv", route !is CardBodyRoute.HeuristicKv)
+        val route = dispatcher.dispatch(emptyList(), multiline)
+        assertTrue("UNIMPLEMENTED seam must not produce HeuristicKv", route !is CardBodyRoute.HeuristicKv)
         assertTrue(route is CardBodyRoute.Text)
     }
 

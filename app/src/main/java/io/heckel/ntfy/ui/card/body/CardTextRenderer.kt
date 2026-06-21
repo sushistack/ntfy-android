@@ -31,7 +31,6 @@ class CardTextRenderer(
     override fun render(container: ViewGroup, route: CardBodyRoute) {
         val decodedBody = when (route) {
             is CardBodyRoute.Text -> route.decodedBody
-            is CardBodyRoute.HeuristicKv -> route.decodedBody
             else -> return
         }
         inflateAndBind(container, decodedBody)

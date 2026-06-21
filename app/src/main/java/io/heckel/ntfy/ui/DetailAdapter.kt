@@ -18,11 +18,10 @@ import io.heckel.ntfy.db.*
 import io.heckel.ntfy.msg.DownloadManager
 import io.heckel.ntfy.msg.DownloadType
 import io.heckel.ntfy.util.Log
-import io.noties.markwon.Markwon
+import io.heckel.ntfy.ui.card.body.MarkwonCardMarkdownRenderer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import io.heckel.ntfy.util.MarkwonFactory
 
 class DetailAdapter(
     private val activity: Activity,
@@ -34,14 +33,14 @@ class DetailAdapter(
     private val onDeleteRequestCallback: ((Notification) -> Unit)? = null,
 ) : ListAdapter<Notification, DetailAdapter.DetailViewHolder>(TopicDiffCallback) {
 
-    private val markwon: Markwon = MarkwonFactory.createForMessage(activity)
+    private val markdownRenderer = MarkwonCardMarkdownRenderer(activity)
     val selected = mutableSetOf<String>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.fragment_detail_item, parent, false)
         val cardActions = buildCardActions(activity, lifecycleScope, repository)
-        val binder = MessageCardBinder(view, markwon, cardActions)
+        val binder = MessageCardBinder(view, markdownRenderer, cardActions)
         return DetailViewHolder(view, binder, selected)
     }
 

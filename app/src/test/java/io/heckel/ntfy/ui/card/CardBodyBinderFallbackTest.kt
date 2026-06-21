@@ -91,11 +91,12 @@ class CardBodyBinderDispatchRouteTest {
     // -------------------------------------------------------------------------
 
     @Test
-    fun `unimplemented heuristic seam continues to Text safely`() {
-        val dispatcher = CardBodyDispatcher() // uses UNIMPLEMENTED
+    fun `UNIMPLEMENTED heuristic seam continues to Text safely`() {
+        // Inject UNIMPLEMENTED explicitly; default is now the real Story 3.8 detector.
+        val dispatcher = CardBodyDispatcher(heuristicKvDetector = CardBodyDispatcher.HeuristicKvDetector.UNIMPLEMENTED)
         val kvBody = "cpu: 80%\nmem: 60%"
         val route = dispatcher.dispatch(emptyList(), kvBody)
-        assertTrue("Expected Text fallback for unimplemented heuristic, got: $route",
+        assertTrue("Expected Text fallback for UNIMPLEMENTED heuristic, got: $route",
             route is CardBodyRoute.Text)
     }
 

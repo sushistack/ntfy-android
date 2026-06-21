@@ -3,8 +3,6 @@ package io.heckel.ntfy.ui.card.body
 import android.text.util.Linkify
 import android.view.ViewGroup
 import android.widget.TextView
-import io.heckel.ntfy.R
-import io.noties.markwon.Markwon
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 /**
@@ -31,12 +29,15 @@ import me.saket.bettermovementmethod.BetterLinkMovementMethod
 class CardBodyBinder(
     private val messageView: TextView,
     private val dispatcher: CardBodyDispatcher,
-    private val markwon: Markwon,
+    private val markdownRenderer: CardMarkdownRenderer,
     private val bodyContainer: ViewGroup? = null,
 ) {
     private val listRenderer = ListBlockRenderer()
     private val kvRenderer = KvBlockRenderer()
     private val chartRenderer = ChartBlockRenderer()
+    private val sectionsRenderer by lazy {
+        SectionsBlockRenderer(markdownRenderer, kvRenderer, listRenderer, chartRenderer)
+    }
 
     /**
      * Bind [decodedBody] for a notification.
@@ -82,45 +83,55 @@ class CardBodyBinder(
     ) {
         when (route) {
             is CardBodyRoute.Structured -> {
+                val container = bodyContainer
                 when (route.spec.type) {
                     CardSpec.KnownType.KV -> {
-                        val container = bodyContainer
                         if (container != null) {
                             messageView.visibility = ViewGroup.GONE
                             kvRenderer.render(container, route)
+                            attachListeners(messageView, cardClickAction, cardLongClickAction, markReadAction)
                             return
                         }
                         applyTextToView(messageView, decodedBody, isMarkdown)
                     }
                     CardSpec.KnownType.LIST -> {
-                        val container = bodyContainer
                         if (container != null) {
-                            // Hide the plain text view; list renderer owns the container.
                             messageView.visibility = ViewGroup.GONE
                             listRenderer.render(container, route)
+                            attachListeners(messageView, cardClickAction, cardLongClickAction, markReadAction)
                             return
                         }
-                        // No container: fall through to raw JSON text.
                         applyTextToView(messageView, decodedBody, isMarkdown)
                     }
                     CardSpec.KnownType.CHART -> {
-                        val container = bodyContainer
                         if (container != null) {
                             messageView.visibility = ViewGroup.GONE
                             chartRenderer.render(container, route)
+                            attachListeners(messageView, cardClickAction, cardLongClickAction, markReadAction)
                             return
                         }
                         applyTextToView(messageView, decodedBody, isMarkdown)
                     }
-                    else -> {
-                        // sections lands in Story 3.7.
+                    CardSpec.KnownType.SECTIONS -> {
+                        if (container != null) {
+                            messageView.visibility = ViewGroup.GONE
+                            sectionsRenderer.renderSections(container, route)
+                            attachListeners(messageView, cardClickAction, cardLongClickAction, markReadAction)
+                            return
+                        }
                         applyTextToView(messageView, decodedBody, isMarkdown)
                     }
                 }
             }
             is CardBodyRoute.HeuristicKv -> {
-                // Story 3.8 fills this; until then fall through to text.
-                applyTextToView(messageView, route.decodedBody, isMarkdown)
+                val container = bodyContainer
+                if (container != null) {
+                    messageView.visibility = ViewGroup.GONE
+                    kvRenderer.renderKvSpec(container, route.kvSpec)
+                    attachListeners(messageView, cardClickAction, cardLongClickAction, markReadAction)
+                    return
+                }
+                applyTextToView(messageView, route.kvSpec.rows.joinToString("\n") { "${it.key}: ${it.value}" }, isMarkdown)
             }
             is CardBodyRoute.Text -> {
                 applyTextToView(messageView, route.decodedBody, isMarkdown)
@@ -131,12 +142,10 @@ class CardBodyBinder(
 
     private fun applyTextToView(tv: TextView, text: String, isMarkdown: Boolean) {
         if (isMarkdown) {
-            tv.autoLinkMask = 0
-            markwon.setMarkdown(tv, text)
+            markdownRenderer.render(tv, text)
         } else {
             applyPlainText(tv, text)
         }
-        tv.movementMethod = BetterLinkMovementMethod.getInstance()
     }
 
     private fun applyPlainText(tv: TextView, text: String) {

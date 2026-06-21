@@ -44,7 +44,8 @@ import io.heckel.ntfy.ui.card.body.CardBodyDispatcher
 import io.heckel.ntfy.ui.design.GlowToken
 import io.heckel.ntfy.ui.design.resolveGlow
 import io.heckel.ntfy.util.*
-import io.noties.markwon.Markwon
+import io.heckel.ntfy.ui.card.body.CardMarkdownRenderer
+import io.heckel.ntfy.ui.card.body.MarkwonCardMarkdownRenderer
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 
 /**
@@ -55,7 +56,7 @@ import me.saket.bettermovementmethod.BetterLinkMovementMethod
  */
 class MessageCardBinder(
     private val itemView: View,
-    private val markwon: Markwon,
+    private val markdownRenderer: CardMarkdownRenderer,
     private val actions: MessageCardActions,
 ) {
     // ID of the notification currently bound; reset on every bind to prevent recycler leakage.
@@ -96,7 +97,7 @@ class MessageCardBinder(
     private val cardBodyBinder: CardBodyBinder = CardBodyBinder(
         messageView = messageView,
         dispatcher = CardBodyDispatcher(),
-        markwon = markwon,
+        markdownRenderer = markdownRenderer,
         bodyContainer = cardBodyView,
     )
 
