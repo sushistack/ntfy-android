@@ -309,6 +309,11 @@
     <string name="publish_sheet_error_send">Failed to send: %s</string>
     <string name="publish_sheet_error_unknown">Unknown error</string>
 
+    <!-- Optimistic send card (Story 4.9) -->
+    <string name="optimistic_send_pending">Sending…</string>
+    <string name="optimistic_send_failed">Send failed</string>
+    <string name="optimistic_send_retry">Retry</string>
+
     <!-- Message bar -->
     <string name="message_bar_hint">Type a message here</string>
     <string name="message_bar_publish_button_description">Publish message</string>

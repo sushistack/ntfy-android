@@ -31,6 +31,8 @@ class FeedAdapter(
     private val onDeleteRequestCallback: ((Notification) -> Unit)? = null,
     private val onMarkReadCallback: ((Notification) -> Unit)? = null,
     private val onArrivalConsumedCallback: ((String) -> Unit)? = null,
+    private val onRetryRequestCallback: ((String) -> Unit)? = null,
+    private val onDiscardRequestCallback: ((String) -> Unit)? = null,
 ) : ListAdapter<FeedItem, FeedAdapter.FeedViewHolder>(FeedItemDiffCallback) {
 
     private val markdownRenderer = MarkwonCardMarkdownRenderer(activity)
@@ -55,8 +57,13 @@ class FeedAdapter(
 
     override fun onBindViewHolder(holder: FeedViewHolder, position: Int) {
         val item = getItem(position)
-        val bindState = buildBindState(item.notification.id)
-        holder.bind(item, bindState)
+        when (item) {
+            is FeedItem.Server -> {
+                val bindState = buildBindState(item.notification.id)
+                holder.bindServer(item, bindState)
+            }
+            is FeedItem.Optimistic -> holder.bindOptimistic(item)
+        }
     }
 
     override fun onViewRecycled(holder: FeedViewHolder) {
@@ -64,7 +71,8 @@ class FeedAdapter(
         holder.reset()
     }
 
-    private fun buildBindState(notificationId: String): CardBindState {
+    private fun buildBindState(notificationId: String?): CardBindState {
+        if (notificationId == null) return CardBindState()
         val isDeepLinkTarget = notificationId == deepLinkTargetId
         val presentation = if (isDeepLinkTarget) {
             CardPresentation.StaticDeepLinkEmphasis(notificationId)
@@ -130,6 +138,14 @@ class FeedAdapter(
         }
 
         override val onMarkRead: ((Notification) -> Unit)? = onMarkReadCallback
+
+        override fun onRetryRequested(localId: String) {
+            onRetryRequestCallback?.invoke(localId)
+        }
+
+        override fun onDiscardRequested(localId: String) {
+            onDiscardRequestCallback?.invoke(localId)
+        }
     }
 
     class FeedViewHolder(
@@ -137,7 +153,7 @@ class FeedAdapter(
         private val binder: MessageCardBinder,
     ) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(item: FeedItem, bindState: CardBindState) {
+        fun bindServer(item: FeedItem.Server, bindState: CardBindState) {
             binder.bind(
                 notification = item.notification,
                 topicName = item.topicName,
@@ -146,14 +162,23 @@ class FeedAdapter(
             )
         }
 
+        fun bindOptimistic(item: FeedItem.Optimistic) {
+            binder.bindOptimistic(item.msg)
+        }
+
         fun reset() {
             binder.reset()
         }
     }
 
     object FeedItemDiffCallback : DiffUtil.ItemCallback<FeedItem>() {
-        override fun areItemsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean =
-            oldItem.notification.id == newItem.notification.id
+        override fun areItemsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean = when {
+            oldItem is FeedItem.Server && newItem is FeedItem.Server ->
+                oldItem.notification.id == newItem.notification.id
+            oldItem is FeedItem.Optimistic && newItem is FeedItem.Optimistic ->
+                oldItem.msg.localId == newItem.msg.localId
+            else -> false
+        }
 
         override fun areContentsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean =
             oldItem == newItem

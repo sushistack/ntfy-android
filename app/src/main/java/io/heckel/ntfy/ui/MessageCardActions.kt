@@ -27,4 +27,15 @@ interface MessageCardActions {
      */
     val onMarkRead: ((notification: Notification) -> Unit)?
         get() = null
+
+    // ── Optimistic-send callbacks (Story 4.9) ──────────────────────────────────
+
+    /** Called when the Retry button is tapped on an error-state optimistic card. */
+    fun onRetryRequested(localId: String) {}
+
+    /**
+     * Called when the X button is tapped on a pending/error optimistic card.
+     * Host shows confirmation dialog; on confirm removes from outbox and cancels job.
+     */
+    fun onDiscardRequested(localId: String) {}
 }

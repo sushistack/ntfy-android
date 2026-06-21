@@ -134,9 +134,11 @@ class TopicChipVisibilityContractTest {
     @Test
     fun feedViewModel_perTopicMode_passesNullTopicName() {
         val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedViewModel.kt")
+        // Story 4.9: FeedItem is now a sealed class; per-topic path uses FeedItem.Server(n, null).
         assertTrue(
             "FeedViewModel per-topic mode must pass null topicName to FeedItem",
-            source.contains("FeedItem(n, null)") || source.contains("FeedItem(notification, null)")
+            source.contains("FeedItem(n, null)") || source.contains("FeedItem(notification, null)") ||
+                source.contains("FeedItem.Server(n, null)") || source.contains("FeedItem.Server(notification, null)")
         )
     }
 

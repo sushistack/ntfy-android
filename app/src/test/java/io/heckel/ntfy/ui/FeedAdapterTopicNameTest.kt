@@ -36,7 +36,7 @@ class FeedAdapterTopicNameTest {
     @Test
     fun feedItem_allMode_topicName_isNonNull() {
         val notification = makeNotification("msg-1", subscriptionId = 42L)
-        val item = FeedItem(notification = notification, topicName = "my-topic")
+        val item = FeedItem.Server(notification = notification, topicName = "my-topic")
 
         assertNotNull(item.topicName)
         assertEquals("my-topic", item.topicName)
@@ -45,7 +45,7 @@ class FeedAdapterTopicNameTest {
     @Test
     fun feedItem_perTopicMode_topicName_isNull() {
         val notification = makeNotification("msg-2", subscriptionId = 7L)
-        val item = FeedItem(notification = notification, topicName = null)
+        val item = FeedItem.Server(notification = notification, topicName = null)
 
         assertNull(item.topicName)
     }
@@ -56,8 +56,8 @@ class FeedAdapterTopicNameTest {
         val sub2Notification = makeNotification("msg-B", subscriptionId = 2L)
 
         val items = listOf(
-            FeedItem(sub1Notification, topicName = "topic-alpha"),
-            FeedItem(sub2Notification, topicName = "topic-beta"),
+            FeedItem.Server(sub1Notification, topicName = "topic-alpha"),
+            FeedItem.Server(sub2Notification, topicName = "topic-beta"),
         )
 
         assertEquals("topic-alpha", items[0].topicName)
@@ -68,9 +68,9 @@ class FeedAdapterTopicNameTest {
     @Test
     fun feedItem_dataEquality_basedOnNotificationAndTopic() {
         val n = makeNotification("msg-X")
-        val a = FeedItem(n, "topic-1")
-        val b = FeedItem(n, "topic-1")
-        val c = FeedItem(n, "topic-2")
+        val a = FeedItem.Server(n, "topic-1")
+        val b = FeedItem.Server(n, "topic-1")
+        val c = FeedItem.Server(n, "topic-2")
 
         assertEquals(a, b)
         assertNotEquals(a, c)

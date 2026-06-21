@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Drag handle -->
+    <View
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:background="@color/control_border"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Sheet title -->
+    <TextView
+        android:id="@+id/publish_sheet_title_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/publish_sheet_title"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Topic -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/publish_sheet_topic_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="@string/publish_sheet_hint_topic"
+        app:boxBackgroundColor="@color/surface_2"
+        app:boxStrokeColor="@color/control_border"
+        app:boxCornerRadiusTopStart="@dimen/radius_sm"
+        app:boxCornerRadiusTopEnd="@dimen/radius_sm"
+        app:boxCornerRadiusBottomStart="@dimen/radius_sm"
+        app:boxCornerRadiusBottomEnd="@dimen/radius_sm"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/publish_sheet_topic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Title (optional) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/publish_sheet_title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="@string/publish_sheet_hint_title"
+        app:boxBackgroundColor="@color/surface_2"
+        app:boxStrokeColor="@color/control_border"
+        app:boxCornerRadiusTopStart="@dimen/radius_sm"
+        app:boxCornerRadiusTopEnd="@dimen/radius_sm"
+        app:boxCornerRadiusBottomStart="@dimen/radius_sm"
+        app:boxCornerRadiusBottomEnd="@dimen/radius_sm"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/publish_sheet_title_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Message (4-row multiline) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/publish_sheet_message_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="@string/publish_sheet_hint_message"
+        app:boxBackgroundColor="@color/surface_2"
+        app:boxStrokeColor="@color/control_border"
+        app:boxCornerRadiusTopStart="@dimen/radius_sm"
+        app:boxCornerRadiusTopEnd="@dimen/radius_sm"
+        app:boxCornerRadiusBottomStart="@dimen/radius_sm"
+        app:boxCornerRadiusBottomEnd="@dimen/radius_sm"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/publish_sheet_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:minLines="4"
+            android:maxLines="4"
+            android:gravity="top|start" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Priority chip group label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/publish_sheet_label_priority"
+        android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+        android:layout_marginBottom="4dp" />
+
+    <!-- Priority chips: Low / Normal / High / Urgent -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/publish_sheet_priority_chips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:singleSelection="true"
+        app:selectionRequired="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_priority_low"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/publish_sheet_chip_low" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_priority_normal"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/publish_sheet_chip_normal"
+            android:checked="true" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_priority_high"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/publish_sheet_chip_high" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_priority_urgent"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/publish_sheet_chip_urgent" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <!-- Tags (optional) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/publish_sheet_tags_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="@string/publish_sheet_hint_tags"
+        app:boxBackgroundColor="@color/surface_2"
+        app:boxStrokeColor="@color/control_border"
+        app:boxCornerRadiusTopStart="@dimen/radius_sm"
+        app:boxCornerRadiusTopEnd="@dimen/radius_sm"
+        app:boxCornerRadiusBottomStart="@dimen/radius_sm"
+        app:boxCornerRadiusBottomEnd="@dimen/radius_sm"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/publish_sheet_tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Inline error text (hidden by default) -->
+    <TextView
+        android:id="@+id/publish_sheet_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/priority_max"
+        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+        android:visibility="gone" />
+
+    <!-- Footer: Close + Send buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="4dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/publish_sheet_close"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@string/publish_sheet_btn_close" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/publish_sheet_send"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/publish_sheet_btn_send"
+            android:enabled="false" />
+
+    </LinearLayout>
+
+</LinearLayout>

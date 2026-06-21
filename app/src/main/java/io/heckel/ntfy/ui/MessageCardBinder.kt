@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
@@ -29,6 +30,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.stfalcon.imageviewer.StfalconImageViewer
 import io.heckel.ntfy.R
 import io.heckel.ntfy.db.*
@@ -91,6 +93,13 @@ class MessageCardBinder(
     private val actionsFlow: Flow = itemView.findViewById(R.id.detail_item_actions_flow)
 
     private val cardBodyView: ViewGroup = itemView.findViewById(R.id.card_body)
+
+    // Story 4.9: optimistic pending/error bar views
+    private val optimisticBar: LinearLayout = itemView.findViewById(R.id.card_optimistic_bar)
+    private val pendingProgress: CircularProgressIndicator = itemView.findViewById(R.id.card_pending_progress)
+    private val errorIcon: ImageView = itemView.findViewById(R.id.card_error_icon)
+    private val errorText: TextView = itemView.findViewById(R.id.card_error_text)
+    private val retryButton: MaterialButton = itemView.findViewById(R.id.card_retry_button)
 
     // Story 3.1: body dispatch with safe fallback; owns messageView from this point on.
     // Story 3.4: bodyContainer wires list (and future structured) renderers to card_body.
@@ -212,6 +221,105 @@ class MessageCardBinder(
         }
     }
 
+    /**
+     * Binds an optimistic (in-flight or failed) send card.
+     * Reuses the same card shell as a normal notification — suppresses tap-to-read,
+     * unread dot, and menu; shows the pending/error bar below the body.
+     */
+    fun bindOptimistic(msg: OptimisticMessage) {
+        // Cancel transient animators and reset all recycled state.
+        effectController.resetTransient()
+        boundNotificationId = msg.localId
+        markReadPending = false
+
+        val context = itemView.context
+
+        // Suppress the legacy date row (always hidden in Story 2.4+).
+        dateView.visibility = View.GONE
+
+        // Body: render title + message as if it were a normal notification body slot.
+        // Use plain text dispatch — no markdown, no structured rendering needed.
+        cardBodyBinder.bind(
+            tags = msg.tags,
+            decodedBody = msg.message,
+            isMarkdown = false,
+            cardClickAction = { /* non-interactive */ false },
+            cardLongClickAction = { /* no-op */ },
+            markReadAction = { /* suppressed for optimistic cards */ },
+        )
+
+        // Whole-card click suppressed (AC 7): no tap-to-read.
+        cardView.setOnClickListener(null)
+        cardView.setOnLongClickListener(null)
+
+        // Title
+        if (msg.title.isNotBlank()) {
+            titleView.visibility = View.VISIBLE
+            titleView.text = msg.title
+        } else {
+            titleView.visibility = View.GONE
+        }
+
+        // Header: priority badge + title fallback; no unread dot.
+        val priority = toPriority(msg.priority)
+        val spec = badgeSpecForPriority(priority)
+        headerBadgeView.text = context.getString(spec.labelRes)
+        headerBadgeView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, spec.backgroundColorRes))
+        headerBadgeView.setTextColor(ContextCompat.getColor(context, spec.textColorRes))
+        headerTitleView.text = if (msg.title.isNotBlank()) msg.title else msg.message
+        headerUnreadDotView.visibility = View.GONE
+        headerUnreadDotView.setLayerType(View.LAYER_TYPE_NONE, null)
+
+        // Meta row: timestamp
+        metaTimestampView.text = CardTagFormatter.formatAbsoluteTimestamp(msg.timestamp)
+        tagChipGroup.removeAllViews()
+
+        // Priority accent bar
+        val accentColorRes = accentColorResForPriority(priority)
+        priorityAccentView.setBackgroundColor(ContextCompat.getColor(context, accentColorRes))
+        applyPriorityGlow(context, priority)
+
+        // Card background (normal, not selected)
+        cardView.setCardBackgroundColor(Colors.cardBackgroundColor(context))
+
+        // Hide attachment, icon, menu, action buttons
+        attachmentImageView.visibility = View.GONE
+        attachmentBoxView.visibility = View.GONE
+        iconView.visibility = View.GONE
+        menuButton.visibility = View.GONE
+        actionsWrapperView.visibility = View.GONE
+        resetCardButtons()
+
+        // X button: routes to discard (not delete), enabled in both Pending and Error states.
+        deleteButton.setOnClickListener {
+            it.isPressed = false
+            actions.onDiscardRequested(msg.localId)
+        }
+
+        // Reset retry / pending indicators before applying new state.
+        pendingProgress.visibility = View.GONE
+        errorIcon.visibility = View.GONE
+        errorText.visibility = View.GONE
+        retryButton.visibility = View.GONE
+        retryButton.setOnClickListener(null)
+
+        when (val state = msg.sendState) {
+            is SendState.Pending -> {
+                optimisticBar.visibility = View.VISIBLE
+                pendingProgress.visibility = View.VISIBLE
+            }
+            is SendState.Error -> {
+                optimisticBar.visibility = View.VISIBLE
+                errorIcon.visibility = View.VISIBLE
+                errorText.visibility = View.VISIBLE
+                errorText.text = context.getString(R.string.optimistic_send_failed)
+                retryButton.visibility = View.VISIBLE
+                retryButton.text = context.getString(R.string.optimistic_send_retry)
+                retryButton.setOnClickListener { actions.onRetryRequested(msg.localId) }
+            }
+        }
+    }
+
     fun reset() {
         // Story 2.6: cancel animators and restore baseline before recycling.
         effectController.resetTransient()
@@ -249,6 +357,13 @@ class MessageCardBinder(
         priorityAccentView.setLayerType(View.LAYER_TYPE_NONE, null)
         actionsWrapperView.visibility = View.GONE
         resetCardButtons()
+        // Story 4.9: reset optimistic bar
+        optimisticBar.visibility = View.GONE
+        pendingProgress.visibility = View.GONE
+        errorIcon.visibility = View.GONE
+        errorText.visibility = View.GONE
+        retryButton.visibility = View.GONE
+        retryButton.setOnClickListener(null)
     }
 
     private fun renderMetaRow(context: Context, notification: Notification, topicName: String?) {

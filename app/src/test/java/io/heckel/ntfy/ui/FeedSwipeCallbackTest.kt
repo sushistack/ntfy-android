@@ -222,15 +222,17 @@ class FeedSwipeCallbackTest {
     }
 
     @Test
-    fun `FeedActivity uses DialogFragment not bare AlertDialog for delete confirm`() {
+    fun `FeedActivity uses DialogFragment not bare AlertDialog for swipe delete confirm`() {
         val src = readSource(*feedActivityCandidates)
         assertTrue(
             "FeedActivity must show DeleteSwipeConfirmFragment for rotation safety",
             src.contains("DeleteSwipeConfirmFragment")
         )
-        assertFalse(
-            "FeedActivity must not show bare AlertDialog directly in swipe path",
-            src.contains("NotificationDeleteConfirmation.show")
+        // FeedActivity uses NotificationDeleteConfirmation for optimistic-discard (Story 4.9),
+        // but the swipe path must go through DeleteSwipeConfirmFragment for rotation safety.
+        assertTrue(
+            "Swipe path must use DeleteSwipeConfirmFragment",
+            src.contains("showDeleteConfirm")
         )
     }
 

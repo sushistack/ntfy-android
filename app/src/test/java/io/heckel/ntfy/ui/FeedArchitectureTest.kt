@@ -91,9 +91,11 @@ class FeedArchitectureTest {
     }
 
     @Test
-    fun feedViewModel_exposesFeedItemDataClass() {
+    fun feedViewModel_exposesFeedItemSealedClass() {
         val vmSource = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedViewModel.kt")
-        assertTrue("FeedItem data class must exist in FeedViewModel file", vmSource.contains("data class FeedItem"))
-        assertTrue("FeedItem must carry topicName field", vmSource.contains("topicName"))
+        // Story 4.9: FeedItem is now a sealed class with Server and Optimistic subtypes.
+        assertTrue("FeedItem sealed class must exist in FeedViewModel file", vmSource.contains("sealed class FeedItem"))
+        assertTrue("FeedItem.Server must carry topicName field", vmSource.contains("topicName"))
+        assertTrue("FeedItem.Optimistic subtype must exist", vmSource.contains("Optimistic"))
     }
 }

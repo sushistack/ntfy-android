@@ -11,9 +11,22 @@ import io.heckel.ntfy.db.Notification
 import io.heckel.ntfy.db.Repository
 import io.heckel.ntfy.db.Subscription
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
-data class FeedItem(val notification: Notification, val topicName: String?)
+sealed class FeedItem {
+    /** A real server-received notification card. */
+    data class Server(val notification: Notification, val topicName: String?) : FeedItem() {
+        val id: String get() = notification.id
+    }
+    /** An in-memory optimistic card shown while a publish is in flight or failed. */
+    data class Optimistic(val msg: OptimisticMessage) : FeedItem() {
+        val id: String get() = msg.localId
+    }
+}
 
 /** Sentinel: no subscription filter — show all topics. */
 const val ALL_SUBSCRIPTIONS_ID = 0L
@@ -79,7 +92,10 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
         if (current.isNotEmpty()) {
             val isAllFeed = activeSubscriptionId == ALL_SUBSCRIPTIONS_ID
             _feedItems.value = current.map { item ->
-                item.copy(topicName = if (isAllFeed) subscriptionMap[item.notification.subscriptionId] else null)
+                when (item) {
+                    is FeedItem.Server -> item.copy(topicName = if (isAllFeed) subscriptionMap[item.notification.subscriptionId] else null)
+                    is FeedItem.Optimistic -> item
+                }
             }
         }
     }
@@ -122,9 +138,17 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
         knownIds = incomingIds
 
         // Merge: live page (newest) + already-loaded older pages
-        val olderPages = (_feedItems.value ?: emptyList())
-            .drop(minOf(livePage.size, _feedItems.value?.size ?: 0))
-            .filter { item -> item.notification.id !in incomingIds }
+        // Keep Optimistic items (they are never server-sourced) and filter out stale server items.
+        val existing = _feedItems.value ?: emptyList()
+        val serverPageSize = minOf(livePage.size, existing.count { it is FeedItem.Server })
+        val olderPages = existing
+            .drop(serverPageSize)
+            .filter { item ->
+                when (item) {
+                    is FeedItem.Server -> item.notification.id !in incomingIds
+                    is FeedItem.Optimistic -> true
+                }
+            }
 
         // Per-topic feed: topicName = null so the chip is hidden (AC 4.4/AC2).
         // All-feed: topicName = subscription display name so the chip is shown (AC 4.4/AC1).
@@ -133,7 +157,7 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
         } else {
             { _ -> null }
         }
-        val decoratedPage = livePage.map { n -> FeedItem(n, topicNameFor(n)) }
+        val decoratedPage = livePage.map { n -> FeedItem.Server(n, topicNameFor(n)) }
         _feedItems.value = decoratedPage + olderPages
 
         // Accumulate new arrivals (don't reset existing ones not yet consumed)
@@ -164,7 +188,7 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
                 val isAllFeed = activeSubscriptionId == ALL_SUBSCRIPTIONS_ID
                 val newItems = results
                     .filter { it.id !in knownSnapshot }
-                    .map { n -> FeedItem(n, if (isAllFeed) subscriptionMap[n.subscriptionId] else null) }
+                    .map { n -> FeedItem.Server(n, if (isAllFeed) subscriptionMap[n.subscriptionId] else null) }
 
                 kotlinx.coroutines.withContext(Dispatchers.Main) {
                     if (results.isEmpty()) {
@@ -200,6 +224,36 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
         repository.markAsDeleted(notificationId)
     }
 
+    // ── Outbox (optimistic send) ────────────────────────────────────────────────
+
+    private val _outbox = MutableStateFlow<List<OptimisticMessage>>(emptyList())
+    val outbox: StateFlow<List<OptimisticMessage>> get() = _outbox
+
+    /** Jobs for in-flight publish requests; keyed by localId so retry can cancel previous job. */
+    private val outboxJobs = mutableMapOf<String, Job>()
+
+    fun addOptimistic(msg: OptimisticMessage) {
+        _outbox.update { it + msg }
+    }
+
+    fun updateOptimisticState(localId: String, state: SendState) {
+        _outbox.update { list -> list.map { if (it.localId == localId) it.copy(sendState = state) else it } }
+    }
+
+    fun removeOptimistic(localId: String) {
+        _outbox.update { it.filter { item -> item.localId != localId } }
+        outboxJobs.remove(localId)?.cancel()
+    }
+
+    fun registerOutboxJob(localId: String, job: Job) {
+        outboxJobs[localId]?.cancel() // cancel previous job for this localId before replacing
+        outboxJobs[localId] = job
+    }
+
+    fun cancelOutboxJob(localId: String) {
+        outboxJobs.remove(localId)?.cancel()
+    }
+
     // ── Legacy single-LiveData API (kept for backwards compat with any callers) ─
 
     /** @deprecated Use [observeLivePage] + [onLivePageUpdate] + [feedItems] instead. */
@@ -210,7 +264,7 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
         var currentSubscriptionMap: Map<Long, String> = emptyMap()
         fun merge() {
             val map = currentSubscriptionMap
-            result.value = currentNotifications.map { n -> FeedItem(n, map[n.subscriptionId]) }
+            result.value = currentNotifications.map { n -> FeedItem.Server(n, map[n.subscriptionId]) }
         }
         result.addSource(notifications) { list ->
             currentNotifications = list ?: emptyList(); merge()
@@ -225,7 +279,7 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
     fun listForSubscription(subscriptionId: Long): LiveData<List<FeedItem>> {
         val result = MediatorLiveData<List<FeedItem>>()
         result.addSource(repository.getNotificationsLiveData(subscriptionId)) { list ->
-            result.value = list.orEmpty().map { n -> FeedItem(n, null) }
+            result.value = list.orEmpty().map { n -> FeedItem.Server(n, null) }
         }
         return result
     }
