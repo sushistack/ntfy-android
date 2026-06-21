@@ -53,19 +53,19 @@ development_status:
   epic-1: in-progress
   1-1-color-token-resources-light-dark: done
   1-2-non-color-token-resources-literal-tag-palettes: done
-  1-3-light-dark-system-theme-switch: review
-  1-4-reduced-motion-accessibility-primitives: review
+  1-3-light-dark-system-theme-switch: done
+  1-4-reduced-motion-accessibility-primitives: done
   epic-1-retrospective: optional
 
   # Epic 2: Redesigned notification card (adapter-agnostic binder)
   epic-2: in-progress
   2-1-adapter-agnostic-card-shell-body-slot: done
-  2-2-priority-accent-bar-all-five-priorities: in-progress
-  2-3a-card-header-static-content-badge-title-unread-dot: in-progress
-  2-3b-x-delete-with-token-styled-confirm-dialog: in-progress
+  2-2-priority-accent-bar-all-five-priorities: done
+  2-3a-card-header-static-content-badge-title-unread-dot: review
+  2-3b-x-delete-with-token-styled-confirm-dialog: review
   2-4-categorized-tag-row-timestamp: ready-for-dev
-  2-5-tap-to-mark-read: ready-for-dev
-  2-6-card-loading-skeleton-new-arrival-animation-deep-link-highlight: ready-for-dev
+  2-5-tap-to-mark-read: review
+  2-6-card-loading-skeleton-new-arrival-animation-deep-link-highlight: in-progress
   epic-2-retrospective: optional
 
   # Epic 3: Structured message rendering (card body)

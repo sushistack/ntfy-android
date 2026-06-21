@@ -8,6 +8,10 @@
 
 - `fallbackToDestructiveMigration(true)` coexists with all explicit migrations — pre-existing. If a future migration is missing, Room silently drops all user data instead of crashing. Consider removing or scoping to dev-only builds after all migration paths are verified.
 
+## Deferred from: code review of 1-3-light-dark-system-theme-switch and 1-4-reduced-motion-accessibility-primitives (2026-06-21)
+
+- `markAsRead(id: String)` method added to Repository by a parallel story session (Epic 2 work) — not part of Stories 1-3/1-4 scope. Verify type consistency with DAO signature and cover with a test in the originating story's review.
+
 ## Deferred from: code review of 2-1-adapter-agnostic-card-shell-body-slot (2026-06-21)
 
 - P5: `toggleSelection` 마지막 아이템 해제 시 `notifyItemChanged` 미호출 — `DetailActivity.endActionModeAndRedraw()`가 전체 rebind로 보정하므로 실제 시각적 버그 없음. DetailActivity 구조 변경 시 재검토 필요.

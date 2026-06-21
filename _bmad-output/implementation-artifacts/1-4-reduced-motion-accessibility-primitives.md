@@ -1,6 +1,10 @@
 # Story 1.4: Reduced-motion & accessibility primitives
 
-Status: ready-for-dev
+---
+baseline_commit: 3b3468c4b851ae0801e085ecb0267a212b63fe5f
+---
+
+Status: done
 
 ## Story
 
@@ -17,31 +21,31 @@ so that later epics inherit consistent, owned accessibility behavior instead of 
 
 ## Tasks / Subtasks
 
-- [ ] Add the shared reduced-motion API (AC: 1, 4)
-  - [ ] Create `app/src/main/java/io/heckel/ntfy/ui/accessibility/ReducedMotion.kt`.
-  - [ ] Expose a clearly named query such as `ReducedMotion.isEnabled(): Boolean`, implemented as the inverse of `ValueAnimator.areAnimatorsEnabled()`.
-  - [ ] Keep a small pure/internal seam that accepts the animator-enabled value so both outcomes can be unit tested without mutating device settings.
-  - [ ] Document that callers query when deciding whether to start an animation; do not cache the result for the process lifetime.
-  - [ ] Do not read/write `Settings.Global.ANIMATOR_DURATION_SCALE` in production or request `WRITE_SECURE_SETTINGS`.
+- [x] Add the shared reduced-motion API (AC: 1, 4)
+  - [x] Create `app/src/main/java/io/heckel/ntfy/ui/accessibility/ReducedMotion.kt`.
+  - [x] Expose a clearly named query such as `ReducedMotion.isEnabled(): Boolean`, implemented as the inverse of `ValueAnimator.areAnimatorsEnabled()`.
+  - [x] Keep a small pure/internal seam that accepts the animator-enabled value so both outcomes can be unit tested without mutating device settings.
+  - [x] Document that callers query when deciding whether to start an animation; do not cache the result for the process lifetime.
+  - [x] Do not read/write `Settings.Global.ANIMATOR_DURATION_SCALE` in production or request `WRITE_SECURE_SETTINGS`.
 
-- [ ] Add the reusable View/XML focus indicator (AC: 2, 4)
-  - [ ] Add a focused-state selector/foreground under `app/src/main/res/drawable/`; its focused item draws a transparent rectangular 2dp stroke using `@color/focus_ring`, and its default item is transparent.
-  - [ ] Add one reusable style in `app/src/main/res/values/themes.xml` or a dedicated `styles.xml`, applying the indicator as a foreground/overlay rather than replacing the control background.
-  - [ ] Keep the primitive squared/shape-neutral; component-specific shape remains the component's responsibility.
-  - [ ] Do not force focusability, clickability, dimensions, padding, color, role, or content description. Callers own semantics and interaction.
-  - [ ] Verify the full stroke remains visible and is not clipped at the View edge.
+- [x] Add the reusable View/XML focus indicator (AC: 2, 4)
+  - [x] Add a focused-state selector/foreground under `app/src/main/res/drawable/`; its focused item draws a transparent rectangular 2dp stroke using `@color/focus_ring`, and its default item is transparent.
+  - [x] Add one reusable style in `app/src/main/res/values/themes.xml` or a dedicated `styles.xml`, applying the indicator as a foreground/overlay rather than replacing the control background.
+  - [x] Keep the primitive squared/shape-neutral; component-specific shape remains the component's responsibility.
+  - [x] Do not force focusability, clickability, dimensions, padding, color, role, or content description. Callers own semantics and interaction.
+  - [x] Verify the full stroke remains visible and is not clipped at the View edge.
 
-- [ ] Test both primitives (AC: 1, 2, 4)
-  - [ ] Unit-test both inputs: animators enabled → reduced motion off; animators disabled → reduced motion on.
-  - [ ] Add a resource/instrumentation assertion or drawable-state test proving the shared style resolves to `@color/focus_ring`, uses a 2dp stroke, and preserves a separate content background.
-  - [ ] Add only the minimum JUnit/AndroidX test dependencies if the module still has no test setup.
-  - [ ] Run lint/resource linking for both `playDebug` and `fdroidDebug`.
+- [x] Test both primitives (AC: 1, 2, 4)
+  - [x] Unit-test both inputs: animators enabled → reduced motion off; animators disabled → reduced motion on.
+  - [x] Add a resource/instrumentation assertion or drawable-state test proving the shared style resolves to `@color/focus_ring`, uses a 2dp stroke, and preserves a separate content background.
+  - [x] Add only the minimum JUnit/AndroidX test dependencies if the module still has no test setup.
+  - [x] Run lint/resource linking for both `playDebug` and `fdroidDebug`.
 
-- [ ] Commit the light-theme contrast check (AC: 3)
-  - [ ] Create `docs/ui-parity/accessibility-contrast.md`.
-  - [ ] Record the WCAG relative-luminance formula and evaluate at least the canonical pairs listed below.
-  - [ ] Classify text/icon pairs against 4.5:1 and borders/focus indicators against 3:1; do not silently reclassify a failing text color as non-text.
-  - [ ] Recompute from the actual Story 1.1 resources if their values differ at implementation time, and resolve failures before completion.
+- [x] Commit the light-theme contrast check (AC: 3)
+  - [x] Create `docs/ui-parity/accessibility-contrast.md`.
+  - [x] Record the WCAG relative-luminance formula and evaluate at least the canonical pairs listed below.
+  - [x] Classify text/icon pairs against 4.5:1 and borders/focus indicators against 3:1; do not silently reclassify a failing text color as non-text.
+  - [x] Recompute from the actual Story 1.1 resources if their values differ at implementation time, and resolve failures before completion.
 
 ## Dev Notes
 
@@ -143,17 +147,43 @@ These values guide implementation but do not replace recomputation from committe
 
 ### Agent Model Used
 
-GPT-5 Codex
+claude-sonnet-4-6
 
 ### Debug Log References
 
-- The customization resolver fallback was used because the available `python3` lacks Python 3.11 `tomllib`; base/team/user TOML was resolved manually.
+- python3 lacks tomllib (< 3.11); customize.toml resolved manually from base only (no team/user overrides).
+- Kotlin daemon instability during parallel Gradle runs; resolved by sequential execution after `./gradlew --stop` + daemon cache cleanup.
+- FocusIndicatorContractTest compile error: `?: fail(...)` leaves type as `Element?` — fixed with explicit `!!` after separate `assertNotNull`.
 
 ### Completion Notes List
 
-- Ultimate context engine analysis completed - comprehensive developer guide created.
-- Story is implementation-ready subject to the explicit Story 1.1 token prerequisite.
+- `ReducedMotion.kt` created in `ui/accessibility` package; `isEnabled()` delegates to `ValueAnimator.areAnimatorsEnabled()` inverse; `internal fun isEnabledForAnimatorsEnabled()` seam enables JVM unit testing of both outcomes without device state mutation.
+- `focus_indicator.xml` drawable: state_focused=true item draws 2dp `@color/focus_ring` stroke; default item is transparent — content background, ripple, and shape drawables preserved.
+- `FocusIndicator` style in `themes.xml` applies drawable as `android:foreground` overlay only.
+- `ReducedMotionTest`: 2 unit tests covering both animator states — all pass.
+- `FocusIndicatorContractTest`: 6 XML-parsing contract tests verifying focused state, focus_ring color ref, 2dp stroke token, transparent default, style existence, and foreground reference — all pass (fdroidDebug BUILD SUCCESSFUL).
+- `docs/ui-parity/accessibility-contrast.md`: WCAG formula documented; 17 light-theme pairs checked (11 text ≥ 4.5:1, 6 non-text ≥ 3:1); all PASS.
+- Lint (fdroidDebug + playDebug): no new errors introduced. Pre-existing errors in `glows.xml` (Story 1.2) and `typography.xml` (Story 1.2) are out of scope.
 
 ### File List
 
-- `_bmad-output/implementation-artifacts/1-4-reduced-motion-accessibility-primitives.md`
+- `app/src/main/java/io/heckel/ntfy/ui/accessibility/ReducedMotion.kt` (new)
+- `app/src/main/res/drawable/focus_indicator.xml` (new)
+- `app/src/main/res/values/themes.xml` (modified — FocusIndicator style added)
+- `app/src/test/java/io/heckel/ntfy/ui/accessibility/ReducedMotionTest.kt` (new)
+- `app/src/test/java/io/heckel/ntfy/ui/accessibility/FocusIndicatorContractTest.kt` (new)
+- `docs/ui-parity/accessibility-contrast.md` (new)
+- `_bmad-output/implementation-artifacts/1-4-reduced-motion-accessibility-primitives.md` (this file)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` (status updated)
+
+### Review Findings
+
+- [x] `Review/Patch` ThemeSegmentedPreference (Story 1.3) buttons not consuming FocusIndicator primitive — fixed in preference_theme_segmented.xml by adding android:foreground="@drawable/focus_indicator" `preference_theme_segmented.xml` (cross-story fix)
+- [x] `Review/Dismiss` card_shell_foreground_focused.xml always-on ring concern — false positive; file is used inside card_shell_foreground.xml state_focused selector, not set directly as foreground
+- [x] `Review/Dismiss` WCAG contrast docs missing concern — false positive; docs/ui-parity/accessibility-contrast.md already committed
+- [x] `Review/Dismiss` ReducedMotion dead code concern — expected; this story delivers a shared primitive with no call sites yet (call sites in Stories 2.6, 4.2)
+
+### Change Log
+
+- 2026-06-21: Implemented Story 1.4 — ReducedMotion API, focus_indicator drawable, FocusIndicator style, unit/contract tests, WCAG contrast documentation.
+- 2026-06-21: Code review — FocusIndicator cross-story fix applied to ThemeSegmentedPreference buttons.
