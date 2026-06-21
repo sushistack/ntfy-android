@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ntfy-web parity: literal tag palette colors.
+
+    These are fixed literal values (no token indirection) that live in default values/ only.
+    Night-mode does NOT override them — both themes use the same literal palette.
+
+    The 6 general-tag pairs are indexed 0–5. Story 2.4 owns the 32-bit hash that maps a tag
+    string to an index; this file only provides the colors at each index.
+
+    The allowlist in the Story 1.1 raw-color verifier is restricted to exactly these 14 resources.
+-->
+<resources>
+    <!-- General tag backgrounds (index 0–5) -->
+    <color name="tag_general_bg_0">#332b52</color>
+    <color name="tag_general_bg_1">#143a34</color>
+    <color name="tag_general_bg_2">#3a2f14</color>
+    <color name="tag_general_bg_3">#3a1f22</color>
+    <color name="tag_general_bg_4">#14303a</color>
+    <color name="tag_general_bg_5">#283a14</color>
+
+    <!-- General tag text colors (index 0–5, paired with backgrounds above) -->
+    <color name="tag_general_text_0">#c4b5fd</color>
+    <color name="tag_general_text_1">#7fe0cb</color>
+    <color name="tag_general_text_2">#f5c97a</color>
+    <color name="tag_general_text_3">#f5a3a5</color>
+    <color name="tag_general_text_4">#7fc8e0</color>
+    <color name="tag_general_text_5">#b7e07f</color>
+
+    <!-- Fixed service tag colors -->
+    <color name="tag_service_bg">#2a3142</color>
+    <color name="tag_service_text">#9db4d8</color>
+
+    <!-- Typed arrays preserving index pairing; Story 2.4 indexes these by hash result -->
+    <array name="tag_general_backgrounds">
+        <item>@color/tag_general_bg_0</item>
+        <item>@color/tag_general_bg_1</item>
+        <item>@color/tag_general_bg_2</item>
+        <item>@color/tag_general_bg_3</item>
+        <item>@color/tag_general_bg_4</item>
+        <item>@color/tag_general_bg_5</item>
+    </array>
+
+    <array name="tag_general_texts">
+        <item>@color/tag_general_text_0</item>
+        <item>@color/tag_general_text_1</item>
+        <item>@color/tag_general_text_2</item>
+        <item>@color/tag_general_text_3</item>
+        <item>@color/tag_general_text_4</item>
+        <item>@color/tag_general_text_5</item>
+    </array>
+</resources>

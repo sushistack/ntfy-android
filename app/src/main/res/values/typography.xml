@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ntfy-web parity: text appearances pairing canonical size/leading/family tokens.
+         Component-specific weight choices (semibold title, extrabold badge) are owned
+         by later stories; do NOT create additional size tokens here.
+
+         android:lineHeight is a platform attribute added in API 28. On API 26–27 it is
+         silently ignored. android:lineSpacingExtra approximates the same visual gap
+         (leading − textSize) and is applied on all supported API levels as a fallback.
+         On API 28+ android:lineHeight takes precedence and the exact token value is used. -->
+
+    <style name="TextAppearance.Ntfy.Display" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:textSize">@dimen/text_display</item>
+        <item name="android:lineSpacingExtra">6sp</item><!-- leading_display(34) - text_display(28) -->
+        <item name="android:lineHeight">@dimen/leading_display</item>
+        <item name="android:fontFamily">@font/font_sans</item>
+    </style>
+
+    <style name="TextAppearance.Ntfy.Title" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textSize">@dimen/text_title</item>
+        <item name="android:lineSpacingExtra">6sp</item><!-- leading_title(28) - text_title(22) -->
+        <item name="android:lineHeight">@dimen/leading_title</item>
+        <item name="android:fontFamily">@font/font_sans</item>
+    </style>
+
+    <style name="TextAppearance.Ntfy.Subtitle" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textSize">@dimen/text_subtitle</item>
+        <item name="android:lineSpacingExtra">6sp</item><!-- leading_subtitle(24) - text_subtitle(18) -->
+        <item name="android:lineHeight">@dimen/leading_subtitle</item>
+        <item name="android:fontFamily">@font/font_sans</item>
+    </style>
+
+    <style name="TextAppearance.Ntfy.Body" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:lineSpacingExtra">8sp</item><!-- leading_body(24) - text_body(16) -->
+        <item name="android:lineHeight">@dimen/leading_body</item>
+        <item name="android:fontFamily">@font/font_sans</item>
+    </style>
+
+    <style name="TextAppearance.Ntfy.BodySmall" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textSize">@dimen/text_body_sm</item>
+        <item name="android:lineSpacingExtra">6sp</item><!-- leading_body_sm(20) - text_body_sm(14) -->
+        <item name="android:lineHeight">@dimen/leading_body_sm</item>
+        <item name="android:fontFamily">@font/font_sans</item>
+    </style>
+
+    <style name="TextAppearance.Ntfy.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">@dimen/text_caption</item>
+        <item name="android:lineSpacingExtra">4sp</item><!-- leading_caption(16) - text_caption(12) -->
+        <item name="android:lineHeight">@dimen/leading_caption</item>
+        <item name="android:fontFamily">@font/font_sans</item>
+    </style>
+
+    <style name="TextAppearance.Ntfy.Mono" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textSize">@dimen/text_mono</item>
+        <item name="android:lineSpacingExtra">6sp</item><!-- leading_mono(20) - text_mono(14) -->
+        <item name="android:lineHeight">@dimen/leading_mono</item>
+        <item name="android:fontFamily">@font/font_mono</item>
+    </style>
+</resources>

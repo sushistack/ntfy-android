@@ -232,9 +232,13 @@ task verifyNoRawUiColors {
     description = 'Fails if any new parity UI file contains a raw #RGB/#RRGGBB/#ARGB/#AARRGGBB color literal'
 
     def inScopePaths = ntfyParityUiPaths
-    def allowlist    = ntfyParityRawColorAllowlist
 
     doLast {
+        // Read the allowlist at execution time so the Story 1.2 override (assigned later in
+        // the build script) is visible. Capturing it at configuration time would hold the
+        // Story 1.1 empty-set reference and silently ignore the Story 1.2 additions.
+        def allowlist = ntfyParityRawColorAllowlist
+
         // Raw hex pattern: #RGB, #ARGB, #RRGGBB, #AARRGGBB — but NOT @color/ references
         def rawHexPattern = ~/#[0-9A-Fa-f]{3}(?:[0-9A-Fa-f](?:[0-9A-Fa-f]{2}(?:[0-9A-Fa-f]{2})?)?)?(?![0-9A-Fa-f])/
 
@@ -245,7 +249,10 @@ task verifyNoRawUiColors {
             f.eachLine { line, lineNum ->
                 def matcher = rawHexPattern.matcher(line)
                 while (matcher.find()) {
-                    def literal = matcher.group()
+                    // Normalize to lowercase so the case-sensitive Set lookup matches the
+                    // lowercase-only entries in ntfyParityRawColorAllowlist regardless of
+                    // how the literal is written in the source file.
+                    def literal = matcher.group().toLowerCase()
                     if (!(literal in allowlist)) {
                         violations << "${relativePath}:${lineNum}: forbidden raw color literal '${literal}'"
                     }

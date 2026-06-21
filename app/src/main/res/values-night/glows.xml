@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ntfy-web parity: dark-only glow specification colors and radii.
+
+    These resources MUST NOT exist in the default values/ qualifier.
+    GlowSpec.resolve() gates on UI_MODE_NIGHT_MASK before loading them,
+    so light mode never touches this file.
+
+    Token assignment:
+      P4 (high priority)   → glow_priority_high
+      P5 (max priority)    → glow_priority_max
+      unread dots, status dots, accent emphasis, deep-link highlight → glow_accent_dot
+      Chart glow only when the owning renderer explicitly requests accent glow.
+
+    Alpha derivation:
+      0.267 × 255 ≈ 0x44  (glow_priority_high)
+      0.333 × 255 ≈ 0x55  (glow_priority_max)
+      1.000 × 255 = 0xFF  (glow_accent_dot — fully opaque base color, blur creates the halo)
+-->
+<resources>
+    <color name="glow_priority_high">#44F5A95C</color>
+    <color name="glow_priority_max">#55FF6B6E</color>
+    <color name="glow_accent_dot">#FF42D392</color>
+
+    <dimen name="glow_priority_high_radius">10dp</dimen>
+    <dimen name="glow_priority_max_radius">10dp</dimen>
+    <dimen name="glow_accent_dot_radius">7dp</dimen>
+</resources>
