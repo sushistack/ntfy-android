@@ -208,8 +208,7 @@ class FirebaseService : FirebaseMessagingService() {
                 attachment = attachment,
                 notificationId = deriveNotificationId(baseUrl, topic, actualSequenceId),
                 deleted = false,
-                serverSequence = null,
-                event = ApiService.EVENT_MESSAGE
+                serverSequence = null
             )
 
             val added = repository.addNotification(notification)
