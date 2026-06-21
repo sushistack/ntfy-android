@@ -9,8 +9,10 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.heckel.ntfy.R
 import io.heckel.ntfy.app.Application
 import io.heckel.ntfy.db.Notification
@@ -19,7 +21,7 @@ import io.heckel.ntfy.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class FeedActivity : AppCompatActivity() {
+class FeedActivity : AppCompatActivity(), DeleteSwipeConfirmFragment.Listener {
 
     private val viewModel by viewModels<FeedViewModel> {
         FeedViewModelFactory((application as Application).repository)
@@ -34,6 +36,7 @@ class FeedActivity : AppCompatActivity() {
     private lateinit var disconnectedContainer: View
     private lateinit var disconnectedRetry: Button
     private lateinit var adapter: FeedAdapter
+    private lateinit var fab: FloatingActionButton
 
     private var subscriptionId: Long = ALL_SUBSCRIPTIONS_ID
     private var subscriptionTopic: String? = null
@@ -56,6 +59,11 @@ class FeedActivity : AppCompatActivity() {
         emptyBody = emptyContainer.findViewById(R.id.feed_empty_body)
         disconnectedContainer = findViewById(R.id.feed_disconnected_container)
         disconnectedRetry = disconnectedContainer.findViewById(R.id.feed_disconnected_retry)
+        fab = findViewById(R.id.feed_fab)
+        fab.setOnClickListener {
+            PublishBottomSheet.newInstance(subscriptionTopic ?: "")
+                .show(supportFragmentManager, PublishBottomSheet.TAG)
+        }
 
         applyFeedState(FeedState.Loading)
 
@@ -76,6 +84,13 @@ class FeedActivity : AppCompatActivity() {
             onArrivalConsumedCallback = { id -> viewModel.consumeArrivedId(id) },
         )
         recyclerView.adapter = adapter
+
+        val swipeCallback = FeedSwipeCallback(
+            notificationAt = { position -> adapter.currentList.getOrNull(position)?.notification },
+            onSwipeLeft = { notification, position -> showDeleteConfirm(notification.id, position) },
+            onSwipeRight = { notification -> markNotificationAsRead(notification) },
+        )
+        ItemTouchHelper(swipeCallback).attachToRecyclerView(recyclerView)
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -136,6 +151,15 @@ class FeedActivity : AppCompatActivity() {
             if (error != null) {
                 Log.w(TAG, "Page load failed: ${error.cause.message}", error.cause)
                 applyFeedState(FeedState.Disconnected(isPageLoadFailure = true)) { viewModel.loadNextPage() }
+            } else {
+                // Error cleared (retry succeeded) — restore the appropriate content state.
+                val items = viewModel.feedItems.value ?: emptyList()
+                val state = if (items.isEmpty()) {
+                    FeedState.Empty(isAllFeed = subscriptionId == ALL_SUBSCRIPTIONS_ID)
+                } else {
+                    FeedState.HasContent
+                }
+                applyFeedState(state)
             }
         }
     }
@@ -198,6 +222,22 @@ class FeedActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             repository.markAsRead(notification.id)
         }
+    }
+
+    private fun showDeleteConfirm(notificationId: String, position: Int) {
+        DeleteSwipeConfirmFragment.newInstance(notificationId, position)
+            .show(supportFragmentManager, DeleteSwipeConfirmFragment.TAG)
+    }
+
+    // DeleteSwipeConfirmFragment.Listener
+    override fun onSwipeDeleteConfirmed(notificationId: String, position: Int) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            repository.markAsDeleted(notificationId)
+        }
+    }
+
+    override fun onSwipeDeleteCancelled(position: Int) {
+        adapter.notifyItemChanged(position)
     }
 
     companion object {
