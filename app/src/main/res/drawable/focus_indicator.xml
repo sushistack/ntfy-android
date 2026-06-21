@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Reusable focus-indicator foreground/overlay.
+     Apply as android:foreground — never replaces background, ripple, or shape.
+     Component-specific shape (corners, radius) remains the component's responsibility.
+     Stroke is 2dp @color/focus_ring for density-independent visual parity with ntfy-web 2px ring. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="@dimen/card_focus_ring_width"
+                android:color="@color/focus_ring" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</selector>
