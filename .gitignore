@@ -8,6 +8,12 @@ google-services.json
 # Playground
 playground/
 
+# IDE settings
+.vscode/
+
+# Claude Code memory
+memory/
+
 # Release
 releases/
 app/release/
