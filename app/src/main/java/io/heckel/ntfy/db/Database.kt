@@ -160,6 +160,7 @@ data class Notification(
     @ColumnInfo(name = "actions") val actions: List<Action>?,
     @Embedded(prefix = "attachment_") val attachment: Attachment?,
     @ColumnInfo(name = "deleted") val deleted: Boolean,
+    @ColumnInfo(name = "serverSequence") val serverSequence: Long?,
     @Ignore val event: String = ApiService.EVENT_MESSAGE, // In-memory event type (message, message_delete, message_clear)
 ) {
     constructor(
@@ -181,7 +182,8 @@ data class Notification(
         deleted: Boolean
     ) : this(
         id, subscriptionId, timestamp, sequenceId, title, message, contentType, encoding,
-        notificationId, priority, tags, click, icon, actions, attachment, deleted, event = ApiService.EVENT_MESSAGE
+        notificationId, priority, tags, click, icon, actions, attachment, deleted,
+        serverSequence = null, event = ApiService.EVENT_MESSAGE
     )
 }
 
@@ -299,7 +301,7 @@ data class LogEntry(
 }
 
 @androidx.room.Database(
-    version = 18,
+    version = 19,
     entities = [
         Subscription::class,
         Notification::class,
@@ -345,6 +347,7 @@ abstract class Database : RoomDatabase() {
                     .addMigrations(MIGRATION_15_16)
                     .addMigrations(MIGRATION_16_17)
                     .addMigrations(MIGRATION_17_18)
+                    .addMigrations(MIGRATION_18_19)
                     .fallbackToDestructiveMigration(true)
                     .build()
                 this.instance = instance
@@ -485,6 +488,12 @@ abstract class Database : RoomDatabase() {
                 db.execSQL("UPDATE Notification SET sequenceId = id WHERE sequenceId = ''")
             }
         }
+
+        val MIGRATION_18_19 = object : Migration(18, 19) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE Notification ADD COLUMN serverSequence INTEGER")
+            }
+        }
     }
 }
 
@@ -587,7 +596,7 @@ interface NotificationDao {
     @Query("SELECT * FROM notification")
     suspend fun list(): List<Notification>
 
-    @Query("SELECT * FROM notification WHERE subscriptionId = :subscriptionId AND deleted != 1 ORDER BY timestamp DESC")
+    @Query("SELECT * FROM notification WHERE subscriptionId = :subscriptionId AND deleted != 1 ORDER BY sequenceId DESC, timestamp DESC, id DESC")
     fun listFlow(subscriptionId: Long): Flow<List<Notification>>
 
     @Query("""
@@ -599,7 +608,7 @@ interface NotificationDao {
             OR message LIKE '%' || :query || '%' COLLATE NOCASE
             OR tags LIKE '%' || :query || '%' COLLATE NOCASE
         )
-        ORDER BY timestamp DESC
+        ORDER BY sequenceId DESC, timestamp DESC, id DESC
     """)
     fun listFlowFiltered(subscriptionId: Long, query: String): Flow<List<Notification>>
 

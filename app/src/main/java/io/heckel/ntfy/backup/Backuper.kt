@@ -204,7 +204,8 @@ class Backuper(val context: Context) {
                     icon = icon,
                     actions = actions,
                     attachment = attachment,
-                    deleted = n.deleted
+                    deleted = n.deleted,
+                    serverSequence = null
                 ))
             } catch (e: Exception) {
                 Log.w(TAG, "Unable to restore notification ${n.id}: ${e.message}. Ignoring.", e)

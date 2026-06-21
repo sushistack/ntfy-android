@@ -208,6 +208,7 @@ class FirebaseService : FirebaseMessagingService() {
                 attachment = attachment,
                 notificationId = deriveNotificationId(baseUrl, topic, actualSequenceId),
                 deleted = false,
+                serverSequence = null,
                 event = ApiService.EVENT_MESSAGE
             )
 

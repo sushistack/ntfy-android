@@ -64,6 +64,12 @@ android {
         }
     }
 
+    sourceSets {
+        androidTest {
+            assets.srcDirs += files("$projectDir/schemas")
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -86,6 +92,593 @@ android.applicationVariants.all { variant ->
     googleTask.enabled = shouldProcessGoogleServices
 }
 
+// =============================================================================
+// ntfy-web parity color token verification (Story 1.1)
+// =============================================================================
+
+// Canonical token manifest — single source of truth for both Gradle tasks.
+// Update here AND in the color XML files when the design system changes.
+ext.ntfyParityTokensLight = [
+    bg: '#F3F4F6', surface: '#FFFFFF', surface_2: '#EEF0F2',
+    surface_active: '#EEF0F2', border: '#E4E6E9', control_border: '#767B80',
+    text: '#1C1E21', muted: '#6A7076', accent_text: '#0E7A48',
+    accent_ui: '#1A9E5F', accent_on_surface: '#0C1A12',
+    priority_high: '#BF6C15', priority_max: '#E5484D', priority_urgent: '#C7353A',
+    priority_high_on_surface: '#241403', priority_max_on_surface: '#1A0E0E',
+    meter_ok: '#0E7A48', meter_track: '#E4E6E9', meter_warning: '#BF6C15',
+    meter_critical: '#E5484D', topic_chip_bg: '#E1F2EA', topic_chip_text: '#136B43',
+    button_fill: '#F4F5F6', button_fill_text: '#15171A', focus_ring: '#1A9E5F',
+]
+ext.ntfyParityTokensDark = [
+    bg: '#0C0D0F', surface: '#16181B', surface_2: '#1C1F23',
+    surface_active: '#1C1F23', border: '#23262B', control_border: '#8B9197',
+    text: '#E8EAED', muted: '#8B9197', accent_text: '#42D392',
+    accent_ui: '#42D392', accent_on_surface: '#0C1A12',
+    priority_high: '#F5A95C', priority_max: '#FF6B6E', priority_urgent: '#FF6B6E',
+    priority_high_on_surface: '#241403', priority_max_on_surface: '#1A0E0E',
+    meter_ok: '#42D392', meter_track: '#262A2F', meter_warning: '#F5A95C',
+    meter_critical: '#FF6B6E', topic_chip_bg: '#143A2D', topic_chip_text: '#7CE6B4',
+    button_fill: '#F4F5F6', button_fill_text: '#15171A', focus_ring: '#42D392',
+]
+
+/**
+ * Parses a colors.xml file and returns a map of name→value.
+ * Throws if any duplicate canonical key is detected.
+ * Only returns entries whose names appear in canonicalKeys (subset check).
+ */
+static Map<String, String> parseColorXml(File xmlFile, Set<String> canonicalKeys) {
+    def factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+    def builder = factory.newDocumentBuilder()
+    def doc = builder.parse(xmlFile)
+    doc.documentElement.normalize()
+
+    def seen = [:]
+    def duplicates = []
+    def nodes = doc.getElementsByTagName('color')
+    for (int i = 0; i < nodes.length; i++) {
+        def el = nodes.item(i)
+        def name = el.attributes.getNamedItem('name').nodeValue
+        def value = el.textContent.trim()
+        if (name in canonicalKeys) {
+            if (seen.containsKey(name)) {
+                duplicates << name
+            } else {
+                seen[name] = value
+            }
+        }
+    }
+    if (duplicates) {
+        throw new GradleException("Duplicate canonical color keys in ${xmlFile.name}: ${duplicates.join(', ')}")
+    }
+    return seen
+}
+
+task verifyColorTokens {
+    group = 'verification'
+    description = 'Verifies ntfy-web parity color tokens exist with correct values in both qualifier color files'
+
+    def lightFile = file('src/main/res/values/colors.xml')
+    def darkFile  = file('src/main/res/values-night/colors.xml')
+    def lightExpected = ntfyParityTokensLight
+    def darkExpected  = ntfyParityTokensDark
+
+    inputs.file lightFile
+    inputs.file darkFile
+
+    doLast {
+        def errors = []
+        def canonicalKeys = lightExpected.keySet()
+
+        // Verify light
+        def lightParsed = parseColorXml(lightFile, canonicalKeys)
+        lightExpected.each { key, expectedHex ->
+            def actual = lightParsed[key]
+            if (actual == null) {
+                errors << "light: missing canonical token '$key'"
+            } else if (actual.toUpperCase() != expectedHex.toUpperCase()) {
+                errors << "light: '$key' expected ${expectedHex.toUpperCase()} but was ${actual.toUpperCase()}"
+            }
+        }
+
+        // Verify dark
+        def darkParsed = parseColorXml(darkFile, darkExpected.keySet())
+        darkExpected.each { key, expectedHex ->
+            def actual = darkParsed[key]
+            if (actual == null) {
+                errors << "dark: missing canonical token '$key'"
+            } else if (actual.toUpperCase() != expectedHex.toUpperCase()) {
+                errors << "dark: '$key' expected ${expectedHex.toUpperCase()} but was ${actual.toUpperCase()}"
+            }
+        }
+
+        if (errors) {
+            throw new GradleException(
+                "❌ Color token parity check FAILED:\n" + errors.collect { "   $it" }.join('\n')
+            )
+        }
+        println "✅ Color token parity check passed (${lightExpected.size()} light + ${darkExpected.size()} dark tokens)"
+    }
+}
+
+// =============================================================================
+// No-raw-color verification gate (Story 1.1)
+// Scoped to parity UI files introduced by this initiative.
+// Pre-existing legacy files are tracked in the baseline allowlist below.
+// =============================================================================
+
+// Directories and files that are explicitly in-scope for the raw-color gate.
+// Expand this list as new parity UI files are added in later stories.
+ext.ntfyParityUiPaths = [
+    // Story 1.1 adds tokens only; no parity UI layout/drawable files yet.
+    // This list grows as Epic 2+ UI files are created.
+]
+
+// Hex patterns that are permitted in parity UI files because Story 1.2 explicitly
+// owns the literal tag/service palette (e.g. '#FF0000' style palette values).
+// Empty until Story 1.2 adds them.
+ext.ntfyParityRawColorAllowlist = [] as Set
+
+// Baseline of pre-existing files known to contain raw hex values.
+// These are NOT re-scanned to avoid mass-converting legacy code in this story.
+// Documented here so violations added in the future are detectable.
+ext.ntfyRawColorBaselinePaths = [
+    'src/main/res/values/colors.xml',
+    'src/main/res/values-night/colors.xml',
+    // Legacy layout/drawable files (not enumerated individually; baseline protects them)
+]
+
+task verifyNoRawUiColors {
+    group = 'verification'
+    description = 'Fails if any new parity UI file contains a raw #RGB/#RRGGBB/#ARGB/#AARRGGBB color literal'
+
+    def inScopePaths = ntfyParityUiPaths
+    def allowlist    = ntfyParityRawColorAllowlist
+
+    doLast {
+        // Raw hex pattern: #RGB, #ARGB, #RRGGBB, #AARRGGBB — but NOT @color/ references
+        def rawHexPattern = ~/#[0-9A-Fa-f]{3}(?:[0-9A-Fa-f](?:[0-9A-Fa-f]{2}(?:[0-9A-Fa-f]{2})?)?)?(?![0-9A-Fa-f])/
+
+        def violations = []
+        inScopePaths.each { relativePath ->
+            def f = file(relativePath)
+            if (!f.exists()) return
+            f.eachLine { line, lineNum ->
+                def matcher = rawHexPattern.matcher(line)
+                while (matcher.find()) {
+                    def literal = matcher.group()
+                    if (!(literal in allowlist)) {
+                        violations << "${relativePath}:${lineNum}: forbidden raw color literal '${literal}'"
+                    }
+                }
+            }
+        }
+
+        if (violations) {
+            throw new GradleException(
+                "❌ Raw color literals found in parity UI files:\n" + violations.collect { "   $it" }.join('\n')
+            )
+        }
+        println "✅ No-raw-color check passed (${inScopePaths.size()} parity UI files scanned)"
+    }
+}
+
+tasks.named('check').configure {
+    dependsOn verifyColorTokens
+    dependsOn verifyNoRawUiColors
+}
+
+// =============================================================================
+// Story 1.2: Non-color token verification
+// Verifies dimensions, typography, tag palettes, and dark-only glows.
+// =============================================================================
+
+// Canonical dimension manifest (dp and sp values as floats for comparison)
+ext.ntfyDimenManifest = [
+    // spacing
+    spacing_1: [value: 4.0, unit: 'dp'],
+    spacing_2: [value: 8.0, unit: 'dp'],
+    spacing_3: [value: 12.0, unit: 'dp'],
+    spacing_4: [value: 16.0, unit: 'dp'],
+    spacing_5: [value: 24.0, unit: 'dp'],
+    spacing_6: [value: 32.0, unit: 'dp'],
+    spacing_7: [value: 48.0, unit: 'dp'],
+    // radius
+    radius_sm: [value: 10.0, unit: 'dp'],
+    radius_md: [value: 16.0, unit: 'dp'],
+    radius_full: [value: 9999.0, unit: 'dp'],
+    radius_badge: [value: 6.0, unit: 'dp'],
+    // typography size (sp)
+    text_display: [value: 28.0, unit: 'sp'],
+    text_title: [value: 22.0, unit: 'sp'],
+    text_subtitle: [value: 18.0, unit: 'sp'],
+    text_body: [value: 16.0, unit: 'sp'],
+    text_body_sm: [value: 14.0, unit: 'sp'],
+    text_caption: [value: 12.0, unit: 'sp'],
+    text_mono: [value: 14.0, unit: 'sp'],
+    // line-height (sp)
+    leading_display: [value: 34.0, unit: 'sp'],
+    leading_title: [value: 28.0, unit: 'sp'],
+    leading_subtitle: [value: 24.0, unit: 'sp'],
+    leading_body: [value: 24.0, unit: 'sp'],
+    leading_body_sm: [value: 20.0, unit: 'sp'],
+    leading_caption: [value: 16.0, unit: 'sp'],
+    leading_mono: [value: 20.0, unit: 'sp'],
+    // shadow/elevation
+    shadow_flat: [value: 0.0, unit: 'dp'],
+    shadow_elev_1: [value: 2.0, unit: 'dp'],
+    shadow_elev_2: [value: 6.0, unit: 'dp'],
+]
+
+/** Parse dimens.xml into a map of name → raw text value (e.g. "16dp", "14sp"). */
+static Map<String, String> parseDimenXml(File xmlFile) {
+    def factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+    def builder = factory.newDocumentBuilder()
+    def doc = builder.parse(xmlFile)
+    doc.documentElement.normalize()
+
+    def seen = [:] as Map<String, String>
+    def duplicates = []
+    def nodes = doc.getElementsByTagName('dimen')
+    for (int i = 0; i < nodes.length; i++) {
+        def el = nodes.item(i)
+        def name = el.attributes.getNamedItem('name').nodeValue
+        def value = el.textContent.trim()
+        if (seen.containsKey(name)) {
+            duplicates << name
+        } else {
+            seen[name] = value
+        }
+    }
+    if (duplicates) {
+        throw new GradleException("Duplicate dimen keys: ${duplicates.join(', ')}")
+    }
+    return seen
+}
+
+task verifyDimensionTokens {
+    group = 'verification'
+    description = 'Verifies ntfy-web parity dimension tokens (spacing, radius, typography, elevation)'
+
+    def dimenFile = file('src/main/res/values/dimens.xml')
+    inputs.file dimenFile
+
+    doLast {
+        def errors = []
+        def parsed = parseDimenXml(dimenFile)
+
+        ntfyDimenManifest.each { key, spec ->
+            def actual = parsed[key as String]
+            if (actual == null) {
+                errors << "missing dimension '$key'"
+            } else {
+                def expectedStr = "${spec.value == (long) spec.value ? (long) spec.value : spec.value}${spec.unit}"
+                // Normalize: "0.0dp" → "0dp", "4.0dp" → "4dp"
+                def normalizedExpected = expectedStr.replaceAll(/\.0(dp|sp)/, '$1')
+                def normalizedActual = actual.replaceAll(/\.0(dp|sp)/, '$1')
+                if (normalizedActual != normalizedExpected) {
+                    errors << "dimension '$key': expected '${normalizedExpected}' but was '${normalizedActual}'"
+                }
+                // Reject px units
+                if (actual.endsWith('px')) {
+                    errors << "dimension '$key': must not use 'px' units (was '${actual}')"
+                }
+            }
+        }
+
+        // Negative fixture: radius_card must NOT exist (cards are explicitly square)
+        if (parsed.containsKey('radius_card')) {
+            errors << "dimension 'radius_card' must not exist — notification cards are explicitly square (0dp)"
+        }
+
+        if (errors) {
+            throw new GradleException("❌ Dimension token check FAILED:\n" + errors.collect { "   $it" }.join('\n'))
+        }
+        println "✅ Dimension token check passed (${ntfyDimenManifest.size()} tokens)"
+    }
+}
+
+// Canonical TextAppearance manifest: style name → expected attribute references
+ext.ntfyTextAppearanceManifest = [
+    'TextAppearance.Ntfy.Display':   [textSize: '@dimen/text_display',   lineHeight: '@dimen/leading_display',   fontFamily: '@font/font_sans'],
+    'TextAppearance.Ntfy.Title':     [textSize: '@dimen/text_title',     lineHeight: '@dimen/leading_title',     fontFamily: '@font/font_sans'],
+    'TextAppearance.Ntfy.Subtitle':  [textSize: '@dimen/text_subtitle',  lineHeight: '@dimen/leading_subtitle',  fontFamily: '@font/font_sans'],
+    'TextAppearance.Ntfy.Body':      [textSize: '@dimen/text_body',      lineHeight: '@dimen/leading_body',      fontFamily: '@font/font_sans'],
+    'TextAppearance.Ntfy.BodySmall': [textSize: '@dimen/text_body_sm',   lineHeight: '@dimen/leading_body_sm',   fontFamily: '@font/font_sans'],
+    'TextAppearance.Ntfy.Caption':   [textSize: '@dimen/text_caption',   lineHeight: '@dimen/leading_caption',   fontFamily: '@font/font_sans'],
+    'TextAppearance.Ntfy.Mono':      [textSize: '@dimen/text_mono',      lineHeight: '@dimen/leading_mono',      fontFamily: '@font/font_mono'],
+]
+
+task verifyTypographyStyles {
+    group = 'verification'
+    description = 'Verifies TextAppearance.Ntfy.* styles reference correct size/leading/family tokens'
+
+    def typographyFile = file('src/main/res/values/typography.xml')
+    inputs.file typographyFile
+
+    doLast {
+        def errors = []
+        if (!typographyFile.exists()) {
+            throw new GradleException("❌ typography.xml not found: ${typographyFile.path}")
+        }
+
+        def factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+        def builder = factory.newDocumentBuilder()
+        def doc = builder.parse(typographyFile)
+        doc.documentElement.normalize()
+
+        // Build a map of style name → {attr → value}
+        def styles = [:]
+        def styleNodes = doc.getElementsByTagName('style')
+        for (int i = 0; i < styleNodes.length; i++) {
+            def styleEl = styleNodes.item(i)
+            def name = styleEl.attributes.getNamedItem('name').nodeValue
+            def attrs = [:]
+            def items = styleEl.getElementsByTagName('item')
+            for (int j = 0; j < items.length; j++) {
+                def item = items.item(j)
+                def attrName = item.attributes.getNamedItem('name').nodeValue
+                attrs[attrName] = item.textContent.trim()
+            }
+            styles[name] = attrs
+        }
+
+        ntfyTextAppearanceManifest.each { styleName, expected ->
+            def actual = styles[styleName]
+            if (actual == null) {
+                errors << "missing TextAppearance style '$styleName'"
+                return
+            }
+            expected.each { attrKey, expectedVal ->
+                def androidAttr = "android:${attrKey}"
+                def actualVal = actual[androidAttr]
+                if (actualVal == null) {
+                    errors << "${styleName}: missing attribute '${androidAttr}'"
+                } else if (actualVal != expectedVal) {
+                    errors << "${styleName}: '${androidAttr}' expected '${expectedVal}' but was '${actualVal}'"
+                }
+            }
+        }
+
+        if (errors) {
+            throw new GradleException("❌ Typography style check FAILED:\n" + errors.collect { "   $it" }.join('\n'))
+        }
+        println "✅ Typography style check passed (${ntfyTextAppearanceManifest.size()} styles)"
+    }
+}
+
+// Canonical tag palette manifest
+ext.ntfyTagPaletteManifest = [
+    tag_general_bg_0:   '#332b52', tag_general_text_0: '#c4b5fd',
+    tag_general_bg_1:   '#143a34', tag_general_text_1: '#7fe0cb',
+    tag_general_bg_2:   '#3a2f14', tag_general_text_2: '#f5c97a',
+    tag_general_bg_3:   '#3a1f22', tag_general_text_3: '#f5a3a5',
+    tag_general_bg_4:   '#14303a', tag_general_text_4: '#7fc8e0',
+    tag_general_bg_5:   '#283a14', tag_general_text_5: '#b7e07f',
+    tag_service_bg:     '#2a3142',
+    tag_service_text:   '#9db4d8',
+]
+ext.ntfyTagArrayManifest = [
+    tag_general_backgrounds: ['@color/tag_general_bg_0','@color/tag_general_bg_1','@color/tag_general_bg_2','@color/tag_general_bg_3','@color/tag_general_bg_4','@color/tag_general_bg_5'],
+    tag_general_texts:       ['@color/tag_general_text_0','@color/tag_general_text_1','@color/tag_general_text_2','@color/tag_general_text_3','@color/tag_general_text_4','@color/tag_general_text_5'],
+]
+
+task verifyTagPalettes {
+    group = 'verification'
+    description = 'Verifies literal tag palette colors and typed arrays match the canonical manifest'
+
+    def paletteFile    = file('src/main/res/values/tag_palettes.xml')
+    def nightPaletteFile = file('src/main/res/values-night/tag_palettes.xml')
+    inputs.file paletteFile
+
+    doLast {
+        def errors = []
+
+        if (!paletteFile.exists()) {
+            throw new GradleException("❌ tag_palettes.xml not found: ${paletteFile.path}")
+        }
+
+        // Negative fixture: no night-qualified tag palette must exist
+        if (nightPaletteFile.exists()) {
+            errors << "values-night/tag_palettes.xml must not exist — tag palettes are literal (theme-invariant)"
+        }
+
+        def factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+        def builder = factory.newDocumentBuilder()
+        def doc = builder.parse(paletteFile)
+        doc.documentElement.normalize()
+
+        // Parse colors
+        def colors = [:]
+        def colorNodes = doc.getElementsByTagName('color')
+        for (int i = 0; i < colorNodes.length; i++) {
+            def el = colorNodes.item(i)
+            def name = el.attributes.getNamedItem('name').nodeValue
+            colors[name] = el.textContent.trim()
+        }
+
+        ntfyTagPaletteManifest.each { key, expectedHex ->
+            def actual = colors[key as String]
+            if (actual == null) {
+                errors << "tag palette: missing color '${key}'"
+            } else if (actual.toUpperCase() != expectedHex.toUpperCase()) {
+                errors << "tag palette: '${key}' expected ${expectedHex.toUpperCase()} but was ${actual.toUpperCase()}"
+            }
+        }
+
+        // Parse arrays
+        def arrays = [:]
+        def arrayNodes = doc.getElementsByTagName('array')
+        for (int i = 0; i < arrayNodes.length; i++) {
+            def el = arrayNodes.item(i)
+            def name = el.attributes.getNamedItem('name').nodeValue
+            def items = el.getElementsByTagName('item')
+            def itemList = []
+            for (int j = 0; j < items.length; j++) {
+                itemList << items.item(j).textContent.trim()
+            }
+            arrays[name] = itemList
+        }
+
+        ntfyTagArrayManifest.each { arrayName, expectedItems ->
+            def actual = arrays[arrayName as String]
+            if (actual == null) {
+                errors << "tag palette: missing array '${arrayName}'"
+            } else if (actual.size() != expectedItems.size()) {
+                errors << "tag palette: array '${arrayName}' has ${actual.size()} items, expected ${expectedItems.size()}"
+            } else {
+                expectedItems.eachWithIndex { expectedItem, idx ->
+                    if (actual[idx] != expectedItem) {
+                        errors << "tag palette: array '${arrayName}[${idx}]' expected '${expectedItem}' but was '${actual[idx]}'"
+                    }
+                }
+            }
+        }
+
+        if (errors) {
+            throw new GradleException("❌ Tag palette check FAILED:\n" + errors.collect { "   $it" }.join('\n'))
+        }
+        println "✅ Tag palette check passed (${ntfyTagPaletteManifest.size()} colors + ${ntfyTagArrayManifest.size()} arrays)"
+    }
+}
+
+// Canonical glow manifest (night-only)
+ext.ntfyGlowManifest = [
+    glow_priority_high: '#44F5A95C',
+    glow_priority_max:  '#55FF6B6E',
+    glow_accent_dot:    '#FF42D392',
+]
+ext.ntfyGlowRadiusManifest = [
+    glow_priority_high_radius: '10dp',
+    glow_priority_max_radius:  '10dp',
+    glow_accent_dot_radius:    '7dp',
+]
+
+task verifyGlowResources {
+    group = 'verification'
+    description = 'Verifies glow colors are night-only and absent from default qualifier'
+
+    def nightGlowFile   = file('src/main/res/values-night/glows.xml')
+    def defaultDimenFile = file('src/main/res/values/dimens.xml')
+    def defaultColorFile = file('src/main/res/values/colors.xml')
+    inputs.file nightGlowFile
+    inputs.file defaultDimenFile
+    inputs.file defaultColorFile
+
+    doLast {
+        def errors = []
+
+        if (!nightGlowFile.exists()) {
+            throw new GradleException("❌ values-night/glows.xml not found")
+        }
+
+        // Parse night glow colors
+        def factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+        def builder = factory.newDocumentBuilder()
+        def nightDoc = builder.parse(nightGlowFile)
+        nightDoc.documentElement.normalize()
+
+        def nightColors = [:]
+        def colorNodes = nightDoc.getElementsByTagName('color')
+        for (int i = 0; i < colorNodes.length; i++) {
+            def el = colorNodes.item(i)
+            nightColors[el.attributes.getNamedItem('name').nodeValue] = el.textContent.trim()
+        }
+        def nightDimens = [:]
+        def dimenNodes = nightDoc.getElementsByTagName('dimen')
+        for (int i = 0; i < dimenNodes.length; i++) {
+            def el = dimenNodes.item(i)
+            nightDimens[el.attributes.getNamedItem('name').nodeValue] = el.textContent.trim()
+        }
+
+        // Verify colors in night file
+        ntfyGlowManifest.each { key, expectedHex ->
+            def actual = nightColors[key as String]
+            if (actual == null) {
+                errors << "glow: missing night color '${key}'"
+            } else if (actual.toUpperCase() != expectedHex.toUpperCase()) {
+                errors << "glow: '${key}' expected ${expectedHex.toUpperCase()} but was ${actual.toUpperCase()}"
+            }
+        }
+
+        // Verify radii in night file
+        ntfyGlowRadiusManifest.each { key, expectedVal ->
+            def actual = nightDimens[key as String]
+            if (actual == null) {
+                errors << "glow: missing night dimen '${key}'"
+            } else if (actual != expectedVal) {
+                errors << "glow: radius '${key}' expected '${expectedVal}' but was '${actual}'"
+            }
+        }
+
+        // Negative fixture: glow keys must NOT appear in default qualifier colors or dimens
+        def defaultColorParsed = parseColorXml(defaultColorFile, ntfyGlowManifest.keySet())
+        ntfyGlowManifest.keySet().each { key ->
+            if (defaultColorParsed.containsKey(key)) {
+                errors << "glow: '${key}' must not exist in default values/colors.xml (night-only)"
+            }
+        }
+        def defaultDimenParsed = parseDimenXml(defaultDimenFile)
+        ntfyGlowRadiusManifest.keySet().each { key ->
+            if (defaultDimenParsed.containsKey(key)) {
+                errors << "glow radius: '${key}' must not exist in default values/dimens.xml (night-only)"
+            }
+        }
+
+        if (errors) {
+            throw new GradleException("❌ Glow resource check FAILED:\n" + errors.collect { "   $it" }.join('\n'))
+        }
+        println "✅ Glow resource check passed (${ntfyGlowManifest.size()} glow colors, night-only confirmed)"
+    }
+}
+
+// Font presence verification
+task verifyFontResources {
+    group = 'verification'
+    description = 'Verifies bundled font assets and family XML files are present for both Play and F-Droid builds'
+
+    def fontDir = file('src/main/res/font')
+    inputs.dir fontDir
+
+    doLast {
+        def errors = []
+        def required = [
+            'plus_jakarta_sans_regular.otf',
+            'plus_jakarta_sans_medium.otf',
+            'plus_jakarta_sans_semibold.otf',
+            'jetbrains_mono_regular.otf',
+            'font_sans.xml',
+            'font_mono.xml',
+        ]
+        required.each { name ->
+            def f = new File(fontDir, name)
+            if (!f.exists()) {
+                errors << "missing font asset: res/font/${name}"
+            }
+        }
+
+        if (errors) {
+            throw new GradleException("❌ Font resource check FAILED:\n" + errors.collect { "   $it" }.join('\n'))
+        }
+        println "✅ Font resource check passed (${required.size()} files present)"
+    }
+}
+
+// Update Story 1.1 raw-color allowlist to permit Story 1.2 palette literals
+ext.ntfyParityRawColorAllowlist = [
+    '#332b52', '#143a34', '#3a2f14', '#3a1f22', '#14303a', '#283a14',
+    '#c4b5fd', '#7fe0cb', '#f5c97a', '#f5a3a5', '#7fc8e0', '#b7e07f',
+    '#2a3142', '#9db4d8',
+] as Set
+
+tasks.named('check').configure {
+    dependsOn verifyDimensionTokens
+    dependsOn verifyTypographyStyles
+    dependsOn verifyTagPalettes
+    dependsOn verifyGlowResources
+    dependsOn verifyFontResources
+}
+// =============================================================================
+
 dependencies {
     // AndroidX, The Basics
     implementation "androidx.appcompat:appcompat:1.7.1"
@@ -104,6 +697,10 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
+    testImplementation "junit:junit:4.13.2"
+    androidTestImplementation "androidx.room:room-testing:$room_version"
+    androidTestImplementation "androidx.test.ext:junit:1.2.1"
+    androidTestImplementation "androidx.test:runner:1.6.2"
 
     // OkHttp (HTTP library)
     implementation 'com.squareup.okhttp3:okhttp:5.3.2'
