@@ -20,21 +20,26 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.view.ActionMode
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.HtmlCompat
+import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import androidx.core.view.isVisible
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -84,7 +89,7 @@ import androidx.core.view.size
 import androidx.core.view.get
 import androidx.core.net.toUri
 
-class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, NotificationFragment.NotificationSettingsListener {
+class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, NotificationFragment.NotificationSettingsListener, DrawerSubscriptionAdapter.DrawerHost {
     private val viewModel by viewModels<SubscriptionsViewModel> {
         SubscriptionsViewModelFactory((application as Application).repository)
     }
@@ -99,6 +104,11 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
     private lateinit var mainListContainer: SwipeRefreshLayout
     private lateinit var adapter: MainAdapter
     private lateinit var fab: FloatingActionButton
+
+    // Navigation drawer
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var drawerToggle: ActionBarDrawerToggle
+    private lateinit var drawerAdapter: DrawerSubscriptionAdapter
 
     // Other stuff
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
@@ -155,17 +165,81 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
         val statusBarColor = Colors.statusBarNormal(this, dynamicColors, darkMode)
         val toolbarTextColor = Colors.toolbarTextColor(this, dynamicColors, darkMode)
         toolbarLayout.setBackgroundColor(statusBarColor)
-        
+
         val toolbar = toolbarLayout.findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
         toolbar.setTitleTextColor(toolbarTextColor)
         toolbar.setNavigationIconTint(toolbarTextColor)
         toolbar.overflowIcon?.setTint(toolbarTextColor)
         setSupportActionBar(toolbar)
-        title = getString(R.string.main_action_bar_title)
-        
+        title = getString(R.string.nav_title_all_notifications)
+
         // Set system status bar appearance
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars =
             Colors.shouldUseLightStatusBar(dynamicColors, darkMode)
+
+        // Navigation drawer setup
+        drawerLayout = findViewById(R.id.drawer_layout)
+        drawerToggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar,
+            R.string.nav_drawer_open,
+            R.string.nav_drawer_close
+        )
+        drawerLayout.addDrawerListener(drawerToggle)
+        drawerToggle.syncState()
+
+        // Back press: close drawer if open, then re-enable so next open works
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    isEnabled = true
+                }
+            }
+        })
+
+        // Wire drawer static items
+        val drawerItemAll = findViewById<View>(R.id.drawer_item_all)
+        drawerItemAll.findViewById<ImageView>(R.id.drawer_item_icon)
+            .setImageResource(android.R.drawable.ic_menu_sort_by_size)
+        drawerItemAll.findViewById<TextView>(R.id.drawer_item_label)
+            .text = getString(R.string.nav_title_all_notifications)
+        drawerItemAll.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.START)
+            title = getString(R.string.nav_title_all_notifications)
+        }
+
+        val drawerItemSubscribe = findViewById<View>(R.id.drawer_item_subscribe)
+        drawerItemSubscribe.findViewById<ImageView>(R.id.drawer_item_icon)
+            .setImageResource(android.R.drawable.ic_input_add)
+        drawerItemSubscribe.findViewById<TextView>(R.id.drawer_item_label)
+            .text = getString(R.string.nav_drawer_subscribe)
+        drawerItemSubscribe.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.START)
+            onSubscribeButtonClick()
+        }
+
+        val drawerItemSettings = findViewById<View>(R.id.drawer_item_settings)
+        drawerItemSettings.findViewById<ImageView>(R.id.drawer_item_icon)
+            .setImageResource(android.R.drawable.ic_menu_preferences)
+        drawerItemSettings.findViewById<TextView>(R.id.drawer_item_label)
+            .text = getString(R.string.nav_drawer_settings)
+        drawerItemSettings.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.START)
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
+
+        // Drawer subscription list (Story 4.7: full row anatomy with context menu)
+        val drawerSubscriptionsList = findViewById<RecyclerView>(R.id.drawer_subscriptions_list)
+        drawerAdapter = DrawerSubscriptionAdapter(
+            repository = repository,
+            lifecycleScope = lifecycleScope,
+            messenger = messenger,
+            host = this,
+        )
+        drawerSubscriptionsList.adapter = drawerAdapter
 
         // Floating action button ("+")
         fab = findViewById(R.id.fab)
@@ -223,6 +297,9 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
                     mainListContainer.visibility = View.VISIBLE
                     noEntries.visibility = View.GONE
                 }
+
+                // Update drawer subscription list
+                drawerAdapter.submitList(subscriptions)
 
                 // Add scrub terms to log (in case it gets exported)
                 subscriptions.forEach { s ->
@@ -606,7 +683,13 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
         }
     }
 
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        drawerToggle.syncState()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (drawerToggle.onOptionsItemSelected(item)) return true
         return when (item.itemId) {
             R.id.main_menu_notifications_enabled -> {
                 onNotificationSettingsClick(enable = false)
@@ -792,6 +875,23 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
             }
             Log.d(TAG, "Finished polling for new notifications")
         }
+    }
+
+    // DrawerSubscriptionAdapter.DrawerHost implementation (Story 4.7)
+
+    override fun onSubscriptionRowClick(subscription: Subscription) {
+        // Row click → close drawer and navigate to per-topic feed (DetailActivity).
+        // IMPORTANT: this goes to DetailActivity intentionally while the single-feed shell (4.1)
+        // is not yet the app's primary UI. Once 4.1/4.6 fully replaces MainActivity, this
+        // should switch to navigating the feed to per-topic mode.
+        drawerLayout.closeDrawer(GravityCompat.START)
+        startDetailView(subscription)
+    }
+
+    override fun onSubscriptionUnsubscribed(subscription: Subscription) {
+        // After unsubscribe, close drawer and stay on current screen.
+        // The subscription LiveData update will remove the row reactively.
+        drawerLayout.closeDrawer(GravityCompat.START)
     }
 
     private fun startDetailView(subscription: Subscription) {

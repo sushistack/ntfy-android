@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Active bar shape: 4dp wide × 16dp tall pill using radius_full. Color is set in code. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="@dimen/radius_full" />
+    <solid android:color="@color/accent_ui" />
+</shape>

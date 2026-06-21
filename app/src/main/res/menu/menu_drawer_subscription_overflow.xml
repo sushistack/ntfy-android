@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Mute (visible when unmuted); Unmute (visible when muted). Exactly one shown at a time. -->
+    <item
+        android:id="@+id/drawer_sub_menu_mute"
+        android:title="@string/drawer_sub_menu_mute"
+        android:orderInCategory="10"
+        android:visible="true"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/drawer_sub_menu_unmute"
+        android:title="@string/drawer_sub_menu_unmute"
+        android:orderInCategory="11"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/drawer_sub_menu_divider1"
+        android:orderInCategory="20"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/drawer_sub_menu_rename"
+        android:title="@string/drawer_sub_menu_rename"
+        android:orderInCategory="30"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/drawer_sub_menu_clear"
+        android:title="@string/drawer_sub_menu_clear"
+        android:orderInCategory="40"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/drawer_sub_menu_divider2"
+        android:orderInCategory="50"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/drawer_sub_menu_unsubscribe"
+        android:title="@string/drawer_sub_menu_unsubscribe"
+        android:orderInCategory="60"
+        app:showAsAction="never" />
+
+</menu>

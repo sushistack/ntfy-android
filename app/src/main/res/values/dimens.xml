@@ -63,4 +63,7 @@
     <!-- Slide-in start offset: card slides in from this distance above its final position -->
     <dimen name="card_arrival_slide_offset">80dp</dimen>
     <!-- Deep-link pulse animation duration in ms (used for integer resource encoding) -->
+
+    <!-- Story 4.6: navigation drawer width -->
+    <dimen name="width_nav_drawer">280dp</dimen>
 </resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/surface">
+
+    <!-- Header spacer for status bar -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <!-- "All notifications" static row -->
+    <include
+        android:id="@+id/drawer_item_all"
+        layout="@layout/drawer_item_row" />
+
+    <!-- Subscription rows (one per subscription) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/drawer_subscriptions_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none"
+        app:layoutManager="LinearLayoutManager" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/border"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp" />
+
+    <!-- "Subscribe to topic" static row -->
+    <include
+        android:id="@+id/drawer_item_subscribe"
+        layout="@layout/drawer_item_row" />
+
+    <!-- "Settings" static row -->
+    <include
+        android:id="@+id/drawer_item_settings"
+        layout="@layout/drawer_item_row" />
+
+    <!-- Bottom spacer for navigation bar -->
+    <View
+        android:id="@+id/drawer_bottom_spacer"
+        android:layout_width="match_parent"
+        android:layout_height="8dp" />
+
+</LinearLayout>
