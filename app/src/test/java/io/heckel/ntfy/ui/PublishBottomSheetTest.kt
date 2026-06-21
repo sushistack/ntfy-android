@@ -120,8 +120,8 @@ class PublishBottomSheetTest {
     fun publishBottomSheet_onSend_callsApiPublish() {
         val source = readBottomSheet()
         assertTrue(
-            "onSendClick must call api.publish()",
-            source.contains("api.publish(")
+            "onSendClick must call the publish API",
+            source.contains("api.publish(") || source.contains("apiService.publish(")
         )
     }
 
@@ -207,14 +207,14 @@ class PublishBottomSheetTest {
 
     @Test
     fun feedActivity_fab_wiredToPublishBottomSheet() {
-        val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt")
+        val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
         assertTrue(
             "FeedActivity must call PublishBottomSheet.newInstance()",
             source.contains("PublishBottomSheet.newInstance(")
         )
         assertTrue(
-            "FeedActivity must show PublishBottomSheet on FAB click",
-            source.contains(".show(supportFragmentManager")
+            "FeedFragment must show PublishBottomSheet on FAB click",
+            source.contains(".show(childFragmentManager") || source.contains(".show(supportFragmentManager")
         )
     }
 

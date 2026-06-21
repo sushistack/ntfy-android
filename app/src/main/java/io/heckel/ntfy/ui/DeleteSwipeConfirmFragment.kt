@@ -25,7 +25,9 @@ class DeleteSwipeConfirmFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val notificationId = requireArguments().getString(ARG_NOTIFICATION_ID)!!
         val position = requireArguments().getInt(ARG_POSITION)
-        val listener = activity as? Listener
+        // Prefer a Fragment host (FeedFragment shows this via childFragmentManager); fall back
+        // to the Activity for legacy activity hosts.
+        val listener = parentFragment as? Listener ?: activity as? Listener
 
         return MaterialAlertDialogBuilder(requireContext())
             .setMessage(R.string.notification_delete_dialog_message)
@@ -53,7 +55,7 @@ class DeleteSwipeConfirmFragment : DialogFragment() {
         super.onCancel(dialog)
         if (cancelDispatched) return  // NegativeButton already dispatched cancel
         val position = requireArguments().getInt(ARG_POSITION)
-        (activity as? Listener)?.onSwipeDeleteCancelled(position)
+        (parentFragment as? Listener ?: activity as? Listener)?.onSwipeDeleteCancelled(position)
     }
 
     companion object {

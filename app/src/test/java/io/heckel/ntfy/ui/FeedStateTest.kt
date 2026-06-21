@@ -96,7 +96,7 @@ class FeedStateTest {
 
     @Test
     fun feedActivity_hasApplyFeedState_method() {
-        val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt")
+        val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
         assertTrue(
             "FeedActivity must declare applyFeedState()",
             source.contains("fun applyFeedState(")
@@ -105,7 +105,7 @@ class FeedStateTest {
 
     @Test
     fun feedActivity_applyFeedState_hidesAllBeforeShowing() {
-        val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt")
+        val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
         // The method must set GONE on all four panels before any VISIBLE assignment
         assertTrue(
             "applyFeedState must set each panel to GONE before revealing the active one",
@@ -115,7 +115,7 @@ class FeedStateTest {
 
     @Test
     fun feedActivity_noDirectVisibilityScatterOutsideApplyFeedState() {
-        val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt")
+        val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
         // Count visibility = View.VISIBLE assignments; all must live inside applyFeedState
         val visibleCount = source.split("View.VISIBLE").size - 1
         val goneCount = source.split("View.GONE").size - 1
@@ -125,7 +125,7 @@ class FeedStateTest {
 
     @Test
     fun feedActivity_retryCallback_delegatesToViewModel() {
-        val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt")
+        val source = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
         // The retry lambda must call viewModel, not repository directly
         assertTrue(
             "Retry callback must delegate to viewModel.loadNextPage()",

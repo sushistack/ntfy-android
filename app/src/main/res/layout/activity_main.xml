@@ -261,11 +261,25 @@
                     android:drawablePadding="4dp" />
             </FrameLayout>
 
+            <!--
+              Single-feed shell (Epic 4): the redesigned feed is the primary content, hosted
+              here and driven by the navigation drawer. The legacy subscription list below is
+              kept (GONE) for binder/code compatibility; subscriptions now live in the drawer.
+            -->
+            <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/main_feed_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/main_banner_no_network" />
+
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                     android:id="@+id/main_subscriptions_list_container"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/main_banner_no_network">

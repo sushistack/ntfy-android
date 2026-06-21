@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Thin host for FeedFragment when the feed is shown as its own screen (deep-link entry).
+  fitsSystemWindows keeps the feed below the status bar; the primary in-app feed is hosted
+  by MainActivity's drawer shell instead.
+-->
+<androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/feed_host_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true" />

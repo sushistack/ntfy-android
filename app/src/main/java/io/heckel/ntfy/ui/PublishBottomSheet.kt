@@ -154,10 +154,18 @@ class PublishBottomSheet : BottomSheetDialogFragment() {
         errorText.visibility = View.GONE
         sendButton.isEnabled = false
 
-        val job = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val baseUrl = repository.getDefaultBaseUrl()
+        // Run on the HOST's scope, not the sheet's: the optimistic path dismiss()es the sheet
+        // before the HTTP call, and a sheet-scoped coroutine would be cancelled on dismiss
+        // (no emit, no publish, no error). The host owns the returned Job for cancel/retry.
+        // api/repository are taken from the application context so they survive the dismiss.
+        val repo = (appContext as Application).repository
+        val apiService = ApiService(appContext)
+        val hostScope = requireActivity().lifecycleScope
+
+        val job = hostScope.launch(Dispatchers.IO) {
+            val baseUrl = repo.getDefaultBaseUrl()
                 ?: appContext.getString(R.string.app_base_url)
-            val user = repository.getUser(baseUrl)
+            val user = repo.getUser(baseUrl)
 
             if (listener != null) {
                 // Optimistic path: emit pending card before the HTTP call, dismiss sheet.
@@ -179,7 +187,7 @@ class PublishBottomSheet : BottomSheetDialogFragment() {
                 }
 
                 try {
-                    api.publish(
+                    apiService.publish(
                         baseUrl  = baseUrl,
                         topic    = topic,
                         user     = user,
@@ -201,7 +209,7 @@ class PublishBottomSheet : BottomSheetDialogFragment() {
             } else {
                 // Fallback path (no outbox wired): original inline send.
                 try {
-                    api.publish(
+                    apiService.publish(
                         baseUrl   = baseUrl,
                         topic     = topic,
                         user      = user,

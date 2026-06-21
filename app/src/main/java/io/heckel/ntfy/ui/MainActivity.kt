@@ -208,7 +208,7 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
             .text = getString(R.string.nav_title_all_notifications)
         drawerItemAll.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.START)
-            title = getString(R.string.nav_title_all_notifications)
+            showFeed(ALL_SUBSCRIPTIONS_ID, null)
         }
 
         val drawerItemSubscribe = findViewById<View>(R.id.drawer_item_subscribe)
@@ -256,6 +256,11 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
             insets
         }
 
+        // Single-feed shell: land on the All-notifications feed; the drawer switches topics.
+        if (savedInstanceState == null) {
+            showFeed(ALL_SUBSCRIPTIONS_ID, null)
+        }
+
         // Swipe to refresh
         mainListContainer = findViewById(R.id.main_subscriptions_list_container)
         mainListContainer.setOnRefreshListener { refreshAllSubscriptions() }
@@ -288,17 +293,11 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
 
         viewModel.list().observe(this) {
             it?.let { subscriptions ->
-                // Update main list
+                // Legacy subscription list is hidden in the single-feed shell; keep it fed for
+                // code/action-mode compatibility but no longer drive its visibility.
                 adapter.submitList(subscriptions as MutableList<Subscription>)
-                if (it.isEmpty()) {
-                    mainListContainer.visibility = View.GONE
-                    noEntries.visibility = View.VISIBLE
-                } else {
-                    mainListContainer.visibility = View.VISIBLE
-                    noEntries.visibility = View.GONE
-                }
 
-                // Update drawer subscription list
+                // Update drawer subscription list (primary subscription surface now)
                 drawerAdapter.submitList(subscriptions)
 
                 // Add scrub terms to log (in case it gets exported)
@@ -880,12 +879,24 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
     // DrawerSubscriptionAdapter.DrawerHost implementation (Story 4.7)
 
     override fun onSubscriptionRowClick(subscription: Subscription) {
-        // Row click → close drawer and navigate to per-topic feed (DetailActivity).
-        // IMPORTANT: this goes to DetailActivity intentionally while the single-feed shell (4.1)
-        // is not yet the app's primary UI. Once 4.1/4.6 fully replaces MainActivity, this
-        // should switch to navigating the feed to per-topic mode.
+        // Row click → close drawer and switch the embedded feed to this topic.
         drawerLayout.closeDrawer(GravityCompat.START)
-        startDetailView(subscription)
+        showFeed(subscription.id, displayName(appBaseUrl, subscription))
+    }
+
+    /**
+     * Swap the embedded [FeedFragment] to show either the All-notifications feed
+     * ([ALL_SUBSCRIPTIONS_ID], topic == null) or a single topic. Updates the app-bar title and
+     * the FAB: the All-feed shows the "+" subscribe FAB; a topic feed defers to the fragment's
+     * own publish FAB.
+     */
+    private fun showFeed(subscriptionId: Long, topic: String?) {
+        val isAllFeed = subscriptionId == ALL_SUBSCRIPTIONS_ID
+        title = if (isAllFeed) getString(R.string.nav_title_all_notifications) else (topic ?: "")
+        fab.visibility = if (isAllFeed) View.VISIBLE else View.GONE
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main_feed_container, FeedFragment.newInstance(subscriptionId, topic))
+            .commit()
     }
 
     override fun onSubscriptionUnsubscribed(subscription: Subscription) {

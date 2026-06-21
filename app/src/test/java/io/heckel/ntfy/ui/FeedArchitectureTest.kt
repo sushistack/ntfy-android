@@ -25,41 +25,50 @@ class FeedArchitectureTest {
         readSource("app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt")
     }
 
+    // Feed UI logic now lives in FeedFragment (FeedActivity is a thin host); deep-link
+    // guards assert against the fragment.
+    private val feedFragmentSource: String by lazy {
+        readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
+    }
+
     private val feedAdapterSource: String by lazy {
         readSource("app/src/main/java/io/heckel/ntfy/ui/FeedAdapter.kt")
     }
 
     @Test
-    fun feedActivity_doesNotReferenceDetailActivity() {
+    fun feed_doesNotReferenceDetailActivity() {
         assertFalse(
             "FeedActivity must not reference DetailActivity",
             feedActivitySource.contains("DetailActivity")
         )
-    }
-
-    @Test
-    fun feedActivity_doesNotCallStartActivityForNotificationTap() {
-        // startActivity is only forbidden in the tap-path; a generic check is sufficient
-        // because FeedActivity has no intent navigation at all in Story 4.1
         assertFalse(
-            "FeedActivity must not call startActivity for notification taps",
-            feedActivitySource.contains("startActivity(")
+            "FeedFragment must not reference DetailActivity",
+            feedFragmentSource.contains("DetailActivity")
         )
     }
 
     @Test
-    fun feedActivity_handlesDeeepLinkViaSmoothScrollToPosition() {
-        assertTrue(
-            "FeedActivity must call smoothScrollToPosition for deep-link scroll",
-            feedActivitySource.contains("smoothScrollToPosition")
+    fun feed_doesNotCallStartActivityForNotificationTap() {
+        // The feed surface performs no intent navigation on notification taps (it scrolls/marks read).
+        assertFalse(
+            "FeedFragment must not call startActivity for notification taps",
+            feedFragmentSource.contains("startActivity(")
         )
     }
 
     @Test
-    fun feedActivity_consumesDeepLinkIdAfterScroll() {
+    fun feed_handlesDeeepLinkViaSmoothScrollToPosition() {
         assertTrue(
-            "FeedActivity must mark deep-link as consumed after first scroll",
-            feedActivitySource.contains("deepLinkConsumed")
+            "FeedFragment must call smoothScrollToPosition for deep-link scroll",
+            feedFragmentSource.contains("smoothScrollToPosition")
+        )
+    }
+
+    @Test
+    fun feed_consumesDeepLinkIdAfterScroll() {
+        assertTrue(
+            "FeedFragment must mark deep-link as consumed after first scroll",
+            feedFragmentSource.contains("deepLinkConsumed")
         )
     }
 

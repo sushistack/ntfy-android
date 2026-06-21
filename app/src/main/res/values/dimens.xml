@@ -52,6 +52,9 @@
     <dimen name="kv_status_dot_size">8dp</dimen>
     <!-- Story 3.3: responsive two-column breakpoint (≈600dp) -->
     <dimen name="kv_two_column_breakpoint">600dp</dimen>
+    <!-- KV column alignment: fixed marker column + min key-column width so values line up -->
+    <dimen name="kv_marker_width">24dp</dimen>
+    <dimen name="kv_key_min_width">88dp</dimen>
 
     <!-- Story 3.5: chart dimensions (canonical contract) -->
     <dimen name="chart_plot_height">120dp</dimen>

@@ -315,25 +315,25 @@ class FeedViewModelLogicTest {
 
     @Test
     fun feedActivity_registersOnScrollListener() {
-        val src = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt")
+        val src = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
         assertTrue("FeedActivity must register addOnScrollListener", src.contains("addOnScrollListener"))
     }
 
     @Test
     fun feedActivity_callsLoadNextPage_fromScrollListener() {
-        val src = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt")
+        val src = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
         assertTrue("FeedActivity scroll listener must call loadNextPage()", src.contains("loadNextPage()"))
     }
 
     @Test
     fun feedActivity_checksIsLoadingPage_beforeTrigger() {
-        val src = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt")
+        val src = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
         assertTrue("FeedActivity must check isLoadingPage before triggering load", src.contains("isLoadingPage"))
     }
 
     @Test
     fun feedActivity_wiresArrivalAnnouncer() {
-        val src = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt")
+        val src = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
         assertTrue("FeedActivity must call ArrivalAnnouncer.announceArrival", src.contains("ArrivalAnnouncer"))
     }
 

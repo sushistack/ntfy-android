@@ -68,3 +68,6 @@ proguard-project.txt
 _bmad
 .agents
 .claude
+
+# Local test config (contains tokens)
+.env

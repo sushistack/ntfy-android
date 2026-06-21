@@ -10,21 +10,21 @@
     android:paddingTop="@dimen/spacing_1"
     android:paddingBottom="@dimen/spacing_1">
 
-    <!-- Leading icon glyph (monospace) -->
+    <!-- Leading marker/icon glyph — fixed-width column so keys line up across rows -->
     <TextView
         android:id="@+id/kv_row_icon"
         style="@style/TextAppearance.Ntfy.Mono"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/kv_marker_width"
         android:layout_height="wrap_content"
-        android:paddingEnd="@dimen/spacing_2"
         android:importantForAccessibility="no" />
 
-    <!-- Key label (muted color, body_sm) -->
+    <!-- Key label (muted color, body_sm) — min-width column so values align across rows -->
     <TextView
         android:id="@+id/kv_row_key"
         style="@style/TextAppearance.Ntfy.BodySmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minWidth="@dimen/kv_key_min_width"
         android:textColor="@color/muted"
         android:paddingEnd="@dimen/spacing_2"
         android:importantForAccessibility="no" />
@@ -36,7 +36,7 @@
         android:layout_height="@dimen/kv_status_dot_size"
         android:background="@drawable/kv_status_dot"
         android:visibility="gone"
-        android:paddingEnd="@dimen/spacing_1"
+        android:layout_marginEnd="@dimen/spacing_2"
         android:importantForAccessibility="no" />
 
     <!-- Value text (default @color/text; error → @color/priority_urgent) -->

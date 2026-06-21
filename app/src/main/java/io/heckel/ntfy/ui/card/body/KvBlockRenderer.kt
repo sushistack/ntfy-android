@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.GridLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import io.heckel.ntfy.R
@@ -115,13 +116,28 @@ class KvBlockRenderer : CardBodyRenderer {
         valueView.text = row.value
 
         // Meter or status dot (AC 4, 5)
+        val valueLp = valueView.layoutParams as LinearLayout.LayoutParams
+        val meterLp = meterView.layoutParams as LinearLayout.LayoutParams
         val meterValue = row.meter
         if (meterValue != null && meterValue.isFinite()) {
-            // Finite meter present: show meter, suppress dot (AC 5 overrides AC 4)
+            // Finite meter present: the meter takes the row's remaining width (fills the area);
+            // the value shrinks to its text so the bar isn't a tiny right-pinned pill.
+            valueLp.width = LinearLayout.LayoutParams.WRAP_CONTENT
+            valueLp.weight = 0f
+            meterLp.width = 0
+            meterLp.weight = 1f
+            valueView.layoutParams = valueLp
+            meterView.layoutParams = meterLp
+
             meterView.bind(meterValue)
             meterView.visibility = View.VISIBLE
         } else {
-            // No finite meter: show status dot for ok/warn/error (AC 4)
+            // No finite meter: value takes the flexible space so long text stays fully visible (AC 7).
+            valueLp.width = 0
+            valueLp.weight = 1f
+            valueView.layoutParams = valueLp
+
+            // Show status dot for known status keywords (AC 4)
             val dotColorRes = statusDotColorRes(row.status)
             if (dotColorRes != null) {
                 dotView.backgroundTintList = ColorStateList.valueOf(
@@ -133,10 +149,11 @@ class KvBlockRenderer : CardBodyRenderer {
     }
 
     companion object {
-        private fun statusDotColorRes(status: String?): Int? = when (status) {
-            "ok" -> R.color.accent_ui
-            "warn" -> R.color.priority_high
-            "error" -> R.color.priority_max
+        // Accepts both the meter vocabulary (ok/warning/critical) and the legacy ok/warn/error.
+        private fun statusDotColorRes(status: String?): Int? = when (status?.lowercase()) {
+            "ok", "up", "healthy", "success" -> R.color.accent_ui
+            "warn", "warning", "degraded" -> R.color.priority_high
+            "error", "critical", "down", "fail", "failed" -> R.color.priority_max
             else -> null
         }
     }

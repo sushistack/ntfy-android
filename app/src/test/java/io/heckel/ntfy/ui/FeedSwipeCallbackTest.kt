@@ -173,8 +173,8 @@ class FeedSwipeCallbackTest {
         "../app/src/main/java/io/heckel/ntfy/ui/FeedSwipeCallback.kt",
     )
     private val feedActivityCandidates = arrayOf(
-        "app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt",
-        "../app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt",
+        "app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt",
+        "../app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt",
     )
 
     @Test

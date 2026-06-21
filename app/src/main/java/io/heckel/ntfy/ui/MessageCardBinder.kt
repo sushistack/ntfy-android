@@ -92,7 +92,10 @@ class MessageCardBinder(
     private val actionsWrapperView: ConstraintLayout = itemView.findViewById(R.id.detail_item_actions_wrapper)
     private val actionsFlow: Flow = itemView.findViewById(R.id.detail_item_actions_flow)
 
-    private val cardBodyView: ViewGroup = itemView.findViewById(R.id.card_body)
+    // Dedicated host for Epic 3 structured renderers. NOT card_body: the renderers call
+    // removeAllViews() on this container, which must never wipe the card's header/title/
+    // meta/delete chrome (all siblings under card_body).
+    private val structuredHostView: ViewGroup = itemView.findViewById(R.id.card_structured_host)
 
     // Story 4.9: optimistic pending/error bar views
     private val optimisticBar: LinearLayout = itemView.findViewById(R.id.card_optimistic_bar)
@@ -102,12 +105,12 @@ class MessageCardBinder(
     private val retryButton: MaterialButton = itemView.findViewById(R.id.card_retry_button)
 
     // Story 3.1: body dispatch with safe fallback; owns messageView from this point on.
-    // Story 3.4: bodyContainer wires list (and future structured) renderers to card_body.
+    // Story 3.4: bodyContainer wires list (and future structured) renderers to the structured host.
     private val cardBodyBinder: CardBodyBinder = CardBodyBinder(
         messageView = messageView,
         dispatcher = CardBodyDispatcher(),
         markdownRenderer = markdownRenderer,
-        bodyContainer = cardBodyView,
+        bodyContainer = structuredHostView,
     )
 
     fun bind(
@@ -168,12 +171,10 @@ class MessageCardBinder(
             actions.onDeleteRequested(notification)
         }
 
-        if (notification.title != "") {
-            titleView.visibility = View.VISIBLE
-            titleView.text = formatTitle(notification)
-        } else {
-            titleView.visibility = View.GONE
-        }
+        // Legacy detail_item_title_text is superseded by the Story 2.3a header title
+        // (card_header_title, set in renderHeader). Keep it hidden so the title never
+        // renders twice. (View retained in the layout for binder/contract compatibility.)
+        titleView.visibility = View.GONE
         renderMetaRow(context, notification, topicName)
 
         // Story 2.6: persistent presentation state — static deep-link emphasis overrides
@@ -252,13 +253,8 @@ class MessageCardBinder(
         cardView.setOnClickListener(null)
         cardView.setOnLongClickListener(null)
 
-        // Title
-        if (msg.title.isNotBlank()) {
-            titleView.visibility = View.VISIBLE
-            titleView.text = msg.title
-        } else {
-            titleView.visibility = View.GONE
-        }
+        // Legacy title view stays hidden; the header title (set below) is canonical.
+        titleView.visibility = View.GONE
 
         // Header: priority badge + title fallback; no unread dot.
         val priority = toPriority(msg.priority)
@@ -391,26 +387,15 @@ class MessageCardBinder(
             tagChipGroup.addView(buildChip(context, label, serviceBg, serviceText, cardClickAction))
         }
 
-        // General chips: first two visible; remainder behind +N more
-        val bgColors = context.resources.obtainTypedArray(R.array.tag_general_backgrounds)
-        val textColors = context.resources.obtainTypedArray(R.array.tag_general_texts)
+        // General chips: dedicated-colors model — only the topic gets its own color; every other
+        // (service/general) tag uses the single fixed service color instead of the per-tag hash
+        // palette. First two visible; remainder behind +N more.
         val general = cardTags.general
 
         val visibleCount = minOf(general.size, GENERAL_TAG_COLLAPSE_COUNT)
-        try {
-            for (i in 0 until visibleCount) {
-                val gt = general[i]
-                tagChipGroup.addView(buildChip(
-                    context,
-                    gt.name,
-                    bgColors.getColor(gt.paletteIndex, 0),
-                    textColors.getColor(gt.paletteIndex, 0),
-                    cardClickAction,
-                ))
-            }
-        } finally {
-            bgColors.recycle()
-            textColors.recycle()
+        for (i in 0 until visibleCount) {
+            val gt = general[i]
+            tagChipGroup.addView(buildChip(context, gt.name, serviceBg, serviceText, cardClickAction))
         }
 
         // +N more button (when 3 or more general tags)
@@ -431,9 +416,9 @@ class MessageCardBinder(
         return Chip(context).apply {
             this.text = text
             chipCornerRadius = context.resources.getDimension(R.dimen.radius_full)
-            setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimension(R.dimen.text_caption))
             chipBackgroundColor = ColorStateList.valueOf(bgColor)
             setTextColor(textColor)
+            applyCompactTagStyle()
             isCheckable = false
             isClickable = true
             isFocusable = true
@@ -443,26 +428,34 @@ class MessageCardBinder(
         }
     }
 
+    /** Compact inline-tag sizing — Material's default chip (48dp touch target + large padding) is oversized for tags. */
+    private fun Chip.applyCompactTagStyle() {
+        val d = resources.displayMetrics.density
+        setEnsureMinTouchTargetSize(false)
+        chipMinHeight = 22f * d
+        chipStartPadding = 7f * d
+        chipEndPadding = 7f * d
+        textStartPadding = 0f
+        textEndPadding = 0f
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+    }
+
     private fun buildMoreButton(
         context: Context,
         remaining: List<CardTagFormatter.GeneralTag>,
         cardClickAction: () -> Unit,
     ): Chip {
-        // Resolve colors eagerly; TypedArray must not outlive this call (AC 5 expansion).
-        val bgArray = context.resources.obtainTypedArray(R.array.tag_general_backgrounds)
-        val textArray = context.resources.obtainTypedArray(R.array.tag_general_texts)
-        val resolvedBg = IntArray(6) { bgArray.getColor(it, 0) }
-        val resolvedText = IntArray(6) { textArray.getColor(it, 0) }
-        bgArray.recycle()
-        textArray.recycle()
+        // Revealed chips use the single fixed service color (dedicated-colors model).
+        val serviceBg = ContextCompat.getColor(context, R.color.tag_service_bg)
+        val serviceText = ContextCompat.getColor(context, R.color.tag_service_text)
 
         val n = remaining.size
         return Chip(context).apply {
             text = context.getString(R.string.notification_card_tags_more, n)
             chipCornerRadius = context.resources.getDimension(R.dimen.radius_full)
-            setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimension(R.dimen.text_caption))
             chipBackgroundColor = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.surface_2))
             setTextColor(ContextCompat.getColor(context, R.color.muted))
+            applyCompactTagStyle()
             isCheckable = false
             isClickable = true
             isFocusable = true
@@ -470,13 +463,7 @@ class MessageCardBinder(
                 // Reveal remaining general chips; remove this button (AC 5)
                 tagChipGroup.removeView(this)
                 for (gt in remaining) {
-                    tagChipGroup.addView(buildChip(
-                        context,
-                        gt.name,
-                        resolvedBg[gt.paletteIndex],
-                        resolvedText[gt.paletteIndex],
-                        cardClickAction,
-                    ))
+                    tagChipGroup.addView(buildChip(context, gt.name, serviceBg, serviceText, cardClickAction))
                 }
             }
             setOnLongClickListener { true }

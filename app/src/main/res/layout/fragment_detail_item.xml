@@ -76,7 +76,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="2dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/card_delete_button"
+                app:layout_constraintEnd_toStartOf="@id/card_header_unread_dot"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <!-- Priority badge: caption size, uppercase, extra-bold, radius_badge corners -->
@@ -111,18 +111,21 @@
                     android:ellipsize="end"
                     tools:text="This is a notification title" />
 
-                <!-- Unread dot: 8dp circle, accent_ui, decorative/non-focusable -->
-                <View
-                    android:id="@+id/card_header_unread_dot"
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:layout_marginStart="6dp"
-                    android:background="@drawable/card_unread_dot"
-                    android:importantForAccessibility="no"
-                    android:focusable="false"
-                    android:visibility="gone" />
-
             </LinearLayout>
+
+            <!-- Unread dot: vertically centered with the X delete button (same row), just left of it -->
+            <View
+                android:id="@+id/card_header_unread_dot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/card_unread_dot"
+                android:importantForAccessibility="no"
+                android:focusable="false"
+                android:visibility="gone"
+                app:layout_constraintEnd_toStartOf="@id/card_delete_button"
+                app:layout_constraintTop_toTopOf="@id/card_delete_button"
+                app:layout_constraintBottom_toBottomOf="@id/card_delete_button" />
 
             <!-- Legacy content preserved below — IDs unchanged for binder compatibility -->
 
@@ -190,11 +193,28 @@
                 android:autoLink="web"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="?android:attr/textColorPrimary"
-                app:layout_constraintBottom_toTopOf="@id/detail_item_attachment_image"
+                app:layout_constraintBottom_toTopOf="@id/card_structured_host"
                 app:layout_constraintEnd_toStartOf="@id/detail_item_icon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/detail_item_title_text"
                 tools:text="This is a notification message." />
+
+            <!--
+              Epic 3 structured-renderer host. Structured body renderers mount here so they
+              can removeAllViews() without destroying the card's header/title/meta/delete
+              chrome. Empty (0 height) for plain-text/markdown routes, where
+              detail_item_message_text is used instead.
+            -->
+            <FrameLayout
+                android:id="@+id/card_structured_host"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="6dp"
+                app:layout_constraintBottom_toTopOf="@id/detail_item_attachment_image"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/detail_item_message_text" />
 
             <ImageView
                 android:id="@+id/detail_item_icon"
@@ -227,7 +247,7 @@
                 app:layout_constraintBottom_toTopOf="@id/card_meta_row"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/detail_item_message_text"
+                app:layout_constraintTop_toBottomOf="@id/card_structured_host"
                 app:shapeAppearanceOverlay="@style/roundedCornersImageView"
                 app:srcCompat="@drawable/ic_cancel_gray_24dp" />
 
