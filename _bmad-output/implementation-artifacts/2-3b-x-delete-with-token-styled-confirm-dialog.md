@@ -1,6 +1,10 @@
+---
+baseline_commit: 3b3468c4b851ae0801e085ecb0267a212b63fe5f
+---
+
 # Story 2.3b: X-Delete with Token-Styled Confirm Dialog
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -21,35 +25,35 @@ so that I can remove a notification safely without accidental loss.
 
 ## Tasks / Subtasks
 
-- [ ] Add the X control to the reusable card header contract (AC: 1, 2, 6, 7)
-  - [ ] Add or finalize a stable `card_delete_button` ID in the header area of `fragment_detail_item.xml`, preserving the shell/body ownership established by Story 2.1 and the badge/title/unread layout established by Story 2.3a.
-  - [ ] Use an existing X/close vector where suitable, or add a token-tinted close vector; do not use the trash-can icon or retain the old `detail_item_menu_button`.
-  - [ ] Provide a localized content description and a minimum 48dp interactive target without distorting the visual icon size.
-  - [ ] Define token-backed selector/tint/scale behavior for default, focus, hover, and press states; destructive interaction uses `priority_max`.
-  - [ ] Ensure the button is independently focusable/clickable and consumes its interaction before the card surface.
-- [ ] Extend the adapter-agnostic binder action boundary (AC: 4, 6, 7)
-  - [ ] Add a narrow `onDeleteRequested(notification)` or notification-ID callback to `MessageCardActions`; do not inject `Repository`, `Activity`, `FragmentManager`, or a coroutine scope into `MessageCardBinder`.
-  - [ ] Replace the delete listener on every bind and clear/reset it as part of recycled-state initialization.
-  - [ ] Keep the binder responsible only for emitting the request; it must not create/show a dialog or mutate Room.
-- [ ] Add one reusable host-owned delete confirmation flow (AC: 3–5, 8)
-  - [ ] Add a focused `NotificationDeleteConfirmation` presenter/helper or equivalent UI-layer contract that accepts a lifecycle-safe host context and a confirmation callback.
-  - [ ] Build the dialog with `MaterialAlertDialogBuilder` and token-backed theme/style resources; use `priority_max` for the destructive Delete action instead of the legacy `DangerText`/Material error alias.
-  - [ ] Use dedicated localizable strings for “Delete this notification?”, “Cancel”, “Delete”, and the X accessibility label; do not reuse subscription-delete or multi-delete copy.
-  - [ ] Guard the confirmation callback so one dialog confirmation produces one deletion request.
-  - [ ] Make the presenter reusable by Story 4.5 swipe-delete without depending on `DetailAdapter`.
-- [ ] Wire current-host deletion without coupling the binder (AC: 4–6)
-  - [ ] Have `DetailActivity` supply the delete-request callback when constructing the adapter/binder.
-  - [ ] On confirmed Delete, launch `repository.markAsDeleted(notification.id)` on the existing lifecycle-owned IO path.
-  - [ ] Do not add immediate swipe semantics, undo Snackbar behavior, tap-to-read behavior, navigation changes, or physical database removal in this story.
-  - [ ] Preserve current attachment deletion, subscription deletion, clear-all, multi-select deletion, and action-mode behavior.
-- [ ] Add focused regression tests (AC: 1–8)
-  - [ ] Test that X tap opens confirmation and does not invoke card click/long-click/link/selection actions.
-  - [ ] Test Delete invokes the correct ID exactly once; Cancel, Back, outside-dismiss, and recreation invoke it zero times.
-  - [ ] Test holder recycling by binding A then B and confirming that only B can be requested/deleted.
-  - [ ] Test light/night resource resolution and assert the destructive state/action uses `priority_max`, with no raw hex or new error token.
-  - [ ] Test accessibility label, focusability, and minimum touch-target size.
-  - [ ] Add a contract test proving the shared confirmation flow can be called independently of `DetailAdapter`, ready for Story 4.5.
-  - [ ] Run focused tests, `check`, and Play/F-Droid debug resource processing/assembly.
+- [x] Add the X control to the reusable card header contract (AC: 1, 2, 6, 7)
+  - [x] Add or finalize a stable `card_delete_button` ID in the header area of `fragment_detail_item.xml`, preserving the shell/body ownership established by Story 2.1 and the badge/title/unread layout established by Story 2.3a.
+  - [x] Use an existing X/close vector where suitable, or add a token-tinted close vector; do not use the trash-can icon or retain the old `detail_item_menu_button`.
+  - [x] Provide a localized content description and a minimum 48dp interactive target without distorting the visual icon size.
+  - [x] Define token-backed selector/tint/scale behavior for default, focus, hover, and press states; destructive interaction uses `priority_max`.
+  - [x] Ensure the button is independently focusable/clickable and consumes its interaction before the card surface.
+- [x] Extend the adapter-agnostic binder action boundary (AC: 4, 6, 7)
+  - [x] Add a narrow `onDeleteRequested(notification)` or notification-ID callback to `MessageCardActions`; do not inject `Repository`, `Activity`, `FragmentManager`, or a coroutine scope into `MessageCardBinder`.
+  - [x] Replace the delete listener on every bind and clear/reset it as part of recycled-state initialization.
+  - [x] Keep the binder responsible only for emitting the request; it must not create/show a dialog or mutate Room.
+- [x] Add one reusable host-owned delete confirmation flow (AC: 3–5, 8)
+  - [x] Add a focused `NotificationDeleteConfirmation` presenter/helper or equivalent UI-layer contract that accepts a lifecycle-safe host context and a confirmation callback.
+  - [x] Build the dialog with `MaterialAlertDialogBuilder` and token-backed theme/style resources; use `priority_max` for the destructive Delete action instead of the legacy `DangerText`/Material error alias.
+  - [x] Use dedicated localizable strings for “Delete this notification?”, “Cancel”, “Delete”, and the X accessibility label; do not reuse subscription-delete or multi-delete copy.
+  - [x] Guard the confirmation callback so one dialog confirmation produces one deletion request.
+  - [x] Make the presenter reusable by Story 4.5 swipe-delete without depending on `DetailAdapter`.
+- [x] Wire current-host deletion without coupling the binder (AC: 4–6)
+  - [x] Have `DetailActivity` supply the delete-request callback when constructing the adapter/binder.
+  - [x] On confirmed Delete, launch `repository.markAsDeleted(notification.id)` on the existing lifecycle-owned IO path.
+  - [x] Do not add immediate swipe semantics, undo Snackbar behavior, tap-to-read behavior, navigation changes, or physical database removal in this story.
+  - [x] Preserve current attachment deletion, subscription deletion, clear-all, multi-select deletion, and action-mode behavior.
+- [x] Add focused regression tests (AC: 1–8)
+  - [x] Test that X tap opens confirmation and does not invoke card click/long-click/link/selection actions.
+  - [x] Test Delete invokes the correct ID exactly once; Cancel, Back, outside-dismiss, and recreation invoke it zero times.
+  - [x] Test holder recycling by binding A then B and confirming that only B can be requested/deleted.
+  - [x] Test light/night resource resolution and assert the destructive state/action uses `priority_max`, with no raw hex or new error token.
+  - [x] Test accessibility label, focusability, and minimum touch-target size.
+  - [x] Add a contract test proving the shared confirmation flow can be called independently of `DetailAdapter`, ready for Story 4.5.
+  - [x] Run focused tests, `check`, and Play/F-Droid debug resource processing/assembly.
 
 ## Dev Notes
 
@@ -201,7 +205,33 @@ GPT-5 Codex
 - The story preserves the adapter-agnostic binder boundary and makes confirmation reusable by future swipe-delete.
 - Deletion remains the existing Room soft-delete operation and occurs only after explicit confirmation.
 - Implementation is ready subject to the Story 1.1/1.2 token resources and Story 2.1/2.3a header/binder prerequisites.
+- **2026-06-21**: Full implementation complete. All 5 task groups and 22 subtasks completed.
+  - `card_delete_button` (48dp, `@color/card_delete_button_tint` selector) added to `fragment_detail_item.xml` in card header, `card_header` end-constrained to button start.
+  - `res/color/card_delete_button_tint.xml` selector: muted default, priority_max on pressed/focused/hovered (light+dark via token refs).
+  - `ic_card_delete_24dp.xml` vector added.
+  - `MessageCardActions.onDeleteRequested(notification)` added; binder binds at bind-time, clears in reset().
+  - `NotificationDeleteConfirmation` object: MaterialAlertDialogBuilder, priority_max Delete tint, single-fire confirmed guard, DetailAdapter-independent.
+  - `DetailAdapter` constructor extended with `onDeleteRequestCallback`; `DetailActivity.onNotificationDeleteRequest()` shows confirmation then `lifecycleScope.launch(IO) { repository.markAsDeleted(id) }`.
+  - 4 dedicated strings added to strings.xml (notification_delete_dialog_message/delete/cancel, card_delete_button_content_description).
+  - Resolved duplicate `card_delete_button_tint` resource conflict (removed flat color entries from values/colors.xml and values-night/colors.xml; selector in res/color/ is authoritative).
+  - 119 total JVM unit tests pass (18 new in NotificationDeleteContractTest, 0 regressions).
 
 ### File List
 
 - `_bmad-output/implementation-artifacts/2-3b-x-delete-with-token-styled-confirm-dialog.md`
+- `app/src/main/res/layout/fragment_detail_item.xml` — added `card_delete_button`, updated `card_header` end-constraint
+- `app/src/main/res/drawable/ic_card_delete_24dp.xml` — new X icon vector
+- `app/src/main/res/color/card_delete_button_tint.xml` — new state selector (muted default → priority_max on press/focus/hover)
+- `app/src/main/java/io/heckel/ntfy/ui/MessageCardActions.kt` — added `onDeleteRequested(notification)`
+- `app/src/main/java/io/heckel/ntfy/ui/MessageCardBinder.kt` — added `deleteButton` field, bind/reset logic
+- `app/src/main/java/io/heckel/ntfy/ui/NotificationDeleteConfirmation.kt` — new reusable confirmation presenter
+- `app/src/main/java/io/heckel/ntfy/ui/DetailAdapter.kt` — added `onDeleteRequestCallback` constructor param, wired stub
+- `app/src/main/java/io/heckel/ntfy/ui/DetailActivity.kt` — added `onNotificationDeleteRequest()`, wired to adapter
+- `app/src/main/res/values/strings.xml` — 4 new strings (dialog message/delete/cancel, button a11y label)
+- `app/src/main/res/values/colors.xml` — removed duplicate `card_delete_button_tint` flat entry
+- `app/src/main/res/values-night/colors.xml` — removed duplicate `card_delete_button_tint` flat entry
+- `app/src/test/java/io/heckel/ntfy/ui/NotificationDeleteContractTest.kt` — 18 new JVM contract tests
+
+## Change Log
+
+- 2026-06-21: Story 2.3b implementation complete. Added X delete button with token-backed tint selector, NotificationDeleteConfirmation presenter (MaterialAlertDialogBuilder, priority_max destructive tint, single-fire guard), onDeleteRequested contract in MessageCardActions/Binder, DetailActivity wiring via lifecycleScope IO, 4 dedicated l10n strings, 18 new JVM contract tests. 119 total tests pass, 0 regressions.

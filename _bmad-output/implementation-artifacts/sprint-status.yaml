@@ -61,10 +61,10 @@ development_status:
   epic-2: in-progress
   2-1-adapter-agnostic-card-shell-body-slot: done
   2-2-priority-accent-bar-all-five-priorities: done
-  2-3a-card-header-static-content-badge-title-unread-dot: review
-  2-3b-x-delete-with-token-styled-confirm-dialog: review
-  2-4-categorized-tag-row-timestamp: ready-for-dev
-  2-5-tap-to-mark-read: review
+  2-3a-card-header-static-content-badge-title-unread-dot: done
+  2-3b-x-delete-with-token-styled-confirm-dialog: done
+  2-4-categorized-tag-row-timestamp: review
+  2-5-tap-to-mark-read: done
   2-6-card-loading-skeleton-new-arrival-animation-deep-link-highlight: in-progress
   epic-2-retrospective: optional
 

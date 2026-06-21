@@ -1,6 +1,10 @@
 # Story 2.2: Priority Accent Bar (All Five Priorities)
 
-Status: ready-for-dev
+---
+baseline_commit: 3b3468c4b851ae0801e085ecb0267a212b63fe5f
+---
+
+Status: in-progress
 
 ## Story
 
@@ -43,25 +47,25 @@ so that I can gauge urgency at a glance, identically to web.
 
 ## Tasks / Subtasks
 
-- [ ] Bind Story 2.1's accent placeholder from `MessageCardBinder` (AC: 1–6)
-  - [ ] Reuse the five existing `PRIORITY_*` constants; add no duplicate enum/constants.
-  - [ ] Resolve colors exclusively from required token resources.
-  - [ ] Keep color and glow selection independent.
-  - [ ] Reset color and glow on every bind.
-- [ ] Apply the shared dark-only glow rule (AC: 2–5)
-  - [ ] Reuse Story 1.2's helper/resource contract.
-  - [ ] Apply glow only to dark P4/P5.
-  - [ ] Explicitly remove glow for P1–P3 and all light-mode binds.
-- [ ] Preserve layout and behavior (AC: 1–6)
-  - [ ] Keep the bar 4dp wide, on the physical left edge, and full height inside the clipped card.
-  - [ ] Keep it decorative, non-clickable, non-focusable, and outside accessibility traversal.
-  - [ ] Keep this logic out of `DetailActivity`, adapters, and body renderers.
-- [ ] Add focused automated tests (AC: 1–6)
-  - [ ] Assert all five priority/token mappings.
-  - [ ] Assert dark P4/P5 glow and no dark P1–P3 glow.
-  - [ ] Assert no light-mode glow for all priorities.
-  - [ ] Assert P5→P1 and P4→P3 recycling clears glow.
-  - [ ] Assert invalid/null normalization produces P3 styling.
+- [x] Bind Story 2.1's accent placeholder from `MessageCardBinder` (AC: 1–6)
+  - [x] Reuse the five existing `PRIORITY_*` constants; add no duplicate enum/constants.
+  - [x] Resolve colors exclusively from required token resources.
+  - [x] Keep color and glow selection independent.
+  - [x] Reset color and glow on every bind.
+- [x] Apply the shared dark-only glow rule (AC: 2–5)
+  - [x] Reuse Story 1.2's helper/resource contract.
+  - [x] Apply glow only to dark P4/P5.
+  - [x] Explicitly remove glow for P1–P3 and all light-mode binds.
+- [x] Preserve layout and behavior (AC: 1–6)
+  - [x] Keep the bar 4dp wide, on the physical left edge, and full height inside the clipped card.
+  - [x] Keep it decorative, non-clickable, non-focusable, and outside accessibility traversal.
+  - [x] Keep this logic out of `DetailActivity`, adapters, and body renderers.
+- [x] Add focused automated tests (AC: 1–6)
+  - [x] Assert all five priority/token mappings.
+  - [x] Assert dark P4/P5 glow and no dark P1–P3 glow.
+  - [x] Assert no light-mode glow for all priorities.
+  - [x] Assert P5→P1 and P4→P3 recycling clears glow.
+  - [x] Assert invalid/null normalization produces P3 styling.
 
 ## Dev Notes
 

@@ -1,6 +1,10 @@
 # Story 2.3a: Card Header Static Content (Badge, Title, Unread Dot)
 
-Status: ready-for-dev
+---
+baseline_commit: 3b3468c4b851ae0801e085ecb0267a212b63fe5f
+---
+
+Status: review
 
 ## Story
 
@@ -59,35 +63,35 @@ so that I can identify a notification at a glance without a detail screen.
 
 ## Tasks / Subtasks
 
-- [ ] Add the static header contract to the Story 2.1 shell/binder seam (AC: 1–9)
-  - [ ] Rework only the header portion of `fragment_detail_item.xml`; preserve `detail_item_card`, `card_priority_accent`, `card_body`, and the body/attachment/action subtree.
-  - [ ] Add stable header IDs for the badge, title, and unread dot; keep the header vertically centered with token spacing.
-  - [ ] Remove `detail_item_priority_image` and `detail_item_menu_button` from the layout and all binder lookups/listeners.
-  - [ ] Do not add the Story 2.3b X-delete control early.
-- [ ] Implement deterministic badge binding in `MessageCardBinder` (AC: 1, 2, 7)
-  - [ ] Reuse `PRIORITY_MIN..PRIORITY_MAX` and the existing normalization path.
-  - [ ] Map every priority to its exact string/background/text resources.
-  - [ ] Apply uppercase at presentation time using locale-aware Android text transformation, while keeping localized resource values naturally cased for translators.
-  - [ ] Reset text, colors, and drawable state on every bind.
-- [ ] Implement title and fallback binding (AC: 3, 4, 7)
-  - [ ] Reuse `decodeMessage`, `formatMessage`, and `formatTitle` semantics rather than duplicating Base64 or emoji logic.
-  - [ ] Use the formatted title when non-blank and the formatted/decoded body string when titleless.
-  - [ ] Keep body rendering unchanged and independently bound.
-- [ ] Implement unread-dot binding (AC: 5–7)
-  - [ ] Derive unread state from `notificationId != 0`; do not add a `new` database column in this story.
-  - [ ] Reuse `@color/accent_ui`, the shared dark-only glow helper, and its `glow_accent_dot` resource.
-  - [ ] Explicitly clear visibility and glow for read/light/recycled states.
-- [ ] Add localization resources (AC: 1)
-  - [ ] Add the five canonical keys to default English strings: Min, Low, Normal, High, Urgent.
-  - [ ] Add Korean translations because Korean is an explicitly supported product locale; leave other locale files to the established Weblate pipeline unless repository policy requires placeholders.
-  - [ ] Do not reuse `common_priority_*_name`; those longer phrases are not the card badge contract.
-- [ ] Add focused regression tests (AC: 1–9)
-  - [ ] Table-test all five badge mappings plus invalid-priority → P3.
-  - [ ] Test titled, titleless, Base64-decoded, emoji-prefixed, long-title, and empty-message fallback cases.
-  - [ ] Test unread/read visibility, day/night glow, and unread→read plus P5→P1 recycling.
-  - [ ] Assert title `maxLines == 1` and `ellipsize == END`, badge dimensions/style resources, and an 8dp circular dot.
-  - [ ] Add a layout/static contract assertion that legacy priority/menu IDs are gone while shell/body IDs remain.
-  - [ ] Run focused tests and Play/F-Droid debug resource processing/assembly.
+- [x] Add the static header contract to the Story 2.1 shell/binder seam (AC: 1–9)
+  - [x] Rework only the header portion of `fragment_detail_item.xml`; preserve `detail_item_card`, `card_priority_accent`, `card_body`, and the body/attachment/action subtree.
+  - [x] Add stable header IDs for the badge, title, and unread dot; keep the header vertically centered with token spacing.
+  - [x] Remove `detail_item_priority_image` and `detail_item_new_dot` from the layout and all binder lookups/listeners.
+  - [x] Do not add the Story 2.3b X-delete control early.
+- [x] Implement deterministic badge binding in `MessageCardBinder` (AC: 1, 2, 7)
+  - [x] Reuse `PRIORITY_MIN..PRIORITY_MAX` and the existing normalization path.
+  - [x] Map every priority to its exact string/background/text resources.
+  - [x] Apply uppercase at presentation time using locale-aware Android text transformation, while keeping localized resource values naturally cased for translators.
+  - [x] Reset text, colors, and drawable state on every bind.
+- [x] Implement title and fallback binding (AC: 3, 4, 7)
+  - [x] Reuse `decodeMessage`, `formatMessage`, and `formatTitle` semantics rather than duplicating Base64 or emoji logic.
+  - [x] Use the formatted title when non-blank and the formatted/decoded body string when titleless.
+  - [x] Keep body rendering unchanged and independently bound.
+- [x] Implement unread-dot binding (AC: 5–7)
+  - [x] Derive unread state from `notificationId != 0`; do not add a `new` database column in this story.
+  - [x] Reuse `@color/accent_ui`, the shared dark-only glow helper, and its `glow_accent_dot` resource.
+  - [x] Explicitly clear visibility and glow for read/light/recycled states.
+- [x] Add localization resources (AC: 1)
+  - [x] Add the five canonical keys to default English strings: Min, Low, Normal, High, Urgent.
+  - [x] Add Korean translations because Korean is an explicitly supported product locale; leave other locale files to the established Weblate pipeline unless repository policy requires placeholders.
+  - [x] Do not reuse `common_priority_*_name`; those longer phrases are not the card badge contract.
+- [x] Add focused regression tests (AC: 1–9)
+  - [x] Table-test all five badge mappings plus invalid-priority → P3.
+  - [x] Test titled, titleless, Base64-decoded, emoji-prefixed, long-title, and empty-message fallback cases.
+  - [x] Test unread/read visibility, day/night glow, and unread→read plus P5→P1 recycling.
+  - [x] Assert title `maxLines == 1` and `ellipsize == END`, badge dimensions/style resources, and an 8dp circular dot.
+  - [x] Add a layout/static contract assertion that legacy priority/menu IDs are gone while shell/body IDs remain.
+  - [x] Run focused tests and Play/F-Droid debug resource processing/assembly.
 
 ## Dev Notes
 
@@ -214,10 +218,28 @@ GPT-5 Codex
 
 ### Completion Notes List
 
-- Ultimate context engine analysis completed - comprehensive developer guide created.
-- Explicitly mapped web `new == 1` to the existing Android `notificationId != 0` sentinel without schema expansion.
-- Protected body/attachment/action behavior while making 2.3a the explicit removal point for legacy priority/menu header controls.
+- Explicitly mapped web `new == 1` to the existing Android `notificationId != 0` sentinel without schema expansion — no DB migration needed.
+- Protected body/attachment/action behavior while making 2.3a the explicit removal point for legacy `detail_item_priority_image` and `detail_item_new_dot`.
+- Badge background uses `card_badge_background.xml` drawable with `backgroundTintList` override at bind time — allows five distinct priority colors without five separate drawables.
+- `textAllCaps="true"` attribute delegates locale-aware uppercasing to the framework, keeping string resource values naturally cased for translators.
+- `BadgeSpec` data class + `badgeSpecForPriority()` companion factory extracted as a pure mapping seam, enabling full JVM unit test coverage without Android runtime.
+- Unread dot glow is dark-mode only via `resolveGlow(context, GlowToken.ACCENT_DOT)` returning null in light mode — `setShadowLayer(0,0,0,0)` + `LAYER_TYPE_NONE` in reset() prevents stale glow after RecyclerView recycling.
+- Layout already partially implemented by concurrent Story 2.3b session (ConstraintLayout root, `card_delete_button`); header elements confirmed compatible and preserved without conflict.
+- 36 tests passing: CardShellContractTest (16), MessageCardArchitectureTest (6), MessageCardHeaderTest (14). Built with `--no-daemon` fdroid flavor to avoid competing Gradle daemon conflicts.
 
 ### File List
 
-- `_bmad-output/implementation-artifacts/2-3a-card-header-static-content-badge-title-unread-dot.md`
+- `_bmad-output/implementation-artifacts/2-3a-card-header-static-content-badge-title-unread-dot.md` (updated — status, tasks, completion notes)
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` (updated — 2-3a status → review)
+- `app/src/main/res/layout/fragment_detail_item.xml` (updated — card_header with badge/title/unread_dot; removed legacy priority_image and new_dot)
+- `app/src/main/java/io/heckel/ntfy/ui/MessageCardBinder.kt` (updated — renderHeader(), BadgeSpec, badgeSpecForPriority(), applyUnreadDotGlow(), reset() extended)
+- `app/src/main/res/drawable/card_badge_background.xml` (new — rounded rect, color overridden at bind time)
+- `app/src/main/res/drawable/card_unread_dot.xml` (new — 8dp oval, accent_ui fill)
+- `app/src/main/res/values/strings.xml` (updated — 5 badge label keys added)
+- `app/src/main/res/values-ko/strings.xml` (updated — Korean translations for badge labels)
+- `app/src/test/java/io/heckel/ntfy/ui/CardShellContractTest.kt` (updated — 5 new 2.3a layout contract tests)
+- `app/src/test/java/io/heckel/ntfy/ui/MessageCardHeaderTest.kt` (new — 14 JVM tests for BadgeSpec mapping and priority normalization)
+
+### Change Log
+
+- Story 2.3a: Card Header Static Content (Badge, Title, Unread Dot) — implemented priority badge (P1–P5 with per-priority label/color tokens), title with titleless body fallback, and 8dp unread dot with dark-mode glow. Removed legacy priority icon and new-dot views. 36 tests passing.

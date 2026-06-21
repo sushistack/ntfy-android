@@ -1,6 +1,10 @@
+---
+baseline_commit: 3b3468c4b851ae0801e085ecb0267a212b63fe5f
+---
+
 # Story 2.5: Tap to Mark Read
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -40,28 +44,28 @@ so that I clear new items without navigating anywhere (there is no detail view).
 
 ## Tasks / Subtasks
 
-- [ ] Add an ID-scoped persistence operation (AC: 1–2)
-  - [ ] Add `NotificationDao.markAsRead(notificationId: String)` using `UPDATE notification SET notificationId = 0 WHERE id = :notificationId AND notificationId != 0`.
-  - [ ] Expose the operation through `Repository.markAsRead(notificationId: String)`.
-  - [ ] Do not use `markAllAsRead()` or `markAsReadBySequenceId()` for card taps.
-- [ ] Make tap-to-read an explicit binder action (AC: 1–6)
-  - [ ] Extend Story 2.1's `MessageCardActions`/callback boundary with an ID- or notification-scoped `onMarkRead` action.
-  - [ ] Keep repository and coroutine ownership in the host; `MessageCardBinder` must remain adapter/Activity agnostic.
-  - [ ] Bind the outer card/non-interactive surface to invoke the callback only when the currently bound notification is unread.
-  - [ ] Guard duplicate dispatch until the row is rebound read; clear holder-local pending state when a different ID is bound.
-- [ ] Replace legacy primary-card tap behavior (AC: 3, 5)
-  - [ ] In the current `DetailActivity` host, preserve action-mode selection as the first branch.
-  - [ ] Outside action mode, route the card tap only to the mark-read callback.
-  - [ ] Remove card-tap URL opening and clipboard-copy behavior; links and explicit action buttons remain independently interactive.
-- [ ] Isolate child interactions (AC: 4)
-  - [ ] Ensure X-delete and Story 2.4 tag/expander listeners consume their gesture without invoking the outer card listener.
-  - [ ] Preserve link, attachment, and action-button handlers as child-owned actions with no tap-to-read fallthrough.
-  - [ ] Do not make the whole `card_body` independently clickable; use the outer card listener plus normal Android child event dispatch.
-- [ ] Add focused automated tests (AC: 1–6)
-  - [ ] DAO test: unread ID becomes read; a different row, including one sharing a sequence ID, is unchanged.
-  - [ ] Binder/host tests: unread tap dispatches once, read tap dispatches zero times, rapid double tap dispatches once, rebind targets the new ID.
-  - [ ] Interaction tests: X, tag/expander, link, attachment, and action button do not dispatch mark-read.
-  - [ ] Host test: normal card tap neither starts an Activity nor copies content; action-mode tap selects without marking read.
+- [x] Add an ID-scoped persistence operation (AC: 1–2)
+  - [x] Add `NotificationDao.markAsRead(notificationId: String)` using `UPDATE notification SET notificationId = 0 WHERE id = :notificationId AND notificationId != 0`.
+  - [x] Expose the operation through `Repository.markAsRead(notificationId: String)`.
+  - [x] Do not use `markAllAsRead()` or `markAsReadBySequenceId()` for card taps.
+- [x] Make tap-to-read an explicit binder action (AC: 1–6)
+  - [x] Extend Story 2.1's `MessageCardActions`/callback boundary with an ID- or notification-scoped `onMarkRead` action.
+  - [x] Keep repository and coroutine ownership in the host; `MessageCardBinder` must remain adapter/Activity agnostic.
+  - [x] Bind the outer card/non-interactive surface to invoke the callback only when the currently bound notification is unread.
+  - [x] Guard duplicate dispatch until the row is rebound read; clear holder-local pending state when a different ID is bound.
+- [x] Replace legacy primary-card tap behavior (AC: 3, 5)
+  - [x] In the current `DetailActivity` host, preserve action-mode selection as the first branch.
+  - [x] Outside action mode, route the card tap only to the mark-read callback.
+  - [x] Remove card-tap URL opening and clipboard-copy behavior; links and explicit action buttons remain independently interactive.
+- [x] Isolate child interactions (AC: 4)
+  - [x] Ensure X-delete and Story 2.4 tag/expander listeners consume their gesture without invoking the outer card listener.
+  - [x] Preserve link, attachment, and action-button handlers as child-owned actions with no tap-to-read fallthrough.
+  - [x] Do not make the whole `card_body` independently clickable; use the outer card listener plus normal Android child event dispatch.
+- [x] Add focused automated tests (AC: 1–6)
+  - [x] DAO test: unread ID becomes read; a different row, including one sharing a sequence ID, is unchanged.
+  - [x] Binder/host tests: unread tap dispatches once, read tap dispatches zero times, rapid double tap dispatches once, rebind targets the new ID.
+  - [x] Interaction tests: X, tag/expander, link, attachment, and action button do not dispatch mark-read.
+  - [x] Host test: normal card tap neither starts an Activity nor copies content; action-mode tap selects without marking read.
 
 ## Dev Notes
 
@@ -174,8 +178,21 @@ GPT-5 Codex
 
 - Ultimate context engine analysis completed - comprehensive developer guide created.
 - Added Android-specific unread-state mapping, exact-ID persistence contract, legacy-click removal, child-event isolation, selection-mode preservation, and duplicate-tap guardrails.
+- **Implementation (2026-06-21):** Added `NotificationDao.markAsRead(id)` with conditional SQL (`notificationId != 0`); exposed via `Repository.markAsRead(id)`. Extended `MessageCardActions` with nullable `onMarkRead` property. `MessageCardBinder` now tracks `boundNotificationId` and `markReadPending` to guard duplicate in-flight dispatches and clear state on rebind. `DetailActivity.onNotificationClick` retains action-mode selection; outside action mode, card tap is a no-op — mark-read flows via `onNotificationMarkRead` → `lifecycleScope.launch(IO) { repository.markAsRead(...) }`. Legacy URL-open and clipboard-copy behaviors removed from whole-card tap. `DetailAdapter` accepts `onMarkReadCallback` and `onDeleteRequestCallback` as optional constructor params. JVM tests: `TapToMarkReadContractTest` covers unread dispatch, read no-dispatch, rapid-double-tap once, rebind reset, null-host safety; `MessageCardArchitectureTest` verifies binder isolation. Instrumented DAO tests: 4 new cases in `NotificationDaoTest` covering mark-read, idempotency, cross-row isolation. All JVM tests pass; instrumented tests compile (no device available for execution).
+
+### Change Log
+
+- 2026-06-21: Implemented tap-to-mark-read — DAO, Repository, binder callback boundary, DetailActivity host wiring, legacy click removal, child isolation, automated tests.
 
 ### File List
 
 - `_bmad-output/implementation-artifacts/2-5-tap-to-mark-read.md`
+- `app/src/main/java/io/heckel/ntfy/db/Database.kt`
+- `app/src/main/java/io/heckel/ntfy/db/Repository.kt`
+- `app/src/main/java/io/heckel/ntfy/ui/MessageCardActions.kt`
+- `app/src/main/java/io/heckel/ntfy/ui/MessageCardBinder.kt`
+- `app/src/main/java/io/heckel/ntfy/ui/DetailAdapter.kt`
+- `app/src/main/java/io/heckel/ntfy/ui/DetailActivity.kt`
+- `app/src/androidTest/java/io/heckel/ntfy/db/NotificationDaoTest.kt`
+- `app/src/test/java/io/heckel/ntfy/ui/TapToMarkReadContractTest.kt`
 

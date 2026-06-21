@@ -1,6 +1,10 @@
+---
+baseline_commit: f0e2e90cc474feba3617fd798c5973f092df5d3f
+---
+
 # Story 2.6: Card Loading Skeleton, New-Arrival Animation & Deep-Link Highlight
 
-Status: ready-for-dev
+Status: in-progress
 
 ## Story
 
