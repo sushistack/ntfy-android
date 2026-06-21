@@ -82,7 +82,8 @@
     { "id": "gate-fail-markdown-toplevel","input": { "tags": ["card"],    "body": "{\"type\":\"markdown\",\"text\":\"hi\"}" }, "expected": "fallback" },
     { "id": "gate-pass-extra-tags",       "input": { "tags": ["card","service:github"], "body": "{\"type\":\"kv\",\"rows\":[]}" }, "expected": "structured" },
     { "id": "gate-fail-empty-body",       "input": { "tags": ["card"],    "body": "" },                                       "expected": "fallback" },
-    { "id": "gate-fail-null-type",        "input": { "tags": ["card"],    "body": "{\"type\":null}" },                        "expected": "fallback" }
+    { "id": "gate-fail-null-type",        "input": { "tags": ["card"],    "body": "{\"type\":null}" },                        "expected": "fallback" },
+    { "id": "gate-fail-case-mismatch-type","input": { "tags": ["card"],   "body": "{\"type\":\"KV\",\"rows\":[]}" },            "expected": "fallback" }
   ],
 
   "markdownDestinationCases": [

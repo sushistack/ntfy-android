@@ -44,7 +44,8 @@ class ParserParityGoldenCorpusTest {
             "gate-pass-extra-tags",
             "gate-fail-no-tag", "gate-fail-wrong-tag", "gate-fail-uppercase-tag",
             "gate-fail-invalid-json", "gate-fail-json-array", "gate-fail-missing-type",
-            "gate-fail-unknown-type", "gate-fail-markdown-toplevel"
+            "gate-fail-unknown-type", "gate-fail-markdown-toplevel",
+            "gate-fail-case-mismatch-type"
         )
 
         // Required markdown link IDs: http, https, mailto live; javascript, data inert.

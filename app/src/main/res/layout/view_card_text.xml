@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Token-styled text body for Story 3.1 card body fallback.
+     Mounted inside card_body by CardBodyBinder; never used standalone. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_text_body"
+    style="@style/TextAppearance.Ntfy.BodySmall"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textColor="@color/muted"
+    android:paddingStart="@dimen/spacing_4"
+    android:paddingEnd="@dimen/spacing_4"
+    android:paddingTop="@dimen/spacing_2"
+    android:paddingBottom="@dimen/spacing_2" />
