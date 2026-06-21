@@ -53,12 +53,13 @@ object CardTagFormatter {
         val general = mutableListOf<GeneralTag>()
 
         for (tag in all) {
+            if (tag.isBlank()) continue
             when {
                 tag == CARD_MARKER -> continue
                 isEmoji(tag) -> continue
                 tag.startsWith(SERVICE_PREFIX) -> {
                     val remainder = tag.removePrefix(SERVICE_PREFIX)
-                    if (remainder.isNotEmpty()) service.add(remainder)
+                    if (remainder.isNotBlank()) service.add(remainder)
                 }
                 else -> general.add(GeneralTag(tag, webHash(tag)))
             }
