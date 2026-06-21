@@ -78,6 +78,9 @@
                 android:parentActivityName=".ui.DetailActivity">
         </activity>
 
+        <!-- Feed activity (Epic 4 — single-feed surface; nav wiring in Story 4.6) -->
+        <activity android:name=".ui.FeedActivity" android:exported="false" />
+
         <!-- Share file activity, incoming files/shares -->
         <activity android:name=".ui.ShareActivity" android:exported="true">
             <intent-filter>

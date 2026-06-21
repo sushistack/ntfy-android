@@ -120,12 +120,24 @@ class Repository(private val sharedPrefs: SharedPreferences, database: Database)
         notificationDao.clearIconUri(uri)
     }
 
+    fun getAllNotificationsLiveData(): LiveData<List<Notification>> {
+        return notificationDao.listAllFlow().asLiveData()
+    }
+
     fun getNotificationsLiveData(subscriptionId: Long): LiveData<List<Notification>> {
         return notificationDao.listFlow(subscriptionId).asLiveData()
     }
 
     fun getNotificationsFilteredLiveData(subscriptionId: Long, query: String): LiveData<List<Notification>> {
         return notificationDao.listFlowFiltered(subscriptionId, query).asLiveData()
+    }
+
+    suspend fun getNotificationsPaged(subscriptionId: Long, limit: Int, offset: Int): List<Notification> {
+        return notificationDao.listPaged(subscriptionId, limit, offset)
+    }
+
+    suspend fun getAllNotificationsPaged(limit: Int, offset: Int): List<Notification> {
+        return notificationDao.listAllPaged(limit, offset)
     }
 
     fun getNotification(notificationId: String): Notification? {
