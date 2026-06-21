@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Body-only vertical host for a sections block.
+    Inflated into @id/card_body by SectionsBlockRenderer.
+    No card shell, header, meta, or action content lives here.
+    Children are added programmatically with spacing_3 (12dp) between rendered blocks.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sections_child_host"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" />
