@@ -45,21 +45,21 @@ story_location: "{project-root}/_bmad-output/implementation-artifacts"
 development_status:
   # Epic 0: Data foundation — server sequence ordering
   epic-0: in-progress
-  0-1-add-sequenceid-to-the-message-schema-with-migration: ready-for-dev
-  0-2-populate-sequenceid-on-receive-and-order-the-dao-query: ready-for-dev
+  0-1-add-sequenceid-to-the-message-schema-with-migration: done
+  0-2-populate-sequenceid-on-receive-and-order-the-dao-query: done
   epic-0-retrospective: optional
 
   # Epic 1: Themeable visual foundation (tokens + light/dark + a11y primitives)
   epic-1: in-progress
-  1-1-color-token-resources-light-dark: ready-for-dev
-  1-2-non-color-token-resources-literal-tag-palettes: ready-for-dev
+  1-1-color-token-resources-light-dark: review
+  1-2-non-color-token-resources-literal-tag-palettes: review
   1-3-light-dark-system-theme-switch: ready-for-dev
   1-4-reduced-motion-accessibility-primitives: ready-for-dev
   epic-1-retrospective: optional
 
   # Epic 2: Redesigned notification card (adapter-agnostic binder)
   epic-2: in-progress
-  2-1-adapter-agnostic-card-shell-body-slot: ready-for-dev
+  2-1-adapter-agnostic-card-shell-body-slot: in-progress
   2-2-priority-accent-bar-all-five-priorities: ready-for-dev
   2-3a-card-header-static-content-badge-title-unread-dot: ready-for-dev
   2-3b-x-delete-with-token-styled-confirm-dialog: ready-for-dev
