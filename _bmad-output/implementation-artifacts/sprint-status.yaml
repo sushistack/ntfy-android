@@ -1,5 +1,5 @@
 # generated: 2026-06-21
-# last_updated: 2026-06-21 (story 4-1 done after code review)
+# last_updated: 2026-06-21 (story 4-4 review)
 # project: ntfy-android
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-06-21
-last_updated: 2026-06-21 (story 3-8 done)
+last_updated: 2026-06-21 (story 4-7 review)
 project: ntfy-android
 
 project_key: NOKEY
@@ -85,12 +85,12 @@ development_status:
   # Epic 4: Single-feed app shell & navigation
   epic-4: in-progress
   4-1-single-feed-surface-ordered-reusing-the-card-binder: done
-  4-2-feed-pagination-arrival-animation-wiring: review
-  4-3-feed-states-loading-empty-disconnected: ready-for-dev
-  4-4-all-vs-per-topic-feed-topic-chip: ready-for-dev
-  4-5-swipe-to-delete-mark-read: ready-for-dev
+  4-2-feed-pagination-arrival-animation-wiring: done
+  4-3-feed-states-loading-empty-disconnected: done
+  4-4-all-vs-per-topic-feed-topic-chip: done
+  4-5-swipe-to-delete-mark-read: done
   4-6-navigation-drawer-app-bar-no-bottom-nav: ready-for-dev
-  4-7-drawer-subscription-rows-context-menu: ready-for-dev
-  4-8-publish-fab-bottom-sheet: ready-for-dev
+  4-7-drawer-subscription-rows-context-menu: review
+  4-8-publish-fab-bottom-sheet: in-progress
   4-9-optimistic-send-pending-failed-retry-card: ready-for-dev
   epic-4-retrospective: optional

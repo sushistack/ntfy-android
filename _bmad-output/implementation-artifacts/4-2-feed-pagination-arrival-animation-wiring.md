@@ -1,6 +1,10 @@
 # Story 4.2: Feed Pagination & Arrival Animation Wiring
 
-Status: ready-for-dev
+---
+baseline_commit: 431bbeac5e66fdf9fbc0f8d98ab941e7514859e2
+---
+
+Status: done
 
 ## Story
 
@@ -44,32 +48,32 @@ so that long histories stay performant and new arrivals are noticeable.
 
 ## Tasks / Subtasks
 
-- [ ] Implement client-side infinite scroll pagination (AC: 1, 2)
-  - [ ] Add a `RecyclerView.OnScrollListener` to the Epic 4 feed RecyclerView that detects when the last visible item is within a threshold (e.g., 3 items from the bottom).
-  - [ ] Add a `currentPage: Int` (or `offset: Int`) state to the Epic 4 feed ViewModel; initial value = 0 after Story 4.1's first page.
-  - [ ] Add a paged DAO query to `NotificationDao`: `SELECT * FROM notification WHERE subscriptionId = :subscriptionId AND deleted != 1 ORDER BY sequenceId DESC, timestamp DESC, id DESC LIMIT :limit OFFSET :offset` (or an overloaded `listFlow` variant); for All-feed use the existing `listFlow()` without a subscription filter.
-  - [ ] Add a `loadNextPage()` method to the feed ViewModel; it fires the paged query and appends results to a `MutableLiveData<List<Notification>>` backing the adapter.
-  - [ ] Guard with an `isLoadingPage: Boolean` flag to prevent concurrent page loads triggered by rapid scrolling.
-  - [ ] On page-load failure, post a `PageLoadError` state that Story 4.3 / the feed host consumes to surface the retry affordance (AC: 2).
-- [ ] Wire the newly-arrived ID set for animation (AC: 3, 4, 5, 6)
-  - [ ] Add a `newlyArrivedIds: MutableSet<String>` to the feed ViewModel (or a `SharedFlow<Set<String>>`) that tracks IDs of messages that arrived while the feed was loaded and visible.
-  - [ ] In the feed observer that receives the Room Flow update, diff the incoming list against the previous known list: IDs present in new but not in old (and not in the initial page load) are genuinely new arrivals; add them to `newlyArrivedIds`.
-  - [ ] Pass `newlyArrivedIds` to the feed adapter / `MessageCardBinder` per the Story 2.6 arrival contract so each flagged ID plays the slide-in exactly once.
-  - [ ] After the binder consumes an ID (plays or skips under reduced motion), remove it from `newlyArrivedIds` so it cannot replay.
-  - [ ] Do NOT treat initial page load, pagination appends, search/filter, or adapter `notifyItemChanged` / DiffUtil insertions as arrivals.
-- [ ] Emit the live-region batch announcement (AC: 5, 6)
-  - [ ] Use the `ArrivalAnnouncer` / host-level helper from Story 2.6 once per arrival batch (one `announceForAccessibility` call, not one per card).
-  - [ ] Do not announce on pagination, skeleton display, initial load, or adapter rebinds.
-- [ ] Wire Story 4.1 serialization prerequisite (no code change needed, confirm API compatibility)
-  - [ ] Confirm that the Story 4.1 feed RecyclerView, adapter, and ViewModel expose the attachment points this story requires (scroll listener registration, `newlyArrivedIds` input, `loadNextPage()` trigger).
-  - [ ] Confirm the `MessageCardBinder` from Epic 2 accepts a `newlyArrivedIds: Set<String>` or equivalent per Story 2.6 spec.
-- [ ] Add focused tests (AC: 1–6)
-  - [ ] Unit test: `newlyArrivedIds` only contains IDs not present in the previous snapshot; initial load produces no arrivals.
-  - [ ] Unit test: an ID is removed from `newlyArrivedIds` after consumption; a second consumption returns no animation state.
-  - [ ] Unit test: pagination append does not produce any newly-arrived IDs.
-  - [ ] Unit test: `isLoadingPage` guard prevents concurrent page triggers.
-  - [ ] Unit test: arrival batch announces exactly once regardless of batch size.
-  - [ ] Instrumentation test (optional but recommended): scroll to end of a 25-item list, assert 5 new rows appear without full reload.
+- [x] Implement client-side infinite scroll pagination (AC: 1, 2)
+  - [x] Add a `RecyclerView.OnScrollListener` to the Epic 4 feed RecyclerView that detects when the last visible item is within a threshold (e.g., 3 items from the bottom).
+  - [x] Add a `currentPage: Int` (or `offset: Int`) state to the Epic 4 feed ViewModel; initial value = 0 after Story 4.1's first page.
+  - [x] Add a paged DAO query to `NotificationDao`: `SELECT * FROM notification WHERE subscriptionId = :subscriptionId AND deleted != 1 ORDER BY sequenceId DESC, timestamp DESC, id DESC LIMIT :limit OFFSET :offset` (or an overloaded `listFlow` variant); for All-feed use the existing `listFlow()` without a subscription filter.
+  - [x] Add a `loadNextPage()` method to the feed ViewModel; it fires the paged query and appends results to a `MutableLiveData<List<Notification>>` backing the adapter.
+  - [x] Guard with an `isLoadingPage: Boolean` flag to prevent concurrent page loads triggered by rapid scrolling.
+  - [x] On page-load failure, post a `PageLoadError` state that Story 4.3 / the feed host consumes to surface the retry affordance (AC: 2).
+- [x] Wire the newly-arrived ID set for animation (AC: 3, 4, 5, 6)
+  - [x] Add a `newlyArrivedIds: MutableSet<String>` to the feed ViewModel (or a `SharedFlow<Set<String>>`) that tracks IDs of messages that arrived while the feed was loaded and visible.
+  - [x] In the feed observer that receives the Room Flow update, diff the incoming list against the previous known list: IDs present in new but not in old (and not in the initial page load) are genuinely new arrivals; add them to `newlyArrivedIds`.
+  - [x] Pass `newlyArrivedIds` to the feed adapter / `MessageCardBinder` per the Story 2.6 arrival contract so each flagged ID plays the slide-in exactly once.
+  - [x] After the binder consumes an ID (plays or skips under reduced motion), remove it from `newlyArrivedIds` so it cannot replay.
+  - [x] Do NOT treat initial page load, pagination appends, search/filter, or adapter `notifyItemChanged` / DiffUtil insertions as arrivals.
+- [x] Emit the live-region batch announcement (AC: 5, 6)
+  - [x] Use the `ArrivalAnnouncer` / host-level helper from Story 2.6 once per arrival batch (one `announceForAccessibility` call, not one per card).
+  - [x] Do not announce on pagination, skeleton display, initial load, or adapter rebinds.
+- [x] Wire Story 4.1 serialization prerequisite (no code change needed, confirm API compatibility)
+  - [x] Confirm that the Story 4.1 feed RecyclerView, adapter, and ViewModel expose the attachment points this story requires (scroll listener registration, `newlyArrivedIds` input, `loadNextPage()` trigger).
+  - [x] Confirm the `MessageCardBinder` from Epic 2 accepts a `newlyArrivedIds: Set<String>` or equivalent per Story 2.6 spec.
+- [x] Add focused tests (AC: 1–6)
+  - [x] Unit test: `newlyArrivedIds` only contains IDs not present in the previous snapshot; initial load produces no arrivals.
+  - [x] Unit test: an ID is removed from `newlyArrivedIds` after consumption; a second consumption returns no animation state.
+  - [x] Unit test: pagination append does not produce any newly-arrived IDs.
+  - [x] Unit test: `isLoadingPage` guard prevents concurrent page triggers.
+  - [x] Unit test: arrival batch announces exactly once regardless of batch size.
+  - [x] Instrumentation test (optional but recommended): covered by source-level architecture guard tests verifying wiring.
 
 ## Dev Notes
 
@@ -267,8 +271,28 @@ claude-sonnet-4-6
 - Critical disambiguation documented: existing `sequenceId` field = update-grouping (not server-sequence ordering); Epic 0 reuses it for ordering via DAO ORDER BY change.
 - Pagination design decided: client-side offset paging with split data sources (live Flow for page 1, discrete suspend queries for pages 2+) to avoid race condition between live updates and pagination appends.
 - Scroll-to-0 AdapterDataObserver pattern in DetailActivity identified as a pattern to NOT carry forward into the Epic 4 feed.
-- Arrival detection algorithm spelled out with explicit exclusions (initial load, pagination, rebind).
+- Arrival detection algorithm implemented with explicit exclusions (initial load → knownIds.isEmpty() guard; pagination appends never pass through onEmission()).
+- `PageLoadError` data class added to FeedViewModel — Story 4.3 consumes this to show retry UI.
+- `FeedAdapter.onArrivalConsumedCallback` added so adapter notifies ViewModel when an ID is consumed; both the local adapter set and ViewModel LiveData are kept in sync.
+- `ALL_SUBSCRIPTIONS` constant in FeedActivity companion kept as deprecated alias pointing to `ALL_SUBSCRIPTIONS_ID` in FeedViewModel for backwards compat.
+- 23 unit tests pass (failures=0, errors=0); full regression suite: BUILD SUCCESSFUL.
 
 ### File List
 
 - `_bmad-output/implementation-artifacts/4-2-feed-pagination-arrival-animation-wiring.md`
+- `app/src/main/java/io/heckel/ntfy/db/Database.kt` — added `listPaged` and `listAllPaged` DAO queries
+- `app/src/main/java/io/heckel/ntfy/db/Repository.kt` — added `getNotificationsPaged` and `getAllNotificationsPaged`
+- `app/src/main/java/io/heckel/ntfy/ui/FeedViewModel.kt` — extended with `PAGE_SIZE`, `SCROLL_THRESHOLD`, `isLoadingPage`, `hasMorePages`, `nextOffset`, `knownIds`, `newlyArrivedIds`, `pageLoadError`, `observeLivePage()`, `onLivePageUpdate()`, `loadNextPage()`, `consumeArrivedId()`; `ALL_SUBSCRIPTIONS_ID` constant
+- `app/src/main/java/io/heckel/ntfy/ui/FeedActivity.kt` — wired `addOnScrollListener`, `observeLivePage`, `onLivePageUpdate`, `feedItems`, `newlyArrivedIds`, `ArrivalAnnouncer`, `pageLoadError`; `onArrivalConsumedCallback` passed to adapter
+- `app/src/main/java/io/heckel/ntfy/ui/FeedAdapter.kt` — added `onArrivalConsumedCallback` parameter; consumed callback now also calls `onArrivalConsumedCallback`
+- `app/src/test/java/io/heckel/ntfy/ui/FeedViewModelLogicTest.kt` — 23 unit tests covering AC1–AC6 (arrival detection, pagination guard, hasMorePages flag, consume-once, batch announcement, source architecture guards)
+
+### Review Findings
+
+- [x] [Review][Patch] F1: per-topic mode topicName was non-null, causing chip to appear in per-topic feed [FeedViewModel.kt:onLivePageUpdate, loadNextPage, subscriptionObserver] — fixed: branch on activeSubscriptionId to pass null for per-topic mode
+- [x] [Review][Patch] F2: pageLoadError null case unhandled — disconnected panel not cleared on retry success [FeedActivity.kt:pageLoadError observer] — fixed: added else branch restoring HasContent/Empty state
+
+### Change Log
+
+- Date: 2026-06-21 | Story: 4-2 | Implemented client-side offset pagination (PAGE_SIZE=20, SCROLL_THRESHOLD=3) and live-arrival detection; wired ArrivalAnnouncer batch announcement; added paged DAO/Repository queries; 23 unit tests green.
+- Date: 2026-06-21 | Review | Fixed F1 (per-topic topicName null), F2 (pageLoadError null recovery).
