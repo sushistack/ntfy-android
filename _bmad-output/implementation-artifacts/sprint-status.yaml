@@ -1,5 +1,5 @@
 # generated: 2026-06-21
-# last_updated: 2026-06-21 (story 3-1 done)
+# last_updated: 2026-06-21 (stories 3-2 through 3-8 done after code review)
 # project: ntfy-android
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-06-21
-last_updated: 2026-06-21
+last_updated: 2026-06-21 (story 3-8 done)
 project: ntfy-android
 
 project_key: NOKEY
@@ -72,20 +72,20 @@ development_status:
   epic-3: in-progress
   3-0-parser-parity-golden-corpus: done
   3-1-card-detection-dispatch-safe-fallback: done
-  3-2-inline-meter-component: review
-  3-3-kv-block-renderer: ready-for-dev
-  3-4-list-block-renderer: in-progress
-  3-5-chart-block-renderer-hand-drawn-canvas: in-progress
-  3-6a-markdown-renderer-styles: ready-for-dev
-  3-6b-markdown-link-image-security: ready-for-dev
-  3-7-sections-block-renderer-mixed-ordered: ready-for-dev
-  3-8-heuristic-kv-fallback-untagged-key-value: ready-for-dev
+  3-2-inline-meter-component: done
+  3-3-kv-block-renderer: done
+  3-4-list-block-renderer: done
+  3-5-chart-block-renderer-hand-drawn-canvas: done
+  3-6a-markdown-renderer-styles: done
+  3-6b-markdown-link-image-security: done
+  3-7-sections-block-renderer-mixed-ordered: done
+  3-8-heuristic-kv-fallback-untagged-key-value: done
   epic-3-retrospective: optional
 
   # Epic 4: Single-feed app shell & navigation
   epic-4: in-progress
-  4-1-single-feed-surface-ordered-reusing-the-card-binder: ready-for-dev
-  4-2-feed-pagination-arrival-animation-wiring: ready-for-dev
+  4-1-single-feed-surface-ordered-reusing-the-card-binder: done
+  4-2-feed-pagination-arrival-animation-wiring: review
   4-3-feed-states-loading-empty-disconnected: ready-for-dev
   4-4-all-vs-per-topic-feed-topic-chip: ready-for-dev
   4-5-swipe-to-delete-mark-read: ready-for-dev
