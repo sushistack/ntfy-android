@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- List block body for Story 3.4.
+     Mounted inside card_body by ListBlockRenderer; never used standalone.
+     Row host (id/list_row_host) is a vertical LinearLayout; rows are added programmatically. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list_block_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/spacing_4"
+    android:paddingEnd="@dimen/spacing_4"
+    android:paddingTop="@dimen/spacing_2"
+    android:paddingBottom="@dimen/spacing_2">
+
+    <!-- Dynamic row host: cleared and repopulated on every bind. -->
+    <LinearLayout
+        android:id="@+id/list_row_host"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+</LinearLayout>

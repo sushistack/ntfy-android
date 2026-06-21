@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- KV block: one row. Mounted programmatically by KvBlockRenderer inside a GridLayout cell.
+     Layout: [icon] [key (muted)] [status dot?] [value] [meter?]
+     No maxLines or ellipsize — all content must remain fully visible (AC 7). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="@dimen/spacing_1"
+    android:paddingBottom="@dimen/spacing_1">
+
+    <!-- Leading icon glyph (monospace) -->
+    <TextView
+        android:id="@+id/kv_row_icon"
+        style="@style/TextAppearance.Ntfy.Mono"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingEnd="@dimen/spacing_2"
+        android:importantForAccessibility="no" />
+
+    <!-- Key label (muted color, body_sm) -->
+    <TextView
+        android:id="@+id/kv_row_key"
+        style="@style/TextAppearance.Ntfy.BodySmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/muted"
+        android:paddingEnd="@dimen/spacing_2"
+        android:importantForAccessibility="no" />
+
+    <!-- Status dot (visible only for ok/warn/error with no finite meter) -->
+    <View
+        android:id="@+id/kv_row_status_dot"
+        android:layout_width="@dimen/kv_status_dot_size"
+        android:layout_height="@dimen/kv_status_dot_size"
+        android:background="@drawable/kv_status_dot"
+        android:visibility="gone"
+        android:paddingEnd="@dimen/spacing_1"
+        android:importantForAccessibility="no" />
+
+    <!-- Value text (default @color/text; error → @color/priority_urgent) -->
+    <TextView
+        android:id="@+id/kv_row_value"
+        style="@style/TextAppearance.Ntfy.BodySmall"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/text"
+        android:paddingEnd="@dimen/spacing_2" />
+
+    <!-- Inline meter (Story 3.2; visible only when finite meter value present) -->
+    <io.heckel.ntfy.ui.structured.InlineMeterView
+        android:id="@+id/kv_row_meter"
+        android:layout_width="80dp"
+        android:layout_height="@dimen/meter_track_height"
+        android:visibility="gone"
+        android:layout_gravity="center_vertical" />
+
+</LinearLayout>

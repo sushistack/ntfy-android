@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- KV block container. Mounted inside card_body by KvBlockRenderer.
+     Uses a GridLayout whose column count is set programmatically (1 or 2).
+     Padding mirrors the text body slot conventions from view_card_text.xml. -->
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/kv_grid"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:columnCount="1"
+    android:paddingStart="@dimen/spacing_4"
+    android:paddingEnd="@dimen/spacing_4"
+    android:paddingTop="@dimen/spacing_2"
+    android:paddingBottom="@dimen/spacing_2" />

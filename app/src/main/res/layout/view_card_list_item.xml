@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Single list item row for Story 3.4.
+     Marker column is fixed-width (wrap_content); text column takes remaining width (weight=1).
+     This layout ensures continuation lines align under item text, not under the marker. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="@dimen/spacing_1">
+
+    <TextView
+        android:id="@+id/list_item_marker"
+        style="@style/TextAppearance.Ntfy.BodySmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/muted"
+        android:paddingEnd="@dimen/spacing_2"
+        android:importantForAccessibility="no" />
+
+    <TextView
+        android:id="@+id/list_item_text"
+        style="@style/TextAppearance.Ntfy.BodySmall"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/muted"
+        android:maxLines="1000"
+        android:ellipsize="none" />
+
+</LinearLayout>
