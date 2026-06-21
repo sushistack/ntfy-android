@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.text.util.Linkify
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,6 +39,8 @@ import io.heckel.ntfy.msg.NotificationService.Companion.ACTION_COPY
 import io.heckel.ntfy.msg.NotificationService.Companion.ACTION_VIEW
 import io.heckel.ntfy.ui.CardTagFormatter.categorize
 import io.heckel.ntfy.ui.CardTagFormatter.formatAbsoluteTimestamp
+import io.heckel.ntfy.ui.card.body.CardBodyBinder
+import io.heckel.ntfy.ui.card.body.CardBodyDispatcher
 import io.heckel.ntfy.ui.design.GlowToken
 import io.heckel.ntfy.ui.design.resolveGlow
 import io.heckel.ntfy.util.*
@@ -86,6 +89,13 @@ class MessageCardBinder(
     private val actionsWrapperView: ConstraintLayout = itemView.findViewById(R.id.detail_item_actions_wrapper)
     private val actionsFlow: Flow = itemView.findViewById(R.id.detail_item_actions_flow)
 
+    // Story 3.1: body dispatch with safe fallback; owns messageView from this point on.
+    private val cardBodyBinder: CardBodyBinder = CardBodyBinder(
+        messageView = messageView,
+        dispatcher = CardBodyDispatcher(),
+        markwon = markwon,
+    )
+
     fun bind(
         notification: Notification,
         topicName: String?,
@@ -107,32 +117,23 @@ class MessageCardBinder(
 
         // Legacy date view kept for any future callers; hidden in Story 2.4 meta row design.
         dateView.visibility = View.GONE
-        if (notification.isMarkdown()) {
-            messageView.autoLinkMask = 0
-            markwon.setMarkdown(messageView, message.toString())
-        } else {
-            messageView.autoLinkMask = Linkify.WEB_URLS
-            messageView.text = message
-        }
-        messageView.movementMethod = BetterLinkMovementMethod.getInstance()
-        messageView.setOnClickListener {
-            // Click & Long-click listeners on the text as well, because "autoLink=web" makes them
-            // clickable, and so we cannot rely on the underlying card to perform the action.
-            // See https://github.com/binwiederhier/ntfy/issues/226
-            val selectionHandled = actions.onClick(notification)
-            // Mirror the card-surface mark-read logic so that tapping the body text (which
-            // intercepts the cardView click via autoLink) also clears the unread state.
-            if (!selectionHandled) {
+
+        // Story 3.1: body dispatch with fail-safe fallback (replaces inline messageView binding).
+        val tags = splitTags(notification.tags)
+        cardBodyBinder.bind(
+            tags = tags,
+            decodedBody = message.toString(),
+            isMarkdown = notification.isMarkdown(),
+            cardClickAction = { actions.onClick(notification) },
+            cardLongClickAction = { actions.onLongClick(notification) },
+            markReadAction = {
                 val markRead = actions.onMarkRead
                 if (markRead != null && notification.notificationId != 0 && !markReadPending) {
                     markReadPending = true
                     markRead(notification)
                 }
-            }
-        }
-        messageView.setOnLongClickListener {
-            actions.onLongClick(notification); true
-        }
+            },
+        )
         cardView.setOnClickListener {
             val selectionHandled = actions.onClick(notification)
             // Tap-to-read: only when host is not in selection/action mode, notification is
@@ -169,6 +170,14 @@ class MessageCardBinder(
             Colors.cardBackgroundColor(context)
         }
         when (bindState.presentation) {
+            is CardPresentation.Loading -> {
+                // Skeleton state: reset all views and suppress interactivity.
+                // The host (Story 4.3) is responsible for mounting the skeleton layout;
+                // this branch ensures a recycled holder shows nothing interactive.
+                reset()
+                cardView.setCardBackgroundColor(normalBackgroundColor)
+                return
+            }
             is CardPresentation.StaticDeepLinkEmphasis -> {
                 effectController.applyStaticDeepLinkEmphasis(context, normalBackgroundColor)
             }
@@ -214,11 +223,8 @@ class MessageCardBinder(
         headerTitleView.text = null
         headerUnreadDotView.visibility = View.GONE
         headerUnreadDotView.setLayerType(View.LAYER_TYPE_NONE, null)
-        messageView.setOnClickListener(null)
-        messageView.setOnLongClickListener(null)
-        messageView.movementMethod = null
-        messageView.autoLinkMask = 0
-        messageView.text = null
+        // Story 3.1: delegate body reset to cardBodyBinder (clears messageView state).
+        cardBodyBinder.reset()
         cardView.setOnClickListener(null)
         cardView.setOnLongClickListener(null)
         attachmentImageView.setImageDrawable(null)
@@ -246,8 +252,8 @@ class MessageCardBinder(
         val cardTags = categorize(notification.tags, topicName)
         val cardClickAction: () -> Unit = { actions.onClick(notification) }
 
-        // Topic chip
-        if (cardTags.topic != null) {
+        // Topic chip — guard against empty string from host
+        if (!cardTags.topic.isNullOrBlank()) {
             tagChipGroup.addView(buildChip(context,
                 text = cardTags.topic,
                 bgColor = ContextCompat.getColor(context, R.color.topic_chip_bg),
@@ -268,18 +274,21 @@ class MessageCardBinder(
         val general = cardTags.general
 
         val visibleCount = minOf(general.size, GENERAL_TAG_COLLAPSE_COUNT)
-        for (i in 0 until visibleCount) {
-            val gt = general[i]
-            tagChipGroup.addView(buildChip(
-                context,
-                gt.name,
-                bgColors.getColor(gt.paletteIndex, 0),
-                textColors.getColor(gt.paletteIndex, 0),
-                cardClickAction,
-            ))
+        try {
+            for (i in 0 until visibleCount) {
+                val gt = general[i]
+                tagChipGroup.addView(buildChip(
+                    context,
+                    gt.name,
+                    bgColors.getColor(gt.paletteIndex, 0),
+                    textColors.getColor(gt.paletteIndex, 0),
+                    cardClickAction,
+                ))
+            }
+        } finally {
+            bgColors.recycle()
+            textColors.recycle()
         }
-        bgColors.recycle()
-        textColors.recycle()
 
         // +N more button (when 3 or more general tags)
         if (general.size > GENERAL_TAG_COLLAPSE_COUNT) {
@@ -299,7 +308,7 @@ class MessageCardBinder(
         return Chip(context).apply {
             this.text = text
             chipCornerRadius = context.resources.getDimension(R.dimen.radius_full)
-            textSize = context.resources.getDimension(R.dimen.text_caption) / context.resources.displayMetrics.scaledDensity
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimension(R.dimen.text_caption))
             chipBackgroundColor = ColorStateList.valueOf(bgColor)
             setTextColor(textColor)
             isCheckable = false
@@ -328,7 +337,7 @@ class MessageCardBinder(
         return Chip(context).apply {
             text = context.getString(R.string.notification_card_tags_more, n)
             chipCornerRadius = context.resources.getDimension(R.dimen.radius_full)
-            textSize = context.resources.getDimension(R.dimen.text_caption) / context.resources.displayMetrics.scaledDensity
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, context.resources.getDimension(R.dimen.text_caption))
             chipBackgroundColor = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.surface_2))
             setTextColor(ContextCompat.getColor(context, R.color.muted))
             isCheckable = false
