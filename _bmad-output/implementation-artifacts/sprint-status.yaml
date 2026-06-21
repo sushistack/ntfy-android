@@ -51,18 +51,18 @@ development_status:
 
   # Epic 1: Themeable visual foundation (tokens + light/dark + a11y primitives)
   epic-1: in-progress
-  1-1-color-token-resources-light-dark: review
-  1-2-non-color-token-resources-literal-tag-palettes: review
-  1-3-light-dark-system-theme-switch: ready-for-dev
-  1-4-reduced-motion-accessibility-primitives: ready-for-dev
+  1-1-color-token-resources-light-dark: done
+  1-2-non-color-token-resources-literal-tag-palettes: done
+  1-3-light-dark-system-theme-switch: review
+  1-4-reduced-motion-accessibility-primitives: in-progress
   epic-1-retrospective: optional
 
   # Epic 2: Redesigned notification card (adapter-agnostic binder)
   epic-2: in-progress
-  2-1-adapter-agnostic-card-shell-body-slot: in-progress
-  2-2-priority-accent-bar-all-five-priorities: ready-for-dev
-  2-3a-card-header-static-content-badge-title-unread-dot: ready-for-dev
-  2-3b-x-delete-with-token-styled-confirm-dialog: ready-for-dev
+  2-1-adapter-agnostic-card-shell-body-slot: review
+  2-2-priority-accent-bar-all-five-priorities: in-progress
+  2-3a-card-header-static-content-badge-title-unread-dot: in-progress
+  2-3b-x-delete-with-token-styled-confirm-dialog: in-progress
   2-4-categorized-tag-row-timestamp: ready-for-dev
   2-5-tap-to-mark-read: ready-for-dev
   2-6-card-loading-skeleton-new-arrival-animation-deep-link-highlight: ready-for-dev
