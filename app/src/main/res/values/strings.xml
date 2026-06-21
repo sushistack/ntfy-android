@@ -3,7 +3,7 @@
 
     <!-- Notification card priority badge labels (Story 2.3a) — naturally cased for translators;
          uppercase rendering is applied at presentation time by the badge TextView. -->
-    <string name="notification_card_badge_min">Min</string>
+    <string name="notification_card_badge_min">Low</string>
     <string name="notification_card_badge_low">Low</string>
     <string name="notification_card_badge_normal">Normal</string>
     <string name="notification_card_badge_high">High</string>

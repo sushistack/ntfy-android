@@ -162,6 +162,8 @@
     <color name="surface">#FFFFFF</color>
     <color name="surface_2">#EEF0F2</color>
     <color name="surface_active">#EEF0F2</color>
+    <!-- Visible neutral box for low-priority badges (MIN/LOW/NORMAL) on light cards -->
+    <color name="badge_neutral_bg">#DDE1E6</color>
     <color name="border">#E4E6E9</color>
     <color name="control_border">#767B80</color>
     <color name="text">#1C1E21</color>

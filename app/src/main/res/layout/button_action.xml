@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Card action button: outlined (boxed) so it clearly reads as a tappable button. -->
 <com.google.android.material.button.MaterialButton
         xmlns:android="http://schemas.android.com/apk/res/android"
-        style="?attr/borderlessButtonStyle"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:id="@+id/button"
         android:text="Button"
         android:layout_margin="0dp"
@@ -13,9 +15,14 @@
         android:insetTop="0dp"
         android:insetLeft="0dp"
         android:insetRight="0dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:textSize="14sp"
-/>
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:textAllCaps="false"
+        android:textColor="@color/text"
+        android:textSize="13sp"
+        app:strokeColor="@color/control_border"
+        app:strokeWidth="1dp"
+        app:cornerRadius="8dp"
+        app:rippleColor="@color/control_border" />

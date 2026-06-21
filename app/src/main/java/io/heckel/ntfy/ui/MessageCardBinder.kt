@@ -432,12 +432,14 @@ class MessageCardBinder(
     private fun Chip.applyCompactTagStyle() {
         val d = resources.displayMetrics.density
         setEnsureMinTouchTargetSize(false)
-        chipMinHeight = 22f * d
+        chipStrokeWidth = 0f          // no border
+        chipMinHeight = 21f * d
         chipStartPadding = 7f * d
         chipEndPadding = 7f * d
         textStartPadding = 0f
         textEndPadding = 0f
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+        // corner radius left at radius_full (set by callers) for a full pill shape
     }
 
     private fun buildMoreButton(
@@ -838,12 +840,12 @@ class MessageCardBinder(
          * Exposed for unit testing; do not use outside this file and its tests.
          */
         fun badgeSpecForPriority(priority: Int): BadgeSpec = when (priority) {
-            PRIORITY_MIN     -> BadgeSpec(R.string.notification_card_badge_min,    R.color.surface_2, R.color.muted)
-            PRIORITY_LOW     -> BadgeSpec(R.string.notification_card_badge_low,    R.color.surface_2, R.color.muted)
-            PRIORITY_DEFAULT -> BadgeSpec(R.string.notification_card_badge_normal, R.color.surface_2, R.color.text)
+            PRIORITY_MIN     -> BadgeSpec(R.string.notification_card_badge_min,    R.color.badge_neutral_bg, R.color.muted)
+            PRIORITY_LOW     -> BadgeSpec(R.string.notification_card_badge_low,    R.color.badge_neutral_bg, R.color.muted)
+            PRIORITY_DEFAULT -> BadgeSpec(R.string.notification_card_badge_normal, R.color.badge_neutral_bg, R.color.text)
             PRIORITY_HIGH    -> BadgeSpec(R.string.notification_card_badge_high,   R.color.priority_high, R.color.priority_high_on_surface)
             PRIORITY_MAX     -> BadgeSpec(R.string.notification_card_badge_max,    R.color.priority_max,  R.color.priority_max_on_surface)
-            else             -> BadgeSpec(R.string.notification_card_badge_normal, R.color.surface_2, R.color.text)
+            else             -> BadgeSpec(R.string.notification_card_badge_normal, R.color.badge_neutral_bg, R.color.text)
         }
 
         /**

@@ -244,7 +244,7 @@
                 android:maxHeight="150dp"
                 android:scaleType="centerCrop"
                 android:visibility="visible"
-                app:layout_constraintBottom_toTopOf="@id/card_meta_row"
+                app:layout_constraintBottom_toTopOf="@id/detail_item_attachment_file_box"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/card_structured_host"
@@ -262,11 +262,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="6dp"
-                android:layout_marginTop="2dp"
-                app:layout_constraintBottom_toTopOf="@id/detail_item_attachment_file_box"
+                android:layout_marginTop="16dp"
+                app:layout_constraintBottom_toTopOf="@id/card_optimistic_bar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/detail_item_attachment_image">
+                app:layout_constraintTop_toBottomOf="@id/detail_item_actions_wrapper">
 
                 <!-- Tag chip host: wraps left of timestamp -->
                 <com.google.android.material.chip.ChipGroup
@@ -312,7 +312,7 @@
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/card_meta_row">
+                app:layout_constraintTop_toBottomOf="@id/detail_item_attachment_image">
 
                 <ImageView
                     android:id="@+id/detail_item_attachment_file_icon"
@@ -393,7 +393,7 @@
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/detail_item_actions_wrapper">
+                app:layout_constraintTop_toBottomOf="@id/card_meta_row">
 
                 <!-- Pending state: indeterminate circular progress -->
                 <com.google.android.material.progressindicator.CircularProgressIndicator

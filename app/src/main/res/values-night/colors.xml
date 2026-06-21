@@ -158,6 +158,8 @@
     <color name="surface">#16181B</color>
     <color name="surface_2">#1C1F23</color>
     <color name="surface_active">#1C1F23</color>
+    <!-- Visible neutral box for low-priority badges (MIN/LOW/NORMAL) on dark cards -->
+    <color name="badge_neutral_bg">#2C3137</color>
     <color name="border">#23262B</color>
     <color name="control_border">#8B9197</color>
     <color name="text">#E8EAED</color>
