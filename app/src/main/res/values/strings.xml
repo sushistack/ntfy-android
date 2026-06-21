@@ -583,6 +583,9 @@
     <string name="client_certificate_dialog_error_invalid_p12_password">Invalid password or corrupted PKCS#12 file</string>
     <string name="client_certificate_dialog_error_invalid_url">Invalid service URL</string>
 
+    <!-- Story 3.2: meter accessibility percentage announcement -->
+    <string name="meter_accessibility_percent">%d%%</string>
+
     <!-- Story 2.6: accessibility announcement for newly arrived notifications (AC 3) -->
     <plurals name="feed_new_notifications_arrival">
         <item quantity="one">1 new notification</item>

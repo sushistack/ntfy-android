@@ -89,11 +89,15 @@ class MessageCardBinder(
     private val actionsWrapperView: ConstraintLayout = itemView.findViewById(R.id.detail_item_actions_wrapper)
     private val actionsFlow: Flow = itemView.findViewById(R.id.detail_item_actions_flow)
 
+    private val cardBodyView: ViewGroup = itemView.findViewById(R.id.card_body)
+
     // Story 3.1: body dispatch with safe fallback; owns messageView from this point on.
+    // Story 3.4: bodyContainer wires list (and future structured) renderers to card_body.
     private val cardBodyBinder: CardBodyBinder = CardBodyBinder(
         messageView = messageView,
         dispatcher = CardBodyDispatcher(),
         markwon = markwon,
+        bodyContainer = cardBodyView,
     )
 
     fun bind(
@@ -223,6 +227,9 @@ class MessageCardBinder(
         headerTitleView.text = null
         headerUnreadDotView.visibility = View.GONE
         headerUnreadDotView.setLayerType(View.LAYER_TYPE_NONE, null)
+        // Title row reset (Story 2.3a / review finding)
+        titleView.text = null
+        titleView.visibility = View.GONE
         // Story 3.1: delegate body reset to cardBodyBinder (clears messageView state).
         cardBodyBinder.reset()
         cardView.setOnClickListener(null)

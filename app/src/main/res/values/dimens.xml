@@ -46,6 +46,19 @@
     <dimen name="card_focus_ring_width">2dp</dimen>
     <dimen name="card_priority_accent_width">4dp</dimen>
 
+    <!-- Story 3.2: inline meter track height (web parity: 7dp) -->
+    <dimen name="meter_track_height">7dp</dimen>
+    <!-- Story 3.3: kv dot size (status dot preceding value) -->
+    <dimen name="kv_status_dot_size">8dp</dimen>
+    <!-- Story 3.3: responsive two-column breakpoint (≈600dp) -->
+    <dimen name="kv_two_column_breakpoint">600dp</dimen>
+
+    <!-- Story 3.5: chart dimensions (canonical contract) -->
+    <dimen name="chart_plot_height">120dp</dimen>
+    <dimen name="chart_line_stroke">2dp</dimen>
+    <dimen name="chart_single_point_radius">4dp</dimen>
+    <dimen name="chart_plot_padding_h">0dp</dimen>
+
     <!-- Story 2.6: card effect dimensions -->
     <!-- Slide-in start offset: card slides in from this distance above its final position -->
     <dimen name="card_arrival_slide_offset">80dp</dimen>
