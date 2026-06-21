@@ -48,12 +48,13 @@ object ArrivalAnnouncer {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             anchorView.announceForAccessibility(text)
         } else {
+            val parent = anchorView.parent ?: return
             val event = AccessibilityEvent.obtain(AccessibilityEvent.TYPE_ANNOUNCEMENT).apply {
                 className = anchorView.javaClass.name
                 packageName = context.packageName
                 this.text.add(text)
             }
-            anchorView.parent?.requestSendAccessibilityEvent(anchorView, event)
+            parent.requestSendAccessibilityEvent(anchorView, event)
         }
     }
 

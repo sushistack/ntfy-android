@@ -43,6 +43,10 @@ class CardEffectController(
      * restores baseline view properties.
      */
     fun resetTransient() {
+        // Snapshot before cancel(): onAnimationCancel fires synchronously and nulls savedCardBackground.
+        val backgroundToRestore = savedCardBackground
+        savedCardBackground = null
+
         runningAnimator?.cancel()
         runningAnimator = null
 
@@ -54,13 +58,11 @@ class CardEffectController(
         rootView.alpha = 1f
 
         // Restore card background if we changed it for deep-link emphasis
-        savedCardBackground?.let { colorInt ->
-            cardView.setCardBackgroundColor(colorInt)
-            savedCardBackground = null
-        }
+        backgroundToRestore?.let { cardView.setCardBackgroundColor(it) }
 
-        // Clear any software layer set for glow
+        // Clear software layers set for glow on both rootView and cardView
         rootView.setLayerType(View.LAYER_TYPE_NONE, null)
+        cardView.setLayerType(View.LAYER_TYPE_NONE, null)
     }
 
     /**
@@ -89,6 +91,7 @@ class CardEffectController(
             duration = ARRIVAL_DURATION_MS
             interpolator = DecelerateInterpolator()
         }
+        runningAnimator?.cancel()
         runningAnimator = animator
         animator.start()
     }
@@ -135,6 +138,7 @@ class CardEffectController(
                 clearDeepLinkGlow()
             }
         })
+        runningAnimator?.cancel()
         runningAnimator = animator
         animator.start()
     }
