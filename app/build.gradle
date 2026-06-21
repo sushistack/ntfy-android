@@ -83,6 +83,12 @@ android {
             ]
         }
     }
+
+    lint {
+        // values-night/glows.xml is intentionally night-only (gated at runtime by
+        // GlowSpec.resolve()); the "missing base resource" warning is a false positive here.
+        disable 'MissingDefaultResource'
+    }
 }
 
 // Disables GoogleServices tasks for F-Droid variant
