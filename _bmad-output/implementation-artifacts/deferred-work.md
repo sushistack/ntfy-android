@@ -17,3 +17,11 @@
 - P5: `toggleSelection` 마지막 아이템 해제 시 `notifyItemChanged` 미호출 — `DetailActivity.endActionModeAndRedraw()`가 전체 rebind로 보정하므로 실제 시각적 버그 없음. DetailActivity 구조 변경 시 재검토 필요.
 
 - P7: `GlobalScope.launch` in `onDeleteAttachment` — lifecycle-unaware. 기존 코드 패턴. Activity가 파괴된 후 DB write가 계속 실행될 수 있음. lifecycleScope로 교체 시 DetailAdapter 시그니처 변경 없이 가능하므로 별도 cleanup 스토리에서 처리 권장.
+
+## Deferred from: code review of 2-4 and 2-6 (2026-06-21)
+
+- `formatAbsoluteTimestamp` uncaught `DateTimeException` for extreme Long epoch values (> year ~292 million) — practical risk is near-zero given server-side validation; clamp or catch if untrusted data path changes in future.
+
+- `ObjectAnimator.ofArgb(cardView, "cardBackgroundColor", …)` getter/setter type mismatch (CardView.getCardBackgroundColor() returns ColorStateList, not int) — currently non-crashing because 3-arg ofArgb skips the getter. Revisit if CardView library updates change the setter signature; workaround is a ValueAnimator with explicit update listener.
+
+- Story 2.6 effects (NewArrival, DeepLinkPulse) and ArrivalAnnouncer not wired in DetailAdapter — intentional; Epic 4 Stories 4.1/4.2/4.3 own host-level wiring for feed arrival tracking and deep-link resolution.

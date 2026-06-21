@@ -255,6 +255,16 @@ claude-sonnet-4-6
 - `app/src/test/java/io/heckel/ntfy/ui/CardTagFormatterTest.kt`
 - `app/src/test/java/io/heckel/ntfy/ui/CardEffectControllerDecisionTest.kt`
 
+### Review Findings
+
+- [x] [Review][Patch] Whitespace-only tags produce blank chips — added `isBlank()` guard in `categorize()` [CardTagFormatter.kt]
+- [x] [Review][Patch] `chip.textSize` used wrong unit conversion (px/scaledDensity = dp) — changed to `setTextSize(COMPLEX_UNIT_PX, px)` [MessageCardBinder.kt]
+- [x] [Review][Patch] `TypedArray` leak if `addView` throws — wrapped in try/finally [MessageCardBinder.kt]
+- [x] [Review][Patch] Empty `topicName ""` rendered blank topic chip — guard changed to `isNullOrBlank()` [MessageCardBinder.kt]
+- [x] [Review][Defer] Story 2.6 effects/ArrivalAnnouncer not wired in DetailAdapter — Epic 4 (4.1/4.2/4.3) connects host at feed level
+- [x] [Review][Defer] `formatAbsoluteTimestamp` uncaught `DateTimeException` for extreme Long values — server-side validation covers practical range
+
 ### Change Log
 
 - 2026-06-21: Story 2.4 implemented — categorized tag row (topic/service/general chips), unsigned hash parity, +N more expansion, absolute timestamp, meta-row layout, full JVM test suite.
+- 2026-06-21: Review patches applied — blank tag guard, textSize unit fix, TypedArray try/finally, topicName isNullOrBlank guard.

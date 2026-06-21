@@ -63,15 +63,15 @@ development_status:
   2-2-priority-accent-bar-all-five-priorities: done
   2-3a-card-header-static-content-badge-title-unread-dot: done
   2-3b-x-delete-with-token-styled-confirm-dialog: done
-  2-4-categorized-tag-row-timestamp: review
+  2-4-categorized-tag-row-timestamp: done
   2-5-tap-to-mark-read: done
-  2-6-card-loading-skeleton-new-arrival-animation-deep-link-highlight: in-progress
+  2-6-card-loading-skeleton-new-arrival-animation-deep-link-highlight: done
   epic-2-retrospective: optional
 
   # Epic 3: Structured message rendering (card body)
   epic-3: in-progress
-  3-0-parser-parity-golden-corpus: ready-for-dev
-  3-1-card-detection-dispatch-safe-fallback: ready-for-dev
+  3-0-parser-parity-golden-corpus: review
+  3-1-card-detection-dispatch-safe-fallback: in-progress
   3-2-inline-meter-component: ready-for-dev
   3-3-kv-block-renderer: ready-for-dev
   3-4-list-block-renderer: ready-for-dev
