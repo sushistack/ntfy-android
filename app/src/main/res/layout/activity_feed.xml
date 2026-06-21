@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- State: HasContent — the live notification list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/feed_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingHorizontal="0dp"
+        android:visibility="gone" />
+
+    <!-- State: Loading — five skeleton card placeholders -->
+    <include
+        layout="@layout/view_feed_loading_state"
+        android:id="@+id/feed_loading_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- State: Empty — no messages for active feed mode -->
+    <include
+        layout="@layout/view_feed_empty_state"
+        android:id="@+id/feed_empty_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- State: Disconnected — connection lost or page-load failure -->
+    <include
+        layout="@layout/view_feed_disconnected_state"
+        android:id="@+id/feed_disconnected_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
