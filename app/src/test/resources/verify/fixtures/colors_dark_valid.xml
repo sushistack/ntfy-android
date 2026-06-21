@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#0C0D0F</color>
+    <color name="surface">#16181B</color>
+    <color name="surface_2">#1C1F23</color>
+    <color name="surface_active">#1C1F23</color>
+    <color name="border">#23262B</color>
+    <color name="control_border">#8B9197</color>
+    <color name="text">#E8EAED</color>
+    <color name="muted">#8B9197</color>
+    <color name="accent_text">#42D392</color>
+    <color name="accent_ui">#42D392</color>
+    <color name="accent_on_surface">#0C1A12</color>
+    <color name="priority_high">#F5A95C</color>
+    <color name="priority_max">#FF6B6E</color>
+    <color name="priority_urgent">#FF6B6E</color>
+    <color name="priority_high_on_surface">#241403</color>
+    <color name="priority_max_on_surface">#1A0E0E</color>
+    <color name="meter_ok">#42D392</color>
+    <color name="meter_track">#262A2F</color>
+    <color name="meter_warning">#F5A95C</color>
+    <color name="meter_critical">#FF6B6E</color>
+    <color name="topic_chip_bg">#143A2D</color>
+    <color name="topic_chip_text">#7CE6B4</color>
+    <color name="button_fill">#F4F5F6</color>
+    <color name="button_fill_text">#15171A</color>
+    <color name="focus_ring">#42D392</color>
+</resources>

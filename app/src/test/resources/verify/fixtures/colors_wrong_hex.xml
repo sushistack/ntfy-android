@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 'bg' has wrong hex value -->
+<resources>
+    <color name="bg">#AABBCC</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_2">#EEF0F2</color>
+    <color name="surface_active">#EEF0F2</color>
+    <color name="border">#E4E6E9</color>
+    <color name="control_border">#767B80</color>
+    <color name="text">#1C1E21</color>
+    <color name="muted">#6A7076</color>
+    <color name="accent_text">#0E7A48</color>
+    <color name="accent_ui">#1A9E5F</color>
+    <color name="accent_on_surface">#0C1A12</color>
+    <color name="priority_high">#BF6C15</color>
+    <color name="priority_max">#E5484D</color>
+    <color name="priority_urgent">#C7353A</color>
+    <color name="priority_high_on_surface">#241403</color>
+    <color name="priority_max_on_surface">#1A0E0E</color>
+    <color name="meter_ok">#0E7A48</color>
+    <color name="meter_track">#E4E6E9</color>
+    <color name="meter_warning">#BF6C15</color>
+    <color name="meter_critical">#E5484D</color>
+    <color name="topic_chip_bg">#E1F2EA</color>
+    <color name="topic_chip_text">#136B43</color>
+    <color name="button_fill">#F4F5F6</color>
+    <color name="button_fill_text">#15171A</color>
+    <color name="focus_ring">#1A9E5F</color>
+</resources>
