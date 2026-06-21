@@ -54,12 +54,12 @@ development_status:
   1-1-color-token-resources-light-dark: done
   1-2-non-color-token-resources-literal-tag-palettes: done
   1-3-light-dark-system-theme-switch: review
-  1-4-reduced-motion-accessibility-primitives: in-progress
+  1-4-reduced-motion-accessibility-primitives: review
   epic-1-retrospective: optional
 
   # Epic 2: Redesigned notification card (adapter-agnostic binder)
   epic-2: in-progress
-  2-1-adapter-agnostic-card-shell-body-slot: review
+  2-1-adapter-agnostic-card-shell-body-slot: done
   2-2-priority-accent-bar-all-five-priorities: in-progress
   2-3a-card-header-static-content-badge-title-unread-dot: in-progress
   2-3b-x-delete-with-token-styled-confirm-dialog: in-progress

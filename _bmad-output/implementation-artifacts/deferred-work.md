@@ -7,3 +7,9 @@
 - `ORDER BY sequenceId DESC` is lexicographic TEXT sorting — if the ntfy server ever emits bare numeric sequence IDs (e.g. `"9"`, `"10"`), `"9"` sorts after `"10"`, breaking recency order. Current tests use same-digit-length padded strings that happen to sort correctly. Requires a protocol decision: confirm server always emits opaque non-numeric identifiers, or change the ordering strategy (e.g. zero-pad, `CAST`, or switch to `serverSequence Long` once populated).
 
 - `fallbackToDestructiveMigration(true)` coexists with all explicit migrations — pre-existing. If a future migration is missing, Room silently drops all user data instead of crashing. Consider removing or scoping to dev-only builds after all migration paths are verified.
+
+## Deferred from: code review of 2-1-adapter-agnostic-card-shell-body-slot (2026-06-21)
+
+- P5: `toggleSelection` 마지막 아이템 해제 시 `notifyItemChanged` 미호출 — `DetailActivity.endActionModeAndRedraw()`가 전체 rebind로 보정하므로 실제 시각적 버그 없음. DetailActivity 구조 변경 시 재검토 필요.
+
+- P7: `GlobalScope.launch` in `onDeleteAttachment` — lifecycle-unaware. 기존 코드 패턴. Activity가 파괴된 후 DB write가 계속 실행될 수 있음. lifecycleScope로 교체 시 DetailAdapter 시그니처 변경 없이 가능하므로 별도 cleanup 스토리에서 처리 권장.
