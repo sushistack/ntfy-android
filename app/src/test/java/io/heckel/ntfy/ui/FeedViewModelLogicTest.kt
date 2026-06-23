@@ -350,4 +350,51 @@ class FeedViewModelLogicTest {
         assertTrue("Repository must have getNotificationsPaged", src.contains("fun getNotificationsPaged("))
         assertTrue("Repository must have getAllNotificationsPaged", src.contains("fun getAllNotificationsPaged("))
     }
+
+    // ── Delete pruning: a deleted card must leave the in-memory feed, even when it lives in an
+    //    older-page snapshot the live Room Flow never refreshes (mirrors removeServerItem). ───
+
+    /** Mirrors FeedViewModel.removeServerItem's filter. */
+    private fun prune(items: List<FeedItem>, id: String): List<FeedItem> =
+        items.filterNot { it is FeedItem.Server && it.notification.id == id }
+
+    @Test
+    fun delete_prunesServerItemFromOlderPageSnapshot() {
+        val items = listOf(
+            FeedItem.Server(makeNotification("p1-live"), null),
+            FeedItem.Server(makeNotification("p2-old"), null), // appended older-page snapshot
+        )
+        val result = prune(items, "p2-old")
+        assertEquals(1, result.size)
+        assertFalse(
+            "deleted older-page card must be gone",
+            result.any { it is FeedItem.Server && it.notification.id == "p2-old" }
+        )
+    }
+
+    @Test
+    fun delete_keepsOtherServerItems() {
+        val items = listOf(
+            FeedItem.Server(makeNotification("a"), null),
+            FeedItem.Server(makeNotification("b"), null),
+        )
+        assertEquals(listOf("b"), prune(items, "a").filterIsInstance<FeedItem.Server>().map { it.id })
+    }
+
+    @Test
+    fun feedViewModel_markAsDeleted_prunesFeedItems() {
+        val src = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedViewModel.kt")
+        assertTrue(
+            "markAsDeleted must prune _feedItems so older-page deletes leave the UI",
+            src.contains("removeServerItem")
+        )
+    }
+
+    @Test
+    fun feedFragment_swipeDelete_routesThroughViewModel() {
+        val src = readSource("app/src/main/java/io/heckel/ntfy/ui/FeedFragment.kt")
+        val body = src.substringAfter("fun onSwipeDeleteConfirmed").substringBefore("\n    override")
+        assertTrue("swipe delete must go through viewModel.markAsDeleted", body.contains("viewModel.markAsDeleted"))
+        assertFalse("swipe delete must not call repository.markAsDeleted directly", body.contains("repository.markAsDeleted"))
+    }
 }

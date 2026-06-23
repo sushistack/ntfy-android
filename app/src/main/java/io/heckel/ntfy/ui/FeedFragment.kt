@@ -312,9 +312,9 @@ class FeedFragment : Fragment(), DeleteSwipeConfirmFragment.Listener {
 
     // DeleteSwipeConfirmFragment.Listener
     override fun onSwipeDeleteConfirmed(notificationId: String, position: Int) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            repository.markAsDeleted(notificationId)
-        }
+        // Route through the ViewModel so the in-memory feed (incl. older-page snapshots) is pruned;
+        // a direct repository call only updates the DB and leaves older-page cards visible.
+        viewModel.markAsDeleted(notificationId)
     }
 
     override fun onSwipeDeleteCancelled(position: Int) {

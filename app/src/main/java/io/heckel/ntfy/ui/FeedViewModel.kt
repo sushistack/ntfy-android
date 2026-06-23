@@ -220,8 +220,20 @@ class FeedViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
-    fun markAsDeleted(notificationId: String) = viewModelScope.launch(Dispatchers.IO) {
-        repository.markAsDeleted(notificationId)
+    fun markAsDeleted(notificationId: String) {
+        // Prune from the in-memory feed up front. Older pages (loaded via loadNextPage) are static
+        // snapshots that the live page-1 Room Flow never refreshes, so a delete there would set
+        // deleted=1 in the DB but the card would linger in the UI. Must run on the main thread.
+        removeServerItem(notificationId)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.markAsDeleted(notificationId)
+        }
+    }
+
+    private fun removeServerItem(notificationId: String) {
+        val current = _feedItems.value ?: return
+        val pruned = current.filterNot { it is FeedItem.Server && it.notification.id == notificationId }
+        if (pruned.size != current.size) _feedItems.value = pruned
     }
 
     // ── Outbox (optimistic send) ────────────────────────────────────────────────
