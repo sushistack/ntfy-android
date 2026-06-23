@@ -59,7 +59,10 @@ class KvBlockRenderer : CardBodyRenderer {
 
                 val params = GridLayout.LayoutParams(
                     GridLayout.spec(GridLayout.UNDEFINED, 1f),
-                    GridLayout.spec(GridLayout.UNDEFINED, 1f),
+                    // FILL alignment forces an EXACTLY measure spec on the cell so the row's
+                    // weighted value TextView is bounded to the column width and wraps long
+                    // unbreakable tokens (paths/URLs) instead of clipping on one line.
+                    GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f),
                 ).apply {
                     width = 0
                     height = GridLayout.LayoutParams.WRAP_CONTENT

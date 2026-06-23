@@ -195,6 +195,49 @@ fun formatMessage(notification: Notification): String {
     }
 }
 
+/**
+ * Card messages carry JSON in the body (rendered as a structured card in-app). A system
+ * notification would otherwise show raw JSON, so flatten it to plain text. Mirrors the web
+ * app's summarizeCard. Returns null if the body is not a recognizable card spec, so callers
+ * fall back to the raw message.
+ */
+fun summarizeCard(raw: String): String? {
+    val spec = try {
+        com.google.gson.JsonParser.parseString(raw)
+    } catch (_: Exception) {
+        return null
+    }
+    if (spec == null || !spec.isJsonObject) return null
+    val obj = spec.asJsonObject
+    fun str(e: com.google.gson.JsonElement?): String = when {
+        e == null || e.isJsonNull -> ""
+        e.isJsonPrimitive -> e.asString
+        else -> e.toString()
+    }
+    val blocks = if (str(obj.get("type")) == "sections") {
+        obj.getAsJsonArray("blocks") ?: com.google.gson.JsonArray()
+    } else {
+        com.google.gson.JsonArray().apply { add(obj) }
+    }
+    val lines = mutableListOf<String>()
+    for (b in blocks) {
+        if (!b.isJsonObject) continue
+        val block = b.asJsonObject
+        when (str(block.get("type"))) {
+            "kv" -> block.getAsJsonArray("rows")?.forEach { r ->
+                if (r.isJsonObject) {
+                    val row = r.asJsonObject
+                    val key = str(row.get("key"))
+                    if (key.isNotEmpty()) lines.add("$key: ${str(row.get("value"))}")
+                }
+            }
+            "list" -> block.getAsJsonArray("items")?.forEach { lines.add("• ${str(it)}") }
+            "markdown" -> str(block.get("text")).takeIf { it.isNotEmpty() }?.let { lines.add(it) }
+        }
+    }
+    return lines.joinToString("\n").ifEmpty { null }
+}
+
 fun decodeMessage(notification: Notification): String {
     return try {
         if (notification.encoding == MESSAGE_ENCODING_BASE64) {

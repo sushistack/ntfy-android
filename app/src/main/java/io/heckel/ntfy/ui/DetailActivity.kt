@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
+import android.graphics.Rect
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
@@ -312,6 +313,13 @@ class DetailActivity : AppCompatActivity(), NotificationFragment.NotificationSet
         adapter = DetailAdapter(this, lifecycleScope, repository, onNotificationClick, onNotificationLongClick, onNotificationMarkRead, onNotificationDeleteRequest)
         mainList = findViewById(R.id.detail_notification_list)
         mainList.adapter = adapter
+
+        // Mirror FeedFragment: gap between cards so they don't appear flush (cards have only a 1dp margin).
+        mainList.addItemDecoration(object : RecyclerView.ItemDecoration() {
+            override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+                if (parent.getChildAdapterPosition(view) != 0) outRect.top = resources.getDimensionPixelSize(R.dimen.spacing_4)
+            }
+        })
         
         // Apply window insets to ensure content is not covered by navigation bar
         mainList.clipToPadding = false

@@ -143,7 +143,7 @@ class NotificationService(val context: Context) {
             try {
                 val attachmentBitmap = contentUri.readBitmapFromUri(context)
                 builder
-                    .setContentText(maybeAppendActionErrors(maybeMarkdown(formatMessage(notification), notification), notification))
+                    .setContentText(maybeAppendActionErrors(maybeMarkdown(notificationMessage(notification), notification), notification))
                     .setLargeIcon(attachmentBitmap)
                     .setStyle(NotificationCompat.BigPictureStyle()
                         .bigPicture(attachmentBitmap)
@@ -163,8 +163,16 @@ class NotificationService(val context: Context) {
         }
     }
 
+    /** Card notifications carry JSON; flatten to text so the popup isn't raw JSON. */
+    private fun notificationMessage(notification: Notification): String {
+        if (splitTags(notification.tags).contains("card")) {
+            summarizeCard(decodeMessage(notification))?.let { return it }
+        }
+        return formatMessage(notification)
+    }
+
     private fun formatMessageMaybeWithAttachmentInfos(notification: Notification): CharSequence {
-        val message = maybeMarkdown(formatMessage(notification), notification)
+        val message = maybeMarkdown(notificationMessage(notification), notification)
         val attachment = notification.attachment ?: return message
         val attachmentInfos = if (attachment.size != null) {
             "${attachment.name}, ${formatBytes(attachment.size)}"
