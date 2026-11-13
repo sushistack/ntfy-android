@@ -14,7 +14,7 @@ android {
     compileSdkVersion 36
 
     defaultConfig {
-        applicationId "io.heckel.ntfy"
+        applicationId "kr.eli.notify" // Notify fork: installs alongside the official ntfy app (code namespace stays io.heckel.ntfy)
         minSdkVersion 26
         targetSdkVersion 36
 

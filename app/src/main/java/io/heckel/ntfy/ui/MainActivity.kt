@@ -516,6 +516,9 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
     }
 
     private fun showHideBatteryBanner(subscriptions: List<Subscription>) {
+        // Hidden like ntfy-web (no advisory banners); delivery settings stay in Settings. ponytail: set HIDE_ADVISORY_BANNERS = false to bring them back.
+        findViewById<View>(R.id.main_banner_battery).visibility = View.GONE
+        if (HIDE_ADVISORY_BANNERS) return
         val hasInstantSubscriptions = subscriptions.count { it.instant } > 0
         val batteryRemindTimeReached = repository.getBatteryOptimizationsRemindTime() < System.currentTimeMillis()
         val ignoringOptimizations = isIgnoringBatteryOptimizations(this@MainActivity)
@@ -526,6 +529,9 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
     }
 
     private fun showHideWebSocketBanner(subscriptions: List<Subscription>) {
+        // Hidden like ntfy-web (no advisory banners); delivery settings stay in Settings. ponytail: set HIDE_ADVISORY_BANNERS = false to bring them back.
+        findViewById<View>(R.id.main_banner_websocket).visibility = View.GONE
+        if (HIDE_ADVISORY_BANNERS) return
         val hasSelfHostedSubscriptions = subscriptions.count { it.baseUrl != appBaseUrl } > 0
         val usingWebSockets = repository.getConnectionProtocol() == Repository.CONNECTION_PROTOCOL_WS
         val wsRemindTimeReached = repository.getWebSocketRemindTime() < System.currentTimeMillis()
@@ -547,6 +553,9 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
     }
 
     private fun showHideWebSocketReconnectBanner() {
+        // Hidden like ntfy-web (no advisory banners); delivery settings stay in Settings. ponytail: set HIDE_ADVISORY_BANNERS = false to bring them back.
+        findViewById<View>(R.id.main_banner_websocket_reconnect).visibility = View.GONE
+        if (HIDE_ADVISORY_BANNERS) return
         val wsReconnectBanner = findViewById<View>(R.id.main_banner_websocket_reconnect)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val usingWebSockets = repository.getConnectionProtocol() == Repository.CONNECTION_PROTOCOL_WS
@@ -1143,6 +1152,7 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
     }
 
     companion object {
+        private const val HIDE_ADVISORY_BANNERS = true
         private const val STATE_SUBSCRIPTION_ID = "currentSubscriptionId"
         private const val STATE_TOPIC = "currentTopic"
         private const val STATE_HISTORY = "historyView"
