@@ -1,0 +1,63 @@
+# Signed play-flavor APK -> GitHub Releases (Obtainium). Trigger: push a tag vX.Y.Z.
+# Secrets: SIGNING_KEYSTORE_B64, SIGNING_STORE_PASSWORD, SIGNING_KEY_ALIAS, SIGNING_KEY_PASSWORD,
+#          GOOGLE_SERVICES_JSON_B64. Nothing secret is written to the repo or logs.
+name: release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Version from tag
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          IFS=. read -r MA MI PA <<< "$V"
+          echo "VERSION_NAME=$V" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=$((MA*10000 + MI*100 + PA))" >> "$GITHUB_ENV"
+
+      - name: Secrets to files
+        env:
+          KEYSTORE_B64: ${{ secrets.SIGNING_KEYSTORE_B64 }}
+          GSJ_B64: ${{ secrets.GOOGLE_SERVICES_JSON_B64 }}
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          echo "$GSJ_B64" | base64 -d > app/google-services.json
+          echo "SIGNING_STORE_FILE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+
+      - name: Test and build
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: ./gradlew --no-daemon testPlayReleaseUnitTest assemblePlayRelease
+
+      - name: Verify signature
+        run: |
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --print-certs app/build/outputs/apk/play/release/app-play-release.apk | grep -E "Signer: certificate DN: CN=Notify"
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/outputs/apk/play/release/app-play-release.apk "notify-$VERSION_NAME.apk"
+          gh release create "$GITHUB_REF_NAME" "notify-$VERSION_NAME.apk" --title "Notify $VERSION_NAME" --generate-notes
+
+      - name: Clean up secret files
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks" app/google-services.json
