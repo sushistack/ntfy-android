@@ -786,40 +786,8 @@ class MessageCardBinder(
     }
 
     private fun runAction(context: Context, notification: Notification, action: Action): Boolean {
-        when (action.action) {
-            ACTION_VIEW -> runViewAction(context, action)
-            ACTION_COPY -> runCopyAction(context, action)
-            else -> runOtherUserAction(context, notification, action)
-        }
+        runNotificationAction(context, notification, action)
         return true
-    }
-
-    private fun runViewAction(context: Context, action: Action) {
-        try {
-            val url = action.url ?: return
-            val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            context.startActivity(intent)
-        } catch (e: Exception) {
-            Log.w(TAG, "Unable to start activity from URL ${action.url}", e)
-            val message = if (e is ActivityNotFoundException) action.url else e.message
-            Toast.makeText(context, context.getString(R.string.detail_item_cannot_open_url, message), Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun runCopyAction(context: Context, action: Action) {
-        val value = action.value ?: return
-        copyToClipboard(context, action.label, value)
-    }
-
-    private fun runOtherUserAction(context: Context, notification: Notification, action: Action) {
-        val intent = Intent(context, NotificationService.UserActionBroadcastReceiver::class.java).apply {
-            putExtra(NotificationService.BROADCAST_EXTRA_TYPE, NotificationService.BROADCAST_TYPE_USER_ACTION)
-            putExtra(NotificationService.BROADCAST_EXTRA_NOTIFICATION_ID, notification.id)
-            putExtra(NotificationService.BROADCAST_EXTRA_ACTION_ID, action.id)
-        }
-        context.sendBroadcast(intent)
     }
 
     private fun previewableImage(fileStat: FileInfo?): Boolean {
@@ -871,4 +839,41 @@ class MessageCardBinder(
             else          -> null
         }
     }
+}
+
+/** Runs a ntfy action button (view / copy / http+broadcast via the receiver). Shared by cards and incident detail. */
+internal fun runNotificationAction(context: Context, notification: Notification, action: Action) {
+    when (action.action) {
+        ACTION_VIEW -> runViewAction(context, action)
+        ACTION_COPY -> runCopyAction(context, action)
+        else -> runOtherUserAction(context, notification, action)
+    }
+}
+
+private fun runViewAction(context: Context, action: Action) {
+    try {
+        val url = action.url ?: return
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Log.w("NtfyMessageCard", "Unable to start activity from URL ${action.url}", e)
+        val message = if (e is ActivityNotFoundException) action.url else e.message
+        Toast.makeText(context, context.getString(R.string.detail_item_cannot_open_url, message), Toast.LENGTH_LONG).show()
+    }
+}
+
+private fun runCopyAction(context: Context, action: Action) {
+    val value = action.value ?: return
+    copyToClipboard(context, action.label, value)
+}
+
+private fun runOtherUserAction(context: Context, notification: Notification, action: Action) {
+    val intent = Intent(context, NotificationService.UserActionBroadcastReceiver::class.java).apply {
+        putExtra(NotificationService.BROADCAST_EXTRA_TYPE, NotificationService.BROADCAST_TYPE_USER_ACTION)
+        putExtra(NotificationService.BROADCAST_EXTRA_NOTIFICATION_ID, notification.id)
+        putExtra(NotificationService.BROADCAST_EXTRA_ACTION_ID, action.id)
+    }
+    context.sendBroadcast(intent)
 }
