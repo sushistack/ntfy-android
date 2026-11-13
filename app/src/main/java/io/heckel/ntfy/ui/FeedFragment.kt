@@ -2,6 +2,11 @@ package io.heckel.ntfy.ui
 
 import android.graphics.Rect
 import android.os.Bundle
+import io.heckel.ntfy.ui.compose.NotifyTheme
+import io.heckel.ntfy.ui.board.FeedFilter
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -56,6 +61,12 @@ class FeedFragment : Fragment(), DeleteSwipeConfirmFragment.Listener {
     private var deepLinkNotificationId: String? = null
     private var deepLinkConsumed = false
 
+    // Message filter (ntfy-web FeedFilter). ponytail: counts only loaded pages, like the web's loaded list.
+    private val unreadOnly = mutableStateOf(false)
+    private val unreadCount = mutableIntStateOf(0)
+    private val filterVisible = mutableStateOf(false)
+    private val unreadEmpty = mutableStateOf(false)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.activity_feed, container, false)
     }
@@ -76,6 +87,17 @@ class FeedFragment : Fragment(), DeleteSwipeConfirmFragment.Listener {
         disconnectedContainer = view.findViewById(R.id.feed_disconnected_container)
         disconnectedRetry = disconnectedContainer.findViewById(R.id.feed_disconnected_retry)
         fab = view.findViewById(R.id.feed_fab)
+        unreadOnly.value = savedInstanceState?.getBoolean(STATE_UNREAD_ONLY) ?: false
+        view.findViewById<ComposeView>(R.id.feed_filter).setContent {
+            NotifyTheme {
+                if (filterVisible.value) {
+                    FeedFilter(unreadOnly.value, unreadCount.intValue, unreadEmpty.value) {
+                        unreadOnly.value = it
+                        submitMergedList(viewModel.feedItems.value ?: emptyList())
+                    }
+                }
+            }
+        }
 
         // Publish FAB applies only to a single topic; the All-feed has no publish target.
         val topic = subscriptionTopic
@@ -243,14 +265,18 @@ class FeedFragment : Fragment(), DeleteSwipeConfirmFragment.Listener {
     }
 
     private fun submitMergedList(serverItems: List<FeedItem>) {
-        val optimisticItems = viewModel.outbox.value.map { FeedItem.Optimistic(it) }
-        val merged = optimisticItems + serverItems.filterIsInstance<FeedItem.Server>()
+        val server = serverItems.filterIsInstance<FeedItem.Server>()
+        val unread = server.filter { it.notification.notificationId != 0 }
+        unreadCount.intValue = unread.size
+        val merged = if (unreadOnly.value) unread else viewModel.outbox.value.map { FeedItem.Optimistic(it) } + server
+        filterVisible.value = server.isNotEmpty()
+        unreadEmpty.value = unreadOnly.value && merged.isEmpty() && server.isNotEmpty()
         val arrivedIds = viewModel.newlyArrivedIds.value ?: emptySet()
         adapter.setNewlyArrivedIds(arrivedIds)
         adapter.submitList(merged) {
             handleDeepLink(merged)
         }
-        val state = if (merged.isEmpty()) {
+        val state = if (merged.isEmpty() && !unreadEmpty.value) {
             FeedState.Empty(isAllFeed = subscriptionId == ALL_SUBSCRIPTIONS_ID)
         } else {
             FeedState.HasContent
@@ -321,7 +347,13 @@ class FeedFragment : Fragment(), DeleteSwipeConfirmFragment.Listener {
         adapter.notifyItemChanged(position)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(STATE_UNREAD_ONLY, unreadOnly.value)
+    }
+
     companion object {
+        private const val STATE_UNREAD_ONLY = "unreadOnly"
         const val TAG = "NtfyFeedFragment"
         const val ARG_SUBSCRIPTION_ID = "subscriptionId"
         const val ARG_SUBSCRIPTION_TOPIC = "subscriptionTopic"

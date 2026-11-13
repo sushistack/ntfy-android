@@ -364,6 +364,11 @@
     <string name="nav_drawer_subscribe">토픽 구독</string>
     <string name="drawer_sub_overflow_content_description">옵션 더보기</string>
     <string name="drawer_sub_muted_content_description">알림 꺼짐</string>
+    <string name="feed_filter_label">메시지 필터</string>
+    <string name="feed_filter_all">전체</string>
+    <string name="feed_filter_unread">안읽음</string>
+    <string name="feed_filter_unread_count">안읽음 %1$d</string>
+    <string name="feed_unread_empty">안 읽은 메시지가 없어요.</string>
     <string name="board_empty_topic">이 토픽에 아직 메시지가 없습니다. 도착하면 바로 보여드릴게요.</string>
     <string name="board_new_indicator">새 알림</string>
     <string name="incident_status_open">%s부터 계속 울리고 있어요.</string>

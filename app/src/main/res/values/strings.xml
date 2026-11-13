@@ -650,6 +650,11 @@
     <string name="brand_name" translatable="false">Notify</string>
     <string name="sidebar_topics_title">Topics</string>
     <string name="sidebar_no_topics">No topics yet. Subscribe to one to start getting alerts.</string>
+    <string name="feed_filter_label">Filter messages</string>
+    <string name="feed_filter_all">All</string>
+    <string name="feed_filter_unread">Unread</string>
+    <string name="feed_filter_unread_count">Unread %1$d</string>
+    <string name="feed_unread_empty">No unread messages.</string>
     <string name="board_empty_topic">No messages in this topic yet. They\'ll appear here as they arrive.</string>
     <string name="board_new_indicator">New notification</string>
     <string name="incident_status_open">Still firing since %s.</string>

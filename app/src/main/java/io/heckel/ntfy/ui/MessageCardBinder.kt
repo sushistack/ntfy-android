@@ -23,6 +23,7 @@ import android.widget.Toast
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.view.allViews
@@ -263,6 +264,7 @@ class MessageCardBinder(
         headerBadgeView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, spec.backgroundColorRes))
         headerBadgeView.setTextColor(ContextCompat.getColor(context, spec.textColorRes))
         headerTitleView.text = if (msg.title.isNotBlank()) msg.title else msg.message
+        styleTitle(unread = true)
         headerUnreadDotView.visibility = View.GONE
         headerUnreadDotView.setLayerType(View.LAYER_TYPE_NONE, null)
 
@@ -499,28 +501,17 @@ class MessageCardBinder(
             bodyFallback
         }
 
-        // Unread dot: visible only when notificationId != 0 (AC 5, 6, 7)
-        val isUnread = notification.notificationId != 0
-        if (isUnread) {
-            headerUnreadDotView.visibility = View.VISIBLE
-            applyUnreadDotGlow(context)
-        } else {
-            headerUnreadDotView.visibility = View.GONE
-            headerUnreadDotView.setLayerType(View.LAYER_TYPE_NONE, null)
-        }
+        // Read state (ntfy-web NotificationCard): no dot; unread titles are bold/text, read ones quieter
+        // and muted. TalkBack hears "New notification" on unread titles.
+        styleTitle(notification.notificationId != 0)
     }
 
-    private fun applyUnreadDotGlow(context: Context) {
-        val spec = resolveGlow(context, GlowToken.ACCENT_DOT)
-        if (spec != null) {
-            val radiusPx = spec.blurRadiusDp * context.resources.displayMetrics.density
-            val paint = android.graphics.Paint().apply {
-                setShadowLayer(radiusPx, 0f, 0f, spec.color)
-            }
-            headerUnreadDotView.setLayerType(View.LAYER_TYPE_SOFTWARE, paint)
-        } else {
-            headerUnreadDotView.setLayerType(View.LAYER_TYPE_NONE, null)
-        }
+    private fun styleTitle(unread: Boolean) {
+        val context = itemView.context
+        headerUnreadDotView.visibility = View.GONE
+        setBold(headerTitleView, unread)
+        headerTitleView.setTextColor(ContextCompat.getColor(context, if (unread) R.color.text else R.color.muted))
+        ViewCompat.setStateDescription(headerTitleView, if (unread) context.getString(R.string.board_new_indicator) else null)
     }
 
     private fun applyPriorityGlow(context: Context, priority: Int) {

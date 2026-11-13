@@ -4,6 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <!-- 전체 / 안읽음 filter (ntfy-web FeedFilter); shown when the feed has messages -->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/feed_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <!-- State: HasContent — the live notification list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/feed_recycler"
@@ -11,8 +22,8 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingHorizontal="0dp"
-        android:paddingTop="10dp"
         android:visibility="gone" />
+    </LinearLayout>
 
     <!-- State: Loading — five skeleton card placeholders -->
     <include
