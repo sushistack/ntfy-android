@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ntfy-web Sidebar icon. Tinted in code/layout. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="15" android:viewportHeight="15">
+    <path android:fillColor="#FFFFFFFF" android:pathData="M1.646,1.646a0.5,0.5 0,0 1,0.708 0L13.354,13.354a0.5,0.5 0,0 1,-0.708 0.708l-1.293,-1.293A3,3 0,0 1,6 13a0.5,0.5 0,1 1,0 -1,2 2,0 0,0 1.938,-1.496L1.646,2.354a0.5,0.5 0,0 1,0 -0.708ZM5,6.5V5.56A2.5,2.5 0,0 1,10 5.5v3.44l-5,-4.94ZM8.5,12H6a0.5,0.5 0,0 0,0 1h3a0.5,0.5 0,0 0,0 -1H8.5Z" />
+</vector>

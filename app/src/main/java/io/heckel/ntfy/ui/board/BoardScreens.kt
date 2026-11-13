@@ -29,6 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -474,6 +477,47 @@ fun ViewToggle(messages: Boolean, onChange: (messages: Boolean) -> Unit) {
     ) {
         ToggleItem(stringResource(R.string.board_view_board), active = !messages, Modifier.weight(1f)) { onChange(false) }
         ToggleItem(stringResource(R.string.board_view_messages), active = messages, Modifier.weight(1f)) { onChange(true) }
+    }
+}
+
+/** ntfy-web FeedFilter: 전체 / 안읽음 pills above the message list, plus the unread-empty line. */
+@Composable
+fun FeedFilter(unreadOnly: Boolean, unreadCount: Int, showUnreadEmpty: Boolean, onChange: (unreadOnly: Boolean) -> Unit) {
+    val label = stringResource(R.string.feed_filter_label)
+    Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)) {
+        Row(Modifier.semantics { contentDescription = label }, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterPill(stringResource(R.string.feed_filter_all), active = !unreadOnly) { onChange(false) }
+            FilterPill(
+                if (unreadCount > 0) stringResource(R.string.feed_filter_unread_count, unreadCount) else stringResource(R.string.feed_filter_unread),
+                active = unreadOnly,
+            ) { onChange(true) }
+        }
+        if (showUnreadEmpty) {
+            Text(
+                stringResource(R.string.feed_unread_empty),
+                Modifier.fillMaxWidth().padding(vertical = 40.dp),
+                style = MaterialTheme.typography.bodyLarge, color = colorResource(R.color.muted), textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun FilterPill(label: String, active: Boolean, onClick: () -> Unit) {
+    Box(
+        Modifier
+            .shadow(if (active) 0.dp else 1.dp, CircleShape)
+            .clip(CircleShape)
+            .background(colorResource(if (active) R.color.text else R.color.surface))
+            .clickable(role = Role.Button, onClick = onClick)
+            .semantics { selected = active }
+            .padding(horizontal = 14.dp, vertical = 6.dp),
+    ) {
+        Text(
+            label,
+            style = TextStyle(fontFamily = MaterialTheme.typography.bodyMedium.fontFamily, fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold),
+            color = colorResource(if (active) R.color.surface else R.color.muted),
+        )
     }
 }
 

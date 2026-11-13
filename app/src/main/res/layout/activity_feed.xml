@@ -4,6 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <!-- 전체 / 안읽음 filter (ntfy-web FeedFilter); shown when the feed has messages -->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/feed_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <!-- State: HasContent — the live notification list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/feed_recycler"
@@ -11,8 +22,8 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingHorizontal="0dp"
-        android:paddingTop="10dp"
         android:visibility="gone" />
+    </LinearLayout>
 
     <!-- State: Loading — five skeleton card placeholders -->
     <include
@@ -40,12 +51,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        android:src="@drawable/ic_send_white_24dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/ic_paper_plane_24dp"
         android:contentDescription="@string/feed_fab_publish_description"
         app:backgroundTint="@color/accent_ui"
         app:tint="@color/accent_on_surface"
-        app:elevation="6dp"
+        app:elevation="@dimen/shadow_elev_2"
+        style="@style/FloatingActionButton"
         xmlns:app="http://schemas.android.com/apk/res-auto" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,33 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Primary drawer destination (ntfy-web Sidebar navRow): icon tile + label. Active state is set in code. -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
     android:minHeight="48dp"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingTop="12dp"
-    android:paddingBottom="12dp"
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="6dp"
     android:foreground="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
 
-    <ImageView
-        android:id="@+id/drawer_item_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginEnd="16dp"
-        android:tint="@color/muted" />
+    <FrameLayout
+        android:id="@+id/drawer_item_tile"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/drawer_tile_bg">
+
+        <ImageView
+            android:id="@+id/drawer_item_icon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:tint="@color/muted" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/drawer_item_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:layout_marginStart="12dp"
         android:textColor="@color/text"
-        android:textSize="@dimen/text_body_sm"
+        android:textSize="@dimen/text_body"
         android:singleLine="true"
         android:ellipsize="end" />
 

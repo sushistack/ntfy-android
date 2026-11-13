@@ -13,6 +13,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
 import android.os.Bundle
+import android.content.res.ColorStateList
 import android.provider.Settings
 import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.text.method.LinkMovementMethod
@@ -218,21 +219,13 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
         })
 
         // Wire drawer static items
-        val drawerItemAll = findViewById<View>(R.id.drawer_item_all)
-        drawerItemAll.findViewById<ImageView>(R.id.drawer_item_icon)
-            .setImageResource(android.R.drawable.ic_menu_sort_by_size)
-        drawerItemAll.findViewById<TextView>(R.id.drawer_item_label)
-            .text = getString(R.string.nav_title_all_notifications)
+        val drawerItemAll = navRow(R.id.drawer_item_all, R.drawable.ic_nav_home, R.string.nav_title_all_notifications)
         drawerItemAll.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.START)
             showFeed(ALL_SUBSCRIPTIONS_ID, null)
         }
 
-        val drawerItemHistory = findViewById<View>(R.id.drawer_item_history)
-        drawerItemHistory.findViewById<ImageView>(R.id.drawer_item_icon)
-            .setImageResource(android.R.drawable.ic_menu_recent_history)
-        drawerItemHistory.findViewById<TextView>(R.id.drawer_item_label)
-            .text = getString(R.string.sidebar_history)
+        val drawerItemHistory = navRow(R.id.drawer_item_history, R.drawable.ic_nav_clock, R.string.sidebar_history)
         drawerItemHistory.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.START)
             historyView = true
@@ -253,21 +246,14 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
             }
         }
 
-        val drawerItemSubscribe = findViewById<View>(R.id.drawer_item_subscribe)
-        drawerItemSubscribe.findViewById<ImageView>(R.id.drawer_item_icon)
-            .setImageResource(android.R.drawable.ic_input_add)
-        drawerItemSubscribe.findViewById<TextView>(R.id.drawer_item_label)
-            .text = getString(R.string.nav_drawer_subscribe)
-        drawerItemSubscribe.setOnClickListener {
+        val subscribe = View.OnClickListener {
             drawerLayout.closeDrawer(GravityCompat.START)
             onSubscribeButtonClick()
         }
+        findViewById<View>(R.id.drawer_add_topic).setOnClickListener(subscribe)
+        findViewById<View>(R.id.drawer_no_topics).setOnClickListener(subscribe)
 
-        val drawerItemSettings = findViewById<View>(R.id.drawer_item_settings)
-        drawerItemSettings.findViewById<ImageView>(R.id.drawer_item_icon)
-            .setImageResource(android.R.drawable.ic_menu_preferences)
-        drawerItemSettings.findViewById<TextView>(R.id.drawer_item_label)
-            .text = getString(R.string.nav_drawer_settings)
+        val drawerItemSettings = navRow(R.id.drawer_item_settings, R.drawable.ic_nav_gear, R.string.nav_drawer_settings)
         drawerItemSettings.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.START)
             startActivity(Intent(this, SettingsActivity::class.java))
@@ -285,8 +271,11 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
 
         // Floating action button ("+")
         fab = findViewById(R.id.fab)
+        // Publish FAB (like ntfy-web): opens the publish sheet, pre-filled with the current topic.
+        // Subscribing moved to the drawer.
         fab.setOnClickListener {
-            onSubscribeButtonClick()
+            val topic = adapter.currentList.firstOrNull { it.id == currentSubscriptionId }?.topic ?: ""
+            PublishBottomSheet.newInstance(topic).show(supportFragmentManager, PublishBottomSheet.TAG)
         }
         
         // Add bottom padding to FAB to account for navigation bar
@@ -347,6 +336,7 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
 
                 // Update drawer subscription list (primary subscription surface now)
                 drawerAdapter.submitList(subscriptions)
+                findViewById<View>(R.id.drawer_no_topics).visibility = if (subscriptions.isEmpty()) View.VISIBLE else View.GONE
 
                 // Add scrub terms to log (in case it gets exported)
                 subscriptions.forEach { s ->
@@ -968,8 +958,29 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
             isAllFeed -> getString(R.string.nav_title_all_notifications)
             else -> currentTopic ?: ""
         }
-        fab.visibility = if (isAllFeed && !historyView) View.VISIBLE else View.GONE
+        // A topic's message feed shows its own publish FAB (wired to its optimistic outbox); hide ours there.
+        fab.visibility = if (messagesView.value && !isAllFeed && !historyView) View.GONE else View.VISIBLE
         toggleVisible.value = toggleVisible.value && !historyView
+        styleNavRow(R.id.drawer_item_all, isAllFeed && !historyView)
+        styleNavRow(R.id.drawer_item_history, historyView)
+        drawerAdapter.setActiveSubscriptionId(if (historyView) ALL_SUBSCRIPTIONS_ID else currentSubscriptionId)
+    }
+
+    private fun navRow(id: Int, icon: Int, label: Int): View = findViewById<View>(id).apply {
+        findViewById<ImageView>(R.id.drawer_item_icon).setImageResource(icon)
+        findViewById<TextView>(R.id.drawer_item_label).setText(label)
+    }
+
+    /** ntfy-web navRow/IconTile: active rows get a surface-2 fill, bold label and a blue tile. */
+    private fun styleNavRow(id: Int, active: Boolean) {
+        val row = findViewById<View>(id)
+        row.setBackgroundResource(if (active) R.drawable.drawer_tile_bg else 0)
+        row.findViewById<View>(R.id.drawer_item_tile).backgroundTintList =
+            ColorStateList.valueOf(getColor(if (active) R.color.accent_ui else R.color.surface_2))
+        row.findViewById<ImageView>(R.id.drawer_item_icon).imageTintList =
+            ColorStateList.valueOf(getColor(if (active) R.color.accent_on_surface else R.color.muted))
+        setBold(row.findViewById(R.id.drawer_item_label), active)
+        row.isSelected = active
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

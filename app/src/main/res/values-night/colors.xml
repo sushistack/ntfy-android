@@ -142,7 +142,7 @@
     <color name="md_theme_surfaceContainerHigh_highContrast">#363D3A</color>
     <color name="md_theme_surfaceContainerHighest_highContrast">#424846</color>
 
-    <color name="action_bar">@color/surface</color> <!-- md_theme_surfaceContainer (dark) - matches card color -->
+    <color name="action_bar">@color/bg</color> <!-- ntfy-web AppBar: header sits on the page background -->
     <color name="detail_activity_background">@color/bg</color>
 
     <!-- Chip colors -->
