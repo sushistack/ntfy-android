@@ -44,7 +44,7 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        run: ./gradlew --no-daemon testPlayReleaseUnitTest assemblePlayRelease
+        run: ./gradlew --no-daemon testPlayDebugUnitTest assemblePlayRelease
 
       - name: Verify signature
         run: |
