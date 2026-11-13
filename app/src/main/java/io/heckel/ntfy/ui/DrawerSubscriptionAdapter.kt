@@ -11,7 +11,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.PopupMenu
+import android.widget.LinearLayout
+import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
@@ -99,11 +100,14 @@ class DrawerSubscriptionAdapter(
         /** ntfy-web TopicAvatar: first letter on a 15% tint of a stable per-name colour. */
         private fun bindAvatar(name: String, muted: Boolean) {
             val color = avatarColor(name)
+            val tint = ColorUtils.setAlphaComponent(color, (0.15 * 255).toInt())
             avatarView.text = if (name.isEmpty()) "" else String(Character.toChars(name.codePointAt(0))).uppercase()
-            avatarView.setTextColor(color)
+            // Web uses the raw palette colour for the letter (as low as 2.2:1 in light mode);
+            // nudge only the letter until it reaches 4.5:1 on the tinted circle.
+            avatarView.setTextColor(readableOn(color, compositeOver(tint, context.getColor(R.color.surface))))
             avatarView.background = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
-                setColor(ColorUtils.setAlphaComponent(color, (0.15 * 255).toInt()))
+                setColor(tint)
             }
             avatarView.alpha = if (muted) 0.5f else 1f
         }
@@ -132,25 +136,57 @@ class DrawerSubscriptionAdapter(
             }
         }
 
+        // Web-parity menu (ui/Menu.jsx): surface card, 1dp border, radius_sm, real separators.
+        // ponytail: hand-built PopupWindow; a PopupMenu can't do separators without blank rows.
         private fun showOverflowMenu(anchor: View, subscription: Subscription) {
-            val popup = PopupMenu(context, anchor)
-            popup.menuInflater.inflate(R.menu.menu_drawer_subscription_overflow, popup.menu)
-
+            val res = context.resources
+            val dp = res.displayMetrics.density
             val isMutedNow = isMuted(subscription)
-            popup.menu.findItem(R.id.drawer_sub_menu_mute)?.isVisible = !isMutedNow
-            popup.menu.findItem(R.id.drawer_sub_menu_unmute)?.isVisible = isMutedNow
-
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.drawer_sub_menu_mute -> { showMuteDurationDialog(subscription); true }
-                    R.id.drawer_sub_menu_unmute -> { doUnmute(subscription); true }
-                    R.id.drawer_sub_menu_rename -> { showRenameDialog(subscription); true }
-                    R.id.drawer_sub_menu_clear -> { showClearDialog(subscription); true }
-                    R.id.drawer_sub_menu_unsubscribe -> { showUnsubscribeDialog(subscription); true }
-                    else -> false
+            val list = LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, (4 * dp).toInt(), 0, (4 * dp).toInt())
+                background = GradientDrawable().apply {
+                    setColor(context.getColor(R.color.surface))
+                    setStroke(dp.toInt().coerceAtLeast(1), context.getColor(R.color.border))
+                    cornerRadius = res.getDimension(R.dimen.radius_sm)
                 }
+                minimumWidth = (180 * dp).toInt()
             }
-            popup.show()
+            val popup = PopupWindow(list, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true).apply {
+                elevation = 8 * dp
+            }
+            fun item(label: Int, action: () -> Unit) {
+                list.addView(TextView(context).apply {
+                    text = context.getString(label)
+                    textSize = 14f
+                    typeface = ResourcesCompat.getFont(context, R.font.font_sans)
+                    setTextColor(context.getColor(R.color.text))
+                    minHeight = (48 * dp).toInt() // touch target
+                    gravity = android.view.Gravity.CENTER_VERTICAL
+                    setPadding((16 * dp).toInt(), 0, (16 * dp).toInt(), 0)
+                    val ta = context.obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground))
+                    background = ta.getDrawable(0); ta.recycle()
+                    setOnClickListener { popup.dismiss(); action() }
+                }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+            }
+            fun separator() {
+                list.addView(View(context).apply { setBackgroundColor(context.getColor(R.color.border)) },
+                    LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp.toInt().coerceAtLeast(1)).apply {
+                        topMargin = (4 * dp).toInt(); bottomMargin = (4 * dp).toInt()
+                    })
+            }
+            if (isMutedNow) item(R.string.drawer_sub_menu_unmute) { doUnmute(subscription) }
+            else item(R.string.drawer_sub_menu_mute) { showMuteDurationDialog(subscription) }
+            separator()
+            item(R.string.drawer_sub_menu_rename) { showRenameDialog(subscription) }
+            item(R.string.drawer_sub_menu_clear) { showClearDialog(subscription) }
+            separator()
+            item(R.string.drawer_sub_menu_unsubscribe) { showUnsubscribeDialog(subscription) }
+            // Below the dots, right edges aligned, so it stays inside the drawer. Gravity.END can't
+            // align a WRAP_CONTENT popup (width unknown before show), so measure and offset.
+            list.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+            popup.width = list.measuredWidth
+            popup.showAsDropDown(anchor, anchor.width - list.measuredWidth, (4 * dp).toInt())
         }
 
         // ── Mute / Unmute ─────────────────────────────────────────────────
@@ -301,6 +337,32 @@ internal fun avatarColor(name: String): Int {
     var h = 0
     for (c in name) h = (h * 31 + c.code) % 997
     return AVATAR_COLORS[h % AVATAR_COLORS.size]
+}
+
+// Pure ARGB math (no android.graphics) so it runs in plain JVM unit tests.
+private fun channelLum(c: Int): Double {
+    val x = c / 255.0
+    return if (x <= 0.03928) x / 12.92 else Math.pow((x + 0.055) / 1.055, 2.4)
+}
+internal fun luminance(rgb: Int): Double =
+    0.2126 * channelLum(rgb shr 16 and 0xFF) + 0.7152 * channelLum(rgb shr 8 and 0xFF) + 0.0722 * channelLum(rgb and 0xFF)
+internal fun contrast(a: Int, b: Int): Double {
+    val la = luminance(a); val lb = luminance(b)
+    return (maxOf(la, lb) + 0.05) / (minOf(la, lb) + 0.05)
+}
+private fun mix(a: Int, b: Int, t: Double): Int {
+    fun ch(s: Int) = ((a shr s and 0xFF) * (1 - t) + (b shr s and 0xFF) * t).toInt()
+    return (0xFF shl 24) or (ch(16) shl 16) or (ch(8) shl 8) or ch(0)
+}
+/** Opaque result of [fg] (with alpha) drawn over opaque [bg]. */
+internal fun compositeOver(fg: Int, bg: Int): Int = mix(bg, fg or (0xFF shl 24), (fg ushr 24) / 255.0)
+/** [fg] moved toward black or white (whichever [bg] contrasts with) until it hits [min]. */
+internal fun readableOn(fg: Int, bg: Int, min: Double = 4.5): Int {
+    val target = if (luminance(bg) > 0.18) 0xFF000000.toInt() else 0xFFFFFFFF.toInt()
+    var t = 0.0
+    var c = fg or (0xFF shl 24)
+    while (contrast(c, bg) < min && t < 1.0) { t += 0.05; c = mix(fg, target, t) }
+    return c
 }
 
 private fun isMuted(subscription: Subscription): Boolean {

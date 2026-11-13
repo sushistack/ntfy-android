@@ -24,8 +24,10 @@
             android:paddingStart="0dp"
             android:paddingEnd="12dp"
             app:navigationIcon="@drawable/ic_close_white_24dp"
+            app:navigationContentDescription="@string/dialog_close"
             app:navigationIconTint="?attr/colorOnSurface"
             app:title="@string/add_dialog_title"
+            app:titleTextAppearance="@style/TextAppearance.Ntfy.AppBarTitle"
             app:titleTextColor="?attr/colorOnSurface"
             app:menu="@menu/menu_add_dialog" />
 
@@ -72,6 +74,12 @@
                     android:visibility="gone"/>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    app:boxCornerRadiusTopStart="@dimen/radius_sm"
+                    app:boxCornerRadiusTopEnd="@dimen/radius_sm"
+                    app:boxCornerRadiusBottomStart="@dimen/radius_sm"
+                    app:boxCornerRadiusBottomEnd="@dimen/radius_sm"
+                    app:boxStrokeColor="@color/accent_ui"
+                    app:hintTextColor="@color/accent_ui"
                     android:id="@+id/add_dialog_subscribe_topic_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -166,8 +174,7 @@
                         android:text="@string/add_dialog_instant_delivery"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="-8dp"
-                        android:layout_marginBottom="-5dp"
+                        android:minHeight="48dp"
                         android:layout_marginStart="-3dp"/>
 
                     <ImageView
@@ -269,6 +276,12 @@
                     android:visibility="gone"/>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    app:boxCornerRadiusTopStart="@dimen/radius_sm"
+                    app:boxCornerRadiusTopEnd="@dimen/radius_sm"
+                    app:boxCornerRadiusBottomStart="@dimen/radius_sm"
+                    app:boxCornerRadiusBottomEnd="@dimen/radius_sm"
+                    app:boxStrokeColor="@color/accent_ui"
+                    app:hintTextColor="@color/accent_ui"
                     android:id="@+id/add_dialog_login_username_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -290,6 +303,12 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    app:boxCornerRadiusTopStart="@dimen/radius_sm"
+                    app:boxCornerRadiusTopEnd="@dimen/radius_sm"
+                    app:boxCornerRadiusBottomStart="@dimen/radius_sm"
+                    app:boxCornerRadiusBottomEnd="@dimen/radius_sm"
+                    app:boxStrokeColor="@color/accent_ui"
+                    app:hintTextColor="@color/accent_ui"
                     android:id="@+id/add_dialog_login_password_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

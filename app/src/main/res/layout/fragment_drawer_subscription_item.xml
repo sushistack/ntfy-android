@@ -67,9 +67,9 @@
 
     <ImageButton
         android:id="@+id/drawer_item_overflow"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="12dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="15dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_nav_dots"
         android:background="?attr/actionBarItemBackground"

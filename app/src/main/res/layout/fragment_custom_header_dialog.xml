@@ -23,6 +23,7 @@
             android:paddingStart="0dp"
             android:paddingEnd="12dp"
             app:navigationIcon="@drawable/ic_close_white_24dp"
+            app:navigationContentDescription="@string/dialog_close"
             app:navigationIconTint="?attr/colorOnSurface"
             app:title="@string/custom_headers_dialog_title_add"
             app:titleTextColor="?attr/colorOnSurface"

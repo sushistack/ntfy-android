@@ -301,6 +301,7 @@
     <string name="publish_sheet_hint_tags">Tags (comma-separated, optional)</string>
     <string name="publish_sheet_label_priority">Priority</string>
     <string name="publish_sheet_btn_close">Close</string>
+    <string name="dialog_close">Close</string>
     <string name="publish_sheet_btn_send">Send</string>
     <string name="publish_sheet_chip_low">Low</string>
     <string name="publish_sheet_chip_normal">Normal</string>
@@ -687,10 +688,10 @@
     <string name="feed_state_retry">다시 시도</string>
 
     <!-- Story 4.7: Drawer subscription row context menu + dialogs (AC: 5, 7–9) -->
-    <string name="drawer_sub_menu_mute">Mute</string>
-    <string name="drawer_sub_menu_unmute">Unmute</string>
+    <string name="drawer_sub_menu_mute">Mute topic</string>
+    <string name="drawer_sub_menu_unmute">Unmute topic</string>
     <string name="drawer_sub_menu_rename">Rename</string>
-    <string name="drawer_sub_menu_clear">Clear</string>
+    <string name="drawer_sub_menu_clear">Clear all notifications</string>
     <string name="drawer_sub_menu_unsubscribe">Unsubscribe</string>
     <string name="drawer_sub_rename_hint">Display name (leave blank for default)</string>
     <string name="drawer_sub_clear_dialog_message">Delete all notifications for this subscription?</string>
