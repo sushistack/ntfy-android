@@ -51,6 +51,11 @@ import androidx.work.WorkManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.ComposeView
+import io.heckel.ntfy.ui.board.BoardFragment
+import io.heckel.ntfy.ui.board.ViewToggle
+import io.heckel.ntfy.ui.compose.NotifyTheme
 import io.heckel.ntfy.BuildConfig
 import io.heckel.ntfy.R
 import io.heckel.ntfy.app.Application
@@ -89,7 +94,7 @@ import androidx.core.view.size
 import androidx.core.view.get
 import androidx.core.net.toUri
 
-class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, NotificationFragment.NotificationSettingsListener, DrawerSubscriptionAdapter.DrawerHost {
+class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, NotificationFragment.NotificationSettingsListener, DrawerSubscriptionAdapter.DrawerHost, BoardFragment.Host {
     private val viewModel by viewModels<SubscriptionsViewModel> {
         SubscriptionsViewModelFactory((application as Application).repository)
     }
@@ -104,6 +109,13 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
     private lateinit var mainListContainer: SwipeRefreshLayout
     private lateinit var adapter: MainAdapter
     private lateinit var fab: FloatingActionButton
+
+    // What the content area shows (2026-11 redesign): a topic (or all) as board or raw messages, or history.
+    private var currentSubscriptionId = ALL_SUBSCRIPTIONS_ID
+    private var currentTopic: String? = null
+    private var historyView = false
+    private val messagesView = mutableStateOf(false)
+    private val toggleVisible = mutableStateOf(true)
 
     // Navigation drawer
     private lateinit var drawerLayout: DrawerLayout
@@ -211,6 +223,31 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
             showFeed(ALL_SUBSCRIPTIONS_ID, null)
         }
 
+        val drawerItemHistory = findViewById<View>(R.id.drawer_item_history)
+        drawerItemHistory.findViewById<ImageView>(R.id.drawer_item_icon)
+            .setImageResource(android.R.drawable.ic_menu_recent_history)
+        drawerItemHistory.findViewById<TextView>(R.id.drawer_item_label)
+            .text = getString(R.string.sidebar_history)
+        drawerItemHistory.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.START)
+            historyView = true
+            showContent()
+        }
+
+        // Board / Messages switch above the content area
+        findViewById<ComposeView>(R.id.main_view_toggle).setContent {
+            NotifyTheme {
+                if (toggleVisible.value) {
+                    ViewToggle(messages = messagesView.value) { messages ->
+                        if (messages != messagesView.value) {
+                            messagesView.value = messages
+                            showContent()
+                        }
+                    }
+                }
+            }
+        }
+
         val drawerItemSubscribe = findViewById<View>(R.id.drawer_item_subscribe)
         drawerItemSubscribe.findViewById<ImageView>(R.id.drawer_item_icon)
             .setImageResource(android.R.drawable.ic_input_add)
@@ -259,6 +296,12 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
         // Single-feed shell: land on the All-notifications feed; the drawer switches topics.
         if (savedInstanceState == null) {
             showFeed(ALL_SUBSCRIPTIONS_ID, null)
+        } else {
+            currentSubscriptionId = savedInstanceState.getLong(STATE_SUBSCRIPTION_ID, ALL_SUBSCRIPTIONS_ID)
+            currentTopic = savedInstanceState.getString(STATE_TOPIC)
+            historyView = savedInstanceState.getBoolean(STATE_HISTORY)
+            messagesView.value = savedInstanceState.getBoolean(STATE_MESSAGES)
+            applyChrome() // the fragment itself is restored by the FragmentManager
         }
 
         // Swipe to refresh
@@ -890,13 +933,57 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
      * the FAB: the All-feed shows the "+" subscribe FAB; a topic feed defers to the fragment's
      * own publish FAB.
      */
-    private fun showFeed(subscriptionId: Long, topic: String?) {
-        val isAllFeed = subscriptionId == ALL_SUBSCRIPTIONS_ID
-        title = if (isAllFeed) getString(R.string.nav_title_all_notifications) else (topic ?: "")
-        fab.visibility = if (isAllFeed) View.VISIBLE else View.GONE
+    private fun showFeed(subscriptionId: Long, topic: String?, incidentId: String? = null) {
+        currentSubscriptionId = subscriptionId
+        currentTopic = topic
+        historyView = false
+        messagesView.value = false // like the web: switching topics lands on the board
+        showContent(incidentId)
+    }
+
+    /** Puts the board, the raw message feed, or the history into the content area. */
+    private fun showContent(incidentId: String? = null) {
+        val fragment = when {
+            historyView -> BoardFragment.history()
+            messagesView.value -> FeedFragment.newInstance(currentSubscriptionId, currentTopic)
+            else -> BoardFragment.board(currentSubscriptionId, incidentId)
+        }
+        toggleVisible.value = !historyView && incidentId == null
+        applyChrome()
         supportFragmentManager.beginTransaction()
-            .replace(R.id.main_feed_container, FeedFragment.newInstance(subscriptionId, topic))
+            .replace(R.id.main_feed_container, fragment)
             .commit()
+    }
+
+    /** App-bar title and FAB for the current content. A topic's message feed brings its own publish FAB. */
+    private fun applyChrome() {
+        val isAllFeed = currentSubscriptionId == ALL_SUBSCRIPTIONS_ID
+        title = when {
+            historyView -> getString(R.string.sidebar_history)
+            isAllFeed -> getString(R.string.nav_title_all_notifications)
+            else -> currentTopic ?: ""
+        }
+        fab.visibility = if (isAllFeed && !historyView) View.VISIBLE else View.GONE
+        toggleVisible.value = toggleVisible.value && !historyView
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putLong(STATE_SUBSCRIPTION_ID, currentSubscriptionId)
+        outState.putString(STATE_TOPIC, currentTopic)
+        outState.putBoolean(STATE_HISTORY, historyView)
+        outState.putBoolean(STATE_MESSAGES, messagesView.value)
+    }
+
+    // BoardFragment.Host
+
+    override fun onIncidentDetailShown(shown: Boolean) {
+        toggleVisible.value = !shown && !historyView
+    }
+
+    override fun openIncident(subscriptionId: Long, incidentId: String) {
+        val subscription = adapter.currentList.firstOrNull { it.id == subscriptionId }
+        showFeed(subscriptionId, subscription?.let { displayName(appBaseUrl, it) }, incidentId)
     }
 
     override fun onSubscriptionUnsubscribed(subscription: Subscription) {
@@ -1040,6 +1127,10 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
     }
 
     companion object {
+        private const val STATE_SUBSCRIPTION_ID = "currentSubscriptionId"
+        private const val STATE_TOPIC = "currentTopic"
+        private const val STATE_HISTORY = "historyView"
+        private const val STATE_MESSAGES = "messagesView"
         const val TAG = "NtfyMainActivity"
         const val EXTRA_SUBSCRIPTION_ID = "subscriptionId"
         const val EXTRA_SUBSCRIPTION_BASE_URL = "subscriptionBaseUrl"

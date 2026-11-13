@@ -17,6 +17,11 @@
         android:id="@+id/drawer_item_all"
         layout="@layout/drawer_item_row" />
 
+    <!-- "History" (last 7 days) static row -->
+    <include
+        android:id="@+id/drawer_item_history"
+        layout="@layout/drawer_item_row" />
+
     <!-- Subscription rows (one per subscription) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/drawer_subscriptions_list"
