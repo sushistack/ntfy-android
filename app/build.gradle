@@ -105,26 +105,26 @@ android.applicationVariants.all { variant ->
 // Canonical token manifest — single source of truth for both Gradle tasks.
 // Update here AND in the color XML files when the design system changes.
 ext.ntfyParityTokensLight = [
-    bg: '#F3F4F6', surface: '#FFFFFF', surface_2: '#EEF0F2',
-    surface_active: '#EEF0F2', border: '#E4E6E9', control_border: '#767B80',
-    text: '#1C1E21', muted: '#6A7076', accent_text: '#0E7A48',
-    accent_ui: '#1A9E5F', accent_on_surface: '#0C1A12',
-    priority_high: '#BF6C15', priority_max: '#E5484D', priority_urgent: '#C7353A',
+    bg: '#F2F4F6', surface: '#FFFFFF', surface_2: '#F2F4F6',
+    surface_active: '#F2F4F6', border: '#E5E8EB', control_border: '#848E99',
+    text: '#191F28', muted: '#636E7B', accent_text: '#1B64DA',
+    accent_ui: '#1D6BE5', accent_on_surface: '#FFFFFF',
+    priority_high: '#C96800', priority_max: '#E5404D', priority_urgent: '#D22030',
     priority_high_on_surface: '#241403', priority_max_on_surface: '#1A0E0E',
-    meter_ok: '#0E7A48', meter_track: '#E4E6E9', meter_warning: '#BF6C15',
-    meter_critical: '#E5484D', topic_chip_bg: '#E1F2EA', topic_chip_text: '#136B43',
-    button_fill: '#F4F5F6', button_fill_text: '#15171A', focus_ring: '#1A9E5F',
+    meter_ok: '#06804F', meter_track: '#E5E8EB', meter_warning: '#C96800',
+    meter_critical: '#E5404D', topic_chip_bg: '#E8F3FF', topic_chip_text: '#1B64DA',
+    button_fill: '#1D6BE5', button_fill_text: '#FFFFFF', focus_ring: '#1D6BE5',
 ]
 ext.ntfyParityTokensDark = [
-    bg: '#0C0D0F', surface: '#16181B', surface_2: '#1C1F23',
-    surface_active: '#1C1F23', border: '#23262B', control_border: '#8B9197',
-    text: '#E8EAED', muted: '#8B9197', accent_text: '#42D392',
-    accent_ui: '#42D392', accent_on_surface: '#0C1A12',
-    priority_high: '#F5A95C', priority_max: '#FF6B6E', priority_urgent: '#FF6B6E',
+    bg: '#17171C', surface: '#202027', surface_2: '#2C2C35',
+    surface_active: '#2C2C35', border: '#2C2C35', control_border: '#7E838F',
+    text: '#ECECF0', muted: '#9EA3AD', accent_text: '#64A8FF',
+    accent_ui: '#2870E6', accent_on_surface: '#FFFFFF',
+    priority_high: '#FFA940', priority_max: '#FF6370', priority_urgent: '#FF6370',
     priority_high_on_surface: '#241403', priority_max_on_surface: '#1A0E0E',
-    meter_ok: '#42D392', meter_track: '#262A2F', meter_warning: '#F5A95C',
-    meter_critical: '#FF6B6E', topic_chip_bg: '#143A2D', topic_chip_text: '#7CE6B4',
-    button_fill: '#F4F5F6', button_fill_text: '#15171A', focus_ring: '#42D392',
+    meter_ok: '#2FCA86', meter_track: '#383842', meter_warning: '#FFA940',
+    meter_critical: '#FF6370', topic_chip_bg: '#1B2A44', topic_chip_text: '#8DBCFF',
+    button_fill: '#1D6BE5', button_fill_text: '#FFFFFF', focus_ring: '#2870E6',
 ]
 
 /**
@@ -296,10 +296,10 @@ ext.ntfyDimenManifest = [
     spacing_6: [value: 32.0, unit: 'dp'],
     spacing_7: [value: 48.0, unit: 'dp'],
     // radius
-    radius_sm: [value: 10.0, unit: 'dp'],
-    radius_md: [value: 16.0, unit: 'dp'],
+    radius_sm: [value: 14.0, unit: 'dp'],
+    radius_md: [value: 20.0, unit: 'dp'],
     radius_full: [value: 9999.0, unit: 'dp'],
-    radius_badge: [value: 6.0, unit: 'dp'],
+    radius_badge: [value: 8.0, unit: 'dp'],
     // typography size (sp)
     text_display: [value: 28.0, unit: 'sp'],
     text_title: [value: 22.0, unit: 'sp'],
@@ -655,9 +655,10 @@ task verifyFontResources {
     doLast {
         def errors = []
         def required = [
-            'plus_jakarta_sans_regular.otf',
-            'plus_jakarta_sans_medium.otf',
-            'plus_jakarta_sans_semibold.otf',
+            'pretendard_regular.otf',
+            'pretendard_medium.otf',
+            'pretendard_semibold.otf',
+            'pretendard_bold.otf',
             'jetbrains_mono_regular.otf',
             'font_sans.xml',
             'font_mono.xml',
