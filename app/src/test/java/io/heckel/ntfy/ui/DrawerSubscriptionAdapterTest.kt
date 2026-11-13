@@ -204,23 +204,18 @@ class DrawerSubscriptionAdapterTest {
     }
 
     @Test
-    fun `drawer row layout uses chat bubble icon not SMS icon (AC 1)`() {
-        assertTrue(
-            "Layout must reference ic_chat_bubble_24dp (chat bubble as specified in components.md §6)",
-            layoutSource.contains("ic_chat_bubble_24dp")
-        )
-        assertFalse(
-            "Layout must NOT use ic_sms — spec requires chat bubble (AC 1)",
-            layoutSource.contains("ic_sms")
-        )
+    fun `drawer row layout has the web topic avatar (2026-11 redesign)`() {
+        assertTrue("Layout must contain drawer_item_avatar", layoutSource.contains("drawer_item_avatar"))
     }
 
     @Test
-    fun `drawer row layout has active bar view with correct id`() {
-        assertTrue(
-            "Layout must contain drawer_item_active_bar",
-            layoutSource.contains("drawer_item_active_bar")
+    fun `avatar colour matches ntfy-web colorFor`() {
+        // Expected values computed with the web's Sidebar.jsx colorFor (node).
+        val expected = mapOf(
+            "Critical" to 0xFFEC4899, "Monitor" to 0xFF8B5CF6, "Vignal" to 0xFFEF4444,
+            "Ops" to 0xFF64748B, "알림" to 0xFFEF4444, "e2e-🚀" to 0xFF0EA5E9,
         )
+        for ((name, color) in expected) assertEquals(name, color.toInt(), avatarColor(name))
     }
 
     @Test

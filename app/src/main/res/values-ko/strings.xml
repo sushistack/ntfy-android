@@ -357,6 +357,13 @@
         <item quantity="other">오늘 %d번 받았어요</item>
     </plurals>
     <string name="board_empty">알림이 없어요</string>
+    <string name="sidebar_topics_title">토픽</string>
+    <string name="sidebar_no_topics">아직 구독한 토픽이 없어요. 토픽을 구독하면 여기에 보여요.</string>
+    <string name="nav_title_all_notifications">모든 알림</string>
+    <string name="nav_drawer_settings">설정</string>
+    <string name="nav_drawer_subscribe">토픽 구독</string>
+    <string name="drawer_sub_overflow_content_description">옵션 더보기</string>
+    <string name="drawer_sub_muted_content_description">알림 꺼짐</string>
     <string name="board_empty_topic">이 토픽에 아직 메시지가 없습니다. 도착하면 바로 보여드릴게요.</string>
     <string name="board_new_indicator">새 알림</string>
     <string name="incident_status_open">%s부터 계속 울리고 있어요.</string>

@@ -1,103 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<!-- Drawer topic row (ntfy-web Sidebar): coloured initial avatar, name, muted icon, unread pill, ⋯ menu. -->
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:foreground="?attr/selectableItemBackground"
+    android:layout_marginHorizontal="12dp"
     android:minHeight="48dp"
-    android:paddingStart="0dp"
-    android:paddingEnd="8dp"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp">
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="8dp"
+    android:paddingEnd="2dp"
+    android:paddingVertical="6dp"
+    android:foreground="?attr/selectableItemBackground">
 
-    <!-- Active bar: 4dp wide × 16dp tall pill, colored accent_ui (active) or transparent (inactive) -->
-    <View
-        android:id="@+id/drawer_item_active_bar"
-        android:layout_width="4dp"
-        android:layout_height="16dp"
-        android:background="@drawable/drawer_active_bar_bg"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:backgroundTint="@color/accent_ui" />
-
-    <!-- Left icon: chat bubble 20×20dp -->
-    <ImageView
-        android:id="@+id/drawer_item_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="8dp"
-        android:src="@drawable/ic_chat_bubble_24dp"
-        android:contentDescription="@null"
-        app:layout_constraintStart_toEndOf="@id/drawer_item_active_bar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:tint="@color/accent_ui" />
-
-    <!-- ⋯ overflow button: anchored end -->
-    <ImageButton
-        android:id="@+id/drawer_item_overflow"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginEnd="0dp"
-        android:src="@drawable/ic_more_vert_24dp"
-        android:background="?attr/actionBarItemBackground"
-        android:contentDescription="@string/drawer_sub_overflow_content_description"
-        app:tint="@color/muted"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <!-- Muted indicator: bell-off icon, just left of overflow button -->
-    <ImageView
-        android:id="@+id/drawer_item_muted"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_marginEnd="4dp"
-        android:src="@drawable/ic_notifications_off_gray_outline_24dp"
-        android:contentDescription="@string/drawer_sub_muted_content_description"
-        android:importantForAccessibility="yes"
-        android:clickable="false"
-        android:focusable="false"
-        app:tint="@color/muted"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@id/drawer_item_overflow"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible" />
-
-    <!-- Unread count: caption style, accent_ui, right-aligned, gone when 0 -->
     <TextView
-        android:id="@+id/drawer_item_unread"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
-        android:textAppearance="@style/TextAppearance.Ntfy.Caption"
-        android:textColor="@color/accent_ui"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@id/drawer_item_muted"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="12"
-        tools:visibility="visible" />
+        android:id="@+id/drawer_item_avatar"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:gravity="center"
+        android:textSize="@dimen/text_body_sm"
+        android:textStyle="bold"
+        android:importantForAccessibility="no"
+        tools:text="C" />
 
-    <!-- Name: body_sm text, primary text color, single line with ellipsis -->
     <TextView
         android:id="@+id/drawer_item_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="4dp"
-        android:textAppearance="@style/TextAppearance.Ntfy.BodySmall"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:textSize="@dimen/text_body"
         android:textColor="@color/text"
         android:maxLines="1"
         android:ellipsize="end"
-        app:layout_constraintStart_toEndOf="@id/drawer_item_icon"
-        app:layout_constraintEnd_toStartOf="@id/drawer_item_unread"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="My Topic Name" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageView
+        android:id="@+id/drawer_item_muted"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="4dp"
+        android:src="@drawable/ic_nav_bell_off"
+        android:contentDescription="@string/drawer_sub_muted_content_description"
+        app:tint="@color/muted"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/drawer_item_unread"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:layout_marginStart="4dp"
+        android:minWidth="18dp"
+        android:paddingHorizontal="6dp"
+        android:gravity="center"
+        android:background="@drawable/drawer_badge_bg"
+        android:textColor="@color/accent_on_surface"
+        android:textSize="@dimen/text_caption"
+        android:textStyle="bold"
+        android:fontFeatureSettings="tnum"
+        android:visibility="gone"
+        tools:text="12"
+        tools:visibility="visible" />
+
+    <ImageButton
+        android:id="@+id/drawer_item_overflow"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_nav_dots"
+        android:background="?attr/actionBarItemBackground"
+        android:contentDescription="@string/drawer_sub_overflow_content_description"
+        app:tint="@color/muted" />
+
+</LinearLayout>
