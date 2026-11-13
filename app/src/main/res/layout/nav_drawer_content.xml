@@ -18,20 +18,11 @@
         android:paddingTop="20dp"
         android:paddingBottom="16dp">
 
-        <FrameLayout
+        <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:background="@drawable/drawer_tile_bg"
-            android:backgroundTint="@color/accent_ui">
-
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_nav_bell"
-                android:importantForAccessibility="no"
-                app:tint="@color/accent_on_surface" />
-        </FrameLayout>
+            android:src="@drawable/ic_brand_bell"
+            android:importantForAccessibility="no" />
 
         <TextView
             android:layout_width="wrap_content"

@@ -186,4 +186,5 @@
     <color name="button_fill_text">#FFFFFF</color>
     <color name="focus_ring">#1D6BE5</color>
     <!-- ===================================================================== -->
+    <color name="launcher_background">#17171C</color> <!-- Notify icon: app dark bg -->
 </resources>
