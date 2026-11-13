@@ -1,9 +1,14 @@
 package io.heckel.ntfy.work
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import io.heckel.ntfy.BuildConfig
+import io.heckel.ntfy.R
 import io.heckel.ntfy.db.Repository
 import io.heckel.ntfy.msg.ApiService
 import io.heckel.ntfy.msg.NotificationDispatcher
@@ -19,6 +24,20 @@ class PollWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, 
 
     init {
         Log.init(ctx) // Init in all entrypoints
+    }
+
+    // Expedited work (FCM poll_request) runs as a short foreground service below API 31,
+    // which needs a notification. Reuses the low-importance subscriber-service channel.
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        val nm = applicationContext.getSystemService(NotificationManager::class.java)
+        nm.createNotificationChannel(NotificationChannel(FOREGROUND_CHANNEL_ID,
+            applicationContext.getString(R.string.channel_subscriber_service_name), NotificationManager.IMPORTANCE_LOW))
+        val notification = NotificationCompat.Builder(applicationContext, FOREGROUND_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(applicationContext.getString(R.string.app_name))
+            .setSilent(true)
+            .build()
+        return ForegroundInfo(FOREGROUND_NOTIFICATION_ID, notification)
     }
 
     override suspend fun doWork(): Result {
@@ -56,6 +75,8 @@ class PollWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, 
     companion object {
         const val VERSION =  BuildConfig.VERSION_CODE
         const val TAG = "NtfyPollWorker"
+        private const val FOREGROUND_CHANNEL_ID = "ntfy-subscriber" // same as SubscriberService
+        private const val FOREGROUND_NOTIFICATION_ID = 2587
         const val WORK_NAME_PERIODIC_ALL = "NtfyPollWorkerPeriodic" // Do not change
         const val WORK_NAME_ONCE_SINGE_PREFIX = "NtfyPollWorkerSingle" // e.g. NtfyPollWorkerSingle_https://ntfy.sh_mytopic
         const val INPUT_DATA_BASE_URL = "baseUrl"

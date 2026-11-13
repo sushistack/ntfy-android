@@ -11,6 +11,7 @@ Notify(`kr.eli.notify`)는 내 Firebase 프로젝트로 FCM을 받습니다.
 > - `google-services.json`, 서비스 계정 키, 토큰은 레포에 커밋하지 않습니다.
 > - `app/google-services.json`은 `.gitignore`에 들어 있습니다.
 > - CI에서는 GitHub Actions secret으로만 넣습니다(6단계).
+> - e2e 토큰은 `~/.config/notify-e2e/token`(권한 600)에만 둡니다.
 
 ## 1. Firebase 프로젝트 만들기
 
@@ -48,22 +49,28 @@ Notify(`kr.eli.notify`)는 내 Firebase 프로젝트로 FCM을 받습니다.
    - 레포, 채팅, 로그 어디에도 붙여 넣지 마세요.
    - 서버의 시크릿으로만 보관합니다(예: k8s Secret).
 
-## 5. ntfy 서버 설정값 (참고용 — gitops는 이 작업에서 건드리지 않음)
+## 5. ntfy 서버 설정 (적용됨: homelab-gitops#188)
 
-ntfy 서버 `server.yml`에 필요한 값입니다. 적용은 직접 하시면 됩니다.
+ntfy는 ArgoCD + SealedSecrets로 배포됩니다(`homelab-gitops/workloads/ntfy/`). `kubectl`로 직접 바꾸면 ArgoCD가 되돌리므로 gitops에 커밋합니다.
 
-```yaml
-base-url: "https://ntfy.eli.kr"
-# 4번의 서비스 계정 키를 Secret으로 마운트한 경로
-firebase-key-file: "/etc/ntfy/firebase-key.json"
-# 이미 모든 토픽이 인증 필수라면 그대로 둡니다. 익명 읽기가 안 되는 토픽은
-# FCM으로 본문 대신 poll_request만 갑니다(메시지 내용이 Google을 거치지 않음).
-auth-default-access: "deny-all"
-# upstream-base-url 은 iOS(ntfy.sh 중계)용이라 Android에는 필요 없습니다.
-```
+1. 4번 키를 봉인합니다. 평문은 커밋하지 않습니다.
+   ```sh
+   kubectl create secret generic ntfy-firebase -n ntfy \
+     --from-file=firebase-key.json=<받은 키>.json --dry-run=client -o yaml \
+   | kubeseal --format yaml --controller-name sealed-secrets --controller-namespace sealed-secrets \
+     > workloads/ntfy/sealedsecret-firebase.yaml
+   ```
+2. `kustomization.yaml` resources에 `sealedsecret-firebase.yaml`을 추가합니다.
+3. `deployment.yaml`: Secret `ntfy-firebase`를 `/etc/ntfy-firebase`에 읽기 전용으로 마운트합니다.
+   - `/etc/ntfy`는 server.yml ConfigMap 마운트라서 그 아래에는 둘 수 없습니다.
+4. `server.yml`:
+   ```yaml
+   firebase-key-file: /etc/ntfy-firebase/firebase-key.json
+   ```
+   `base-url`, `auth-default-access: deny-all`은 이미 설정돼 있습니다. 모든 토픽이 deny-all이라 FCM에는 본문 대신 poll_request만 갑니다.
+5. 머지 후 ArgoCD sync → 파드 재시작(Recreate). 로그에 Firebase 오류가 없는지 확인하고, 내려받은 키 파일은 지웁니다.
 
-- 적용 후 서버 로그에 Firebase 관련 오류가 없는지 확인합니다.
-- `firebase-key-file`이 없으면 FCM 전송이 꺼집니다. 이때 앱은 계속 연결(instant delivery)로만 받습니다.
+키 교체: Firebase 콘솔에서 새 키 → 다시 봉인 → 콘솔에서 옛 키 삭제.
 
 ## 6. 앱에서 할 일
 
@@ -75,11 +82,14 @@ auth-default-access: "deny-all"
 
 ## 7. 확인 방법
 
-1. 앱에서 `e2e-fcm` 토픽을 구독합니다.
-2. 앱을 완전히 종료(최근 앱에서 밀기)하고 배터리 절약 모드를 켭니다.
-3. PC에서 보냅니다. 토큰은 셸 변수로만 쓰고, 기록에 남기지 않습니다.
+1. 앱에서 `e2e-fcm` 토픽을 구독합니다("즉시 알림"은 끔 → FCM만으로 받는지 확인).
+2. 앱을 최근 앱에서 밀어 종료하고 배터리 절약 모드를 켭니다.
+   - 설정의 "강제 종료"는 쓰지 마세요. 강제 종료된 앱에는 FCM도 전달되지 않습니다(Android 규칙).
+3. PC에서 보냅니다. 토큰은 파일에서 읽고 화면이나 기록에 남기지 않습니다.
    ```sh
-   read -rs NTFY_TOKEN
-   curl -H "Authorization: Bearer $NTFY_TOKEN" -d "fcm test" https://ntfy.eli.kr/e2e-fcm
+   curl -H "Authorization: Bearer $(cat ~/.config/notify-e2e/token)" -d "fcm test" https://ntfy.eli.kr/e2e-fcm
    ```
 4. 몇 초 안에 알림이 오면 성공입니다.
+
+2026-11-13 확인: S25+(Android 17), 앱 종료 + 배터리 절약 모드에서 전송 후 약 2초 만에 알림.
+- poll_request를 받으면 `PollWorker`를 expedited로 예약합니다. 일반 작업으로 두면 배터리 절약 모드에서 최대 약 30분까지 미뤄집니다(실측: 60초 넘게 안 옴).
