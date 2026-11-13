@@ -70,6 +70,13 @@
     <style name="FloatingActionButton" parent="@style/Widget.Material3.FloatingActionButton.Primary">
         <item name="backgroundTint">?attr/colorPrimary</item>
         <item name="tint">?attr/colorOnPrimary</item>
+        <!-- ntfy-web PublishFab: 56dp blue circle -->
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Circle</item>
+    </style>
+
+    <style name="ShapeAppearance.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 
     <style name="CardView" parent="@style/Widget.Material3.CardView.Elevated" />

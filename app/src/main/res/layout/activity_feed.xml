@@ -40,12 +40,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        android:src="@drawable/ic_send_white_24dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/ic_paper_plane_24dp"
         android:contentDescription="@string/feed_fab_publish_description"
         app:backgroundTint="@color/accent_ui"
         app:tint="@color/accent_on_surface"
-        app:elevation="6dp"
+        app:elevation="@dimen/shadow_elev_2"
+        style="@style/FloatingActionButton"
         xmlns:app="http://schemas.android.com/apk/res-auto" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

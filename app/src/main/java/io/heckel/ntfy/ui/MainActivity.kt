@@ -285,8 +285,11 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
 
         // Floating action button ("+")
         fab = findViewById(R.id.fab)
+        // Publish FAB (like ntfy-web): opens the publish sheet, pre-filled with the current topic.
+        // Subscribing moved to the drawer.
         fab.setOnClickListener {
-            onSubscribeButtonClick()
+            val topic = adapter.currentList.firstOrNull { it.id == currentSubscriptionId }?.topic ?: ""
+            PublishBottomSheet.newInstance(topic).show(supportFragmentManager, PublishBottomSheet.TAG)
         }
         
         // Add bottom padding to FAB to account for navigation bar
@@ -968,7 +971,8 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
             isAllFeed -> getString(R.string.nav_title_all_notifications)
             else -> currentTopic ?: ""
         }
-        fab.visibility = if (isAllFeed && !historyView) View.VISIBLE else View.GONE
+        // A topic's message feed shows its own publish FAB (wired to its optimistic outbox); hide ours there.
+        fab.visibility = if (messagesView.value && !isAllFeed && !historyView) View.GONE else View.VISIBLE
         toggleVisible.value = toggleVisible.value && !historyView
     }
 
