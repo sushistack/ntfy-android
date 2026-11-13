@@ -18,8 +18,9 @@ android {
         minSdkVersion 26
         targetSdkVersion 36
 
-        versionCode 61
-        versionName "1.25.0"
+        // CI release: VERSION_NAME comes from the git tag (vX.Y.Z), VERSION_CODE = X*10000+Y*100+Z
+        versionCode = (System.getenv("VERSION_CODE") ?: "61").toInteger()
+        versionName = System.getenv("VERSION_NAME") ?: "1.25.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -34,8 +35,21 @@ android {
         }
     }
 
+    // Release signing from env only (CI secrets, or local ~/.signing). Never commit the keystore.
+    signingConfigs {
+        release {
+            if (System.getenv("SIGNING_STORE_FILE")) {
+                storeFile file(System.getenv("SIGNING_STORE_FILE"))
+                storePassword System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword System.getenv("SIGNING_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (System.getenv("SIGNING_STORE_FILE")) signingConfig signingConfigs.release
             minifyEnabled false
             shrinkResources false
             debuggable false
