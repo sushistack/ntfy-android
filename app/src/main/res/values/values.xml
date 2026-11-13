@@ -4,8 +4,8 @@
          The translatable="false" attribute is just an additional safety. -->
 
     <!-- Main app constants -->
-    <string name="app_name" translatable="false">ntfy</string>
-    <string name="app_base_url" translatable="false">https://ntfy.sh</string> <!-- If changed, you must also change google-services.json! -->
+    <string name="app_name" translatable="false">Notify</string>
+    <string name="app_base_url" translatable="false">https://ntfy.eli.kr</string> <!-- Notify server. FCM (play flavor) topics + poll_request use this host; google-services.json must be from the Notify Firebase project. -->
 
     <!-- Main activity -->
     <string name="main_menu_report_bug_url" translatable="false">https://github.com/binwiederhier/ntfy/issues</string>
