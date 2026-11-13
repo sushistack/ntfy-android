@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -542,6 +543,7 @@ fun FeedFilter(unreadOnly: Boolean, unreadCount: Int, showUnreadEmpty: Boolean, 
 private fun FilterPill(label: String, active: Boolean, onClick: () -> Unit) {
     Box(
         Modifier
+            .minimumInteractiveComponentSize() // 48dp touch target; visual pill stays 32dp
             .shadow(if (active) 0.dp else 1.dp, CircleShape)
             .clip(CircleShape)
             .background(colorResource(if (active) R.color.text else R.color.surface))

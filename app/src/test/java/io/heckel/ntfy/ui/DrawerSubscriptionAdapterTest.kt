@@ -262,6 +262,23 @@ class DrawerSubscriptionAdapterTest {
         newCount = newCount,
         lastActive = 0L,
     )
+
+    @Test
+    fun `avatar letters reach 4_5 to 1 on their tint in light and dark`() {
+        val palette = listOf(0x3182f6, 0x8b5cf6, 0xec4899, 0xf97316, 0x10b981, 0x0ea5e9, 0xef4444, 0x64748b)
+        for (surface in listOf(0xFFFFFFFF.toInt(), 0xFF202027.toInt())) {
+            for (p in palette) {
+                val color = p or (0xFF shl 24)
+                val bg = compositeOver((38 shl 24) or p, surface)
+                val letter = readableOn(color, bg)
+                assertTrue("#${Integer.toHexString(p)} on ${Integer.toHexString(surface)}: ${contrast(letter, bg)}",
+                    contrast(letter, bg) >= 4.5)
+            }
+        }
+        // Already-readable colours are left alone.
+        assertEquals(0xFF000000.toInt(), readableOn(0xFF000000.toInt(), 0xFFFFFFFF.toInt()))
+    }
+
 }
 
 /**

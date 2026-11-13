@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- KV block container. Mounted inside card_body by KvBlockRenderer.
      Uses a GridLayout whose column count is set programmatically (1 or 2).
-     Padding mirrors the text body slot conventions from view_card_text.xml. -->
+     card_structured_host already insets 16dp, so only spacing_1 here (aligns rows with the
+     card header; a full spacing_4 doubled the inset). -->
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/kv_grid"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:columnCount="1"
-    android:paddingStart="@dimen/spacing_4"
-    android:paddingEnd="@dimen/spacing_4"
+    android:paddingStart="@dimen/spacing_1"
+    android:paddingEnd="0dp"
     android:paddingTop="@dimen/spacing_2"
     android:paddingBottom="@dimen/spacing_2" />
