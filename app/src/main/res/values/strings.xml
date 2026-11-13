@@ -620,6 +620,56 @@
         <item quantity="other">%d new notifications</item>
     </plurals>
 
+    <!-- 2026-11 redesign: board / incident / history (keys mirror ntfy-web langs) -->
+    <string name="board_view_label">View</string>
+    <string name="board_view_board">Board</string>
+    <string name="board_view_messages">Messages</string>
+    <string name="board_back">Board</string>
+    <plurals name="board_summary_firing">
+        <item quantity="one">%d thing is still firing.</item>
+        <item quantity="other">%d things are still firing.</item>
+    </plurals>
+    <string name="board_summary_clear">Nothing is firing.</string>
+    <plurals name="board_summary_quiet">
+        <item quantity="one">%d went quiet today.</item>
+        <item quantity="other">%d went quiet today.</item>
+    </plurals>
+    <string name="board_summary_last">Last alert at %s.</string>
+    <string name="board_summary_none_today">No alerts today.</string>
+    <string name="board_today_strip">Alerts today, in 15-minute windows</string>
+    <string name="board_section_open">Firing now</string>
+    <string name="board_section_quiet">Went quiet today</string>
+    <string name="board_section_info">For your information</string>
+    <string name="board_since">Since %s</string>
+    <string name="board_range">%1$s to %2$s</string>
+    <plurals name="board_sent_today">
+        <item quantity="one">Sent once today</item>
+        <item quantity="other">Sent %d times today</item>
+    </plurals>
+    <string name="board_empty">No notifications</string>
+    <string name="board_new_indicator">New notification</string>
+    <string name="incident_status_open">Still firing since %s.</string>
+    <string name="incident_status_quiet">Stopped firing after %s.</string>
+    <string name="incident_status_resolved">Fixed at %s.</string>
+    <string name="incident_status_info">Sent at %s.</string>
+    <string name="incident_sent_at">Sent at</string>
+    <string name="incident_sent_earlier">and %d earlier</string>
+    <string name="incident_mark_read">Mark read</string>
+    <string name="incident_mute_hour">Mute topic for 1 hour</string>
+    <string name="incident_not_found">This alert is no longer in your messages.</string>
+    <string name="history_title">Last 7 days</string>
+    <string name="history_description">Each row is a day, each tick a 15-minute window. Alerts that recur at the same time line up in columns.</string>
+    <string name="history_empty">No alerts in the last 7 days.</string>
+    <string name="history_today">Today</string>
+    <string name="history_still_firing">Still firing</string>
+    <plurals name="history_sent_week">
+        <item quantity="one">Sent once this week</item>
+        <item quantity="other">Sent %d times this week</item>
+    </plurals>
+    <string name="history_days_one">On one day, last at %s</string>
+    <string name="history_days_other">Across %d days</string>
+    <string name="sidebar_history">History</string>
+
     <!-- Epic 4 feed state panels (Story 4.3) -->
     <string name="empty_feed_all_title">아직 받은 알림이 없어요</string>
     <string name="empty_feed_all_body">주제를 구독하면 첫 알림이 여기에 나타나요</string>
@@ -641,4 +691,5 @@
     <string name="drawer_sub_muted_content_description">Notifications muted</string>
     <string name="drawer_sub_overflow_content_description">More options</string>
     <string name="feed_fab_publish_description">Publish message</string>
+
 </resources>
