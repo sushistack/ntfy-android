@@ -266,6 +266,15 @@
               here and driven by the navigation drawer. The legacy subscription list below is
               kept (GONE) for binder/code compatibility; subscriptions now live in the drawer.
             -->
+            <!-- Board / Messages switch (Compose); hidden in history and incident detail -->
+            <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/main_view_toggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/main_banner_no_network" />
+
             <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/main_feed_container"
                     android:layout_width="match_parent"
@@ -273,7 +282,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/main_banner_no_network" />
+                    app:layout_constraintTop_toBottomOf="@id/main_view_toggle" />
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                     android:id="@+id/main_subscriptions_list_container"

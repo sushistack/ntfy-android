@@ -332,4 +332,51 @@
     <string name="user_dialog_button_delete">사용자 삭제</string>
     <string name="detail_settings_notifications_dedicated_channels_summary_on">이 구독에 사용자 설정 사용</string>
     <string name="channel_notifications_group_default_name">기본 그룹</string>
+
+    <!-- 2026-11 redesign: board / incident / history (keys mirror ntfy-web langs) -->
+    <string name="board_view_label">보기</string>
+    <string name="board_view_board">보드</string>
+    <string name="board_view_messages">메시지</string>
+    <string name="board_back">보드</string>
+    <plurals name="board_summary_firing">
+        <item quantity="other">아직 %d개가 울리고 있어요</item>
+    </plurals>
+    <string name="board_summary_clear">지금은 조용해요</string>
+    <plurals name="board_summary_quiet">
+        <item quantity="other">오늘 %d개는 잠잠해졌어요.</item>
+    </plurals>
+    <string name="board_summary_last">마지막 알림 %s</string>
+    <string name="board_summary_none_today">오늘은 알림이 없었어요</string>
+    <string name="board_today_strip">오늘 알림, 15분 단위</string>
+    <string name="board_section_open">울리는 중</string>
+    <string name="board_section_quiet">오늘 잠잠해짐</string>
+    <string name="board_section_info">참고</string>
+    <string name="board_since">%s부터</string>
+    <string name="board_range">%1$s ~ %2$s</string>
+    <plurals name="board_sent_today">
+        <item quantity="other">오늘 %d번 받았어요</item>
+    </plurals>
+    <string name="board_empty">알림이 없어요</string>
+    <string name="board_empty_topic">이 토픽에 아직 메시지가 없습니다. 도착하면 바로 보여드릴게요.</string>
+    <string name="board_new_indicator">새 알림</string>
+    <string name="incident_status_open">%s부터 계속 울리고 있어요.</string>
+    <string name="incident_status_quiet">%s 이후로 잠잠해요.</string>
+    <string name="incident_status_resolved">%s에 해결됐어요.</string>
+    <string name="incident_status_info">%s에 받았어요.</string>
+    <string name="incident_sent_at">받은 시각</string>
+    <string name="incident_sent_earlier">외 %d개</string>
+    <string name="incident_mark_read">읽음으로 표시</string>
+    <string name="incident_mute_hour">1시간 알림 끄기</string>
+    <string name="incident_not_found">이 알림은 더 이상 메시지에 없어요.</string>
+    <string name="history_title">최근 7일</string>
+    <string name="history_description">한 줄이 하루, 한 칸이 15분이에요. 같은 시간에 반복되는 알림은 세로로 줄을 서요.</string>
+    <string name="history_empty">최근 7일 동안 알림이 없었어요.</string>
+    <string name="history_today">오늘</string>
+    <string name="history_still_firing">아직 울리는 중</string>
+    <plurals name="history_sent_week">
+        <item quantity="other">이번 주 %d번</item>
+    </plurals>
+    <string name="history_days_one">하루, 마지막 %s</string>
+    <string name="history_days_other">%d일에 걸쳐</string>
+    <string name="sidebar_history">기록</string>
 </resources>
