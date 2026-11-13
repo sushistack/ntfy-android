@@ -12,11 +12,11 @@
     <dimen name="spacing_7">48dp</dimen>
 
     <!-- ntfy-web parity: radius tokens -->
-    <!-- Note: notification cards are explicitly square (0dp); radius_card is intentionally absent -->
-    <dimen name="radius_sm">10dp</dimen>
-    <dimen name="radius_md">16dp</dimen>
+    <!-- 2026-11 redesign: cards are rounded with radius_md (web @utility rounded-card) -->
+    <dimen name="radius_sm">14dp</dimen>
+    <dimen name="radius_md">20dp</dimen>
     <dimen name="radius_full">9999dp</dimen>
-    <dimen name="radius_badge">6dp</dimen>
+    <dimen name="radius_badge">8dp</dimen>
 
     <!-- ntfy-web parity: typography size tokens (sp) -->
     <dimen name="text_display">28sp</dimen>

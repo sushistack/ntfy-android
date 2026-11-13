@@ -15,26 +15,26 @@ class ColorTokenVerifierTest {
 
     companion object {
         private val LIGHT = mapOf(
-            "bg" to "#F3F4F6", "surface" to "#FFFFFF", "surface_2" to "#EEF0F2",
-            "surface_active" to "#EEF0F2", "border" to "#E4E6E9", "control_border" to "#767B80",
-            "text" to "#1C1E21", "muted" to "#6A7076", "accent_text" to "#0E7A48",
-            "accent_ui" to "#1A9E5F", "accent_on_surface" to "#0C1A12",
-            "priority_high" to "#BF6C15", "priority_max" to "#E5484D", "priority_urgent" to "#C7353A",
+            "bg" to "#F2F4F6", "surface" to "#FFFFFF", "surface_2" to "#F2F4F6",
+            "surface_active" to "#F2F4F6", "border" to "#E5E8EB", "control_border" to "#848E99",
+            "text" to "#191F28", "muted" to "#636E7B", "accent_text" to "#1B64DA",
+            "accent_ui" to "#1D6BE5", "accent_on_surface" to "#FFFFFF",
+            "priority_high" to "#C96800", "priority_max" to "#E5404D", "priority_urgent" to "#D22030",
             "priority_high_on_surface" to "#241403", "priority_max_on_surface" to "#1A0E0E",
-            "meter_ok" to "#0E7A48", "meter_track" to "#E4E6E9", "meter_warning" to "#BF6C15",
-            "meter_critical" to "#E5484D", "topic_chip_bg" to "#E1F2EA", "topic_chip_text" to "#136B43",
-            "button_fill" to "#F4F5F6", "button_fill_text" to "#15171A", "focus_ring" to "#1A9E5F",
+            "meter_ok" to "#06804F", "meter_track" to "#E5E8EB", "meter_warning" to "#C96800",
+            "meter_critical" to "#E5404D", "topic_chip_bg" to "#E8F3FF", "topic_chip_text" to "#1B64DA",
+            "button_fill" to "#1D6BE5", "button_fill_text" to "#FFFFFF", "focus_ring" to "#1D6BE5",
         )
         private val DARK = mapOf(
-            "bg" to "#0C0D0F", "surface" to "#16181B", "surface_2" to "#1C1F23",
-            "surface_active" to "#1C1F23", "border" to "#23262B", "control_border" to "#8B9197",
-            "text" to "#E8EAED", "muted" to "#8B9197", "accent_text" to "#42D392",
-            "accent_ui" to "#42D392", "accent_on_surface" to "#0C1A12",
-            "priority_high" to "#F5A95C", "priority_max" to "#FF6B6E", "priority_urgent" to "#FF6B6E",
+            "bg" to "#17171C", "surface" to "#202027", "surface_2" to "#2C2C35",
+            "surface_active" to "#2C2C35", "border" to "#2C2C35", "control_border" to "#7E838F",
+            "text" to "#ECECF0", "muted" to "#9EA3AD", "accent_text" to "#64A8FF",
+            "accent_ui" to "#2870E6", "accent_on_surface" to "#FFFFFF",
+            "priority_high" to "#FFA940", "priority_max" to "#FF6370", "priority_urgent" to "#FF6370",
             "priority_high_on_surface" to "#241403", "priority_max_on_surface" to "#1A0E0E",
-            "meter_ok" to "#42D392", "meter_track" to "#262A2F", "meter_warning" to "#F5A95C",
-            "meter_critical" to "#FF6B6E", "topic_chip_bg" to "#143A2D", "topic_chip_text" to "#7CE6B4",
-            "button_fill" to "#F4F5F6", "button_fill_text" to "#15171A", "focus_ring" to "#42D392",
+            "meter_ok" to "#2FCA86", "meter_track" to "#383842", "meter_warning" to "#FFA940",
+            "meter_critical" to "#FF6370", "topic_chip_bg" to "#1B2A44", "topic_chip_text" to "#8DBCFF",
+            "button_fill" to "#1D6BE5", "button_fill_text" to "#FFFFFF", "focus_ring" to "#2870E6",
         )
         private val RAW_HEX = Regex("""#[0-9A-Fa-f]{3}(?:[0-9A-Fa-f](?:[0-9A-Fa-f]{2}(?:[0-9A-Fa-f]{2})?)?)?(?![0-9A-Fa-f])""")
 
@@ -128,7 +128,7 @@ class ColorTokenVerifierTest {
     fun `wrong hex value triggers failure`() {
         val errors = checkTokens(fixture("colors_wrong_hex.xml"), LIGHT)
         assertTrue("Expected wrong-hex error but got: $errors",
-            errors.any { it.contains("'bg'") && it.contains("F3F4F6") })
+            errors.any { it.contains("'bg'") && it.contains("F2F4F6") })
     }
 
     @Test

@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="md_theme_primary">#338574</color>
-    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primary">@color/accent_ui</color>
+    <color name="md_theme_onPrimary">@color/accent_on_surface</color>
     <color name="md_theme_primaryContainer">#A0F2DD</color>
     <color name="md_theme_onPrimaryContainer">#005144</color>
     <color name="md_theme_secondary">#4B635C</color>
     <color name="md_theme_onSecondary">#FFFFFF</color>
-    <color name="md_theme_secondaryContainer">#CDE8DF</color>
-    <color name="md_theme_onSecondaryContainer">#334B45</color>
+    <color name="md_theme_secondaryContainer">@color/topic_chip_bg</color>
+    <color name="md_theme_onSecondaryContainer">@color/topic_chip_text</color>
     <color name="md_theme_tertiary">#436278</color>
     <color name="md_theme_onTertiary">#FFFFFF</color>
     <color name="md_theme_tertiaryContainer">#C8E6FF</color>
     <color name="md_theme_onTertiaryContainer">#2A4A5F</color>
-    <color name="md_theme_error">#BA1A1A</color>
+    <color name="md_theme_error">@color/priority_urgent</color>
     <color name="md_theme_onError">#FFFFFF</color>
     <color name="md_theme_errorContainer">#FFDAD6</color>
     <color name="md_theme_onErrorContainer">#93000A</color>
-    <color name="md_theme_background">#FFFFFF</color>
-    <color name="md_theme_onBackground">#171D1B</color>
-    <color name="md_theme_surface">#FFFFFF</color>
-    <color name="md_theme_onSurface">#171D1B</color>
+    <color name="md_theme_background">@color/bg</color>
+    <color name="md_theme_onBackground">@color/text</color>
+    <color name="md_theme_surface">@color/surface</color>
+    <color name="md_theme_onSurface">@color/text</color>
     <color name="md_theme_surfaceVariant">#E0E0E0</color>
-    <color name="md_theme_onSurfaceVariant">#3F4946</color>
-    <color name="md_theme_outline">#6F7976</color>
-    <color name="md_theme_outlineVariant">#C0C0C0</color>
+    <color name="md_theme_onSurfaceVariant">@color/muted</color>
+    <color name="md_theme_outline">@color/control_border</color>
+    <color name="md_theme_outlineVariant">@color/border</color>
     <color name="md_theme_scrim">#000000</color>
     <color name="md_theme_inverseSurface">#2B3230</color>
     <color name="md_theme_inverseOnSurface">#F0F0F0</color>
@@ -44,8 +44,8 @@
     <color name="md_theme_surfaceBright">#FFFFFF</color>
     <color name="md_theme_surfaceContainerLowest">#FFFFFF</color>
     <color name="md_theme_surfaceContainerLow">#F5F5F5</color>
-    <color name="md_theme_surfaceContainer">#F0F0F0</color>
-    <color name="md_theme_surfaceContainerHigh">#EEEEEE</color>
+    <color name="md_theme_surfaceContainer">@color/surface</color>
+    <color name="md_theme_surfaceContainerHigh">@color/surface_2</color>
     <color name="md_theme_surfaceContainerHighest">#E0E0E0</color>
     <color name="md_theme_primary_mediumContrast">#003E34</color>
     <color name="md_theme_onPrimary_mediumContrast">#FFFFFF</color>
@@ -142,8 +142,8 @@
     <color name="md_theme_surfaceContainerHigh_highContrast">#CFD6D2</color>
     <color name="md_theme_surfaceContainerHighest_highContrast">#C1C8C5</color>
 
-    <color name="action_bar">#338574</color> <!-- md_theme_primary (light) -->
-    <color name="detail_activity_background">#EEEEEE</color> <!-- Light gray for detail activity in light mode -->
+    <color name="action_bar">@color/accent_ui</color> <!-- md_theme_primary (light) -->
+    <color name="detail_activity_background">@color/bg</color>
 
     <!-- Chip colors -->
     <color name="chip_background_color">#E8E8E8</color> <!-- Light gray background -->
@@ -158,32 +158,32 @@
          Source: docs/ui-parity/design-tokens.md#Color-Tokens
          DO NOT edit individual values here without updating the token manifest.
          ===================================================================== -->
-    <color name="bg">#F3F4F6</color>
+    <color name="bg">#F2F4F6</color>
     <color name="surface">#FFFFFF</color>
-    <color name="surface_2">#EEF0F2</color>
-    <color name="surface_active">#EEF0F2</color>
+    <color name="surface_2">#F2F4F6</color>
+    <color name="surface_active">#F2F4F6</color>
     <!-- Visible neutral box for low-priority badges (MIN/LOW/NORMAL) on light cards -->
     <color name="badge_neutral_bg">#DDE1E6</color>
-    <color name="border">#E4E6E9</color>
-    <color name="control_border">#767B80</color>
-    <color name="text">#1C1E21</color>
-    <color name="muted">#6A7076</color>
-    <color name="accent_text">#0E7A48</color>
-    <color name="accent_ui">#1A9E5F</color>
-    <color name="accent_on_surface">#0C1A12</color>
-    <color name="priority_high">#BF6C15</color>
-    <color name="priority_max">#E5484D</color>
-    <color name="priority_urgent">#C7353A</color>
+    <color name="border">#E5E8EB</color>
+    <color name="control_border">#848E99</color>
+    <color name="text">#191F28</color>
+    <color name="muted">#636E7B</color>
+    <color name="accent_text">#1B64DA</color>
+    <color name="accent_ui">#1D6BE5</color>
+    <color name="accent_on_surface">#FFFFFF</color>
+    <color name="priority_high">#C96800</color>
+    <color name="priority_max">#E5404D</color>
+    <color name="priority_urgent">#D22030</color>
     <color name="priority_high_on_surface">#241403</color>
     <color name="priority_max_on_surface">#1A0E0E</color>
-    <color name="meter_ok">#0E7A48</color>
-    <color name="meter_track">#E4E6E9</color>
-    <color name="meter_warning">#BF6C15</color>
-    <color name="meter_critical">#E5484D</color>
-    <color name="topic_chip_bg">#E1F2EA</color>
-    <color name="topic_chip_text">#136B43</color>
-    <color name="button_fill">#F4F5F6</color>
-    <color name="button_fill_text">#15171A</color>
-    <color name="focus_ring">#1A9E5F</color>
+    <color name="meter_ok">#06804F</color>
+    <color name="meter_track">#E5E8EB</color>
+    <color name="meter_warning">#C96800</color>
+    <color name="meter_critical">#E5404D</color>
+    <color name="topic_chip_bg">#E8F3FF</color>
+    <color name="topic_chip_text">#1B64DA</color>
+    <color name="button_fill">#1D6BE5</color>
+    <color name="button_fill_text">#FFFFFF</color>
+    <color name="focus_ring">#1D6BE5</color>
     <!-- ===================================================================== -->
 </resources>

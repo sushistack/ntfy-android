@@ -7,7 +7,9 @@ Example: `accent-on-surface` → `accent_on_surface`
 
 **Web-key rule:** always the full CSS custom property name: `--color-surface`, `--radius-md`, etc.
 
-All light-theme color values were verified against their applicable WCAG AA targets in Story 5.3.
+Values synced to ntfy-web `5f12a2e` (2026-11-13 Toss-style redesign: Pretendard, blue accent, white cards on gray canvas). Contrast ratios are annotated per token in web `tokens.css`.
+
+Android consumers: XML `@color/<token>` (checked by `./gradlew verifyColorTokens`), Compose `ui/compose/NotifyTheme.kt` (reads the same resources via `colorResource`). Pretendard ships as 4 static weights (400/500/600/700) in `res/font/` — license in `docs/ui-parity/fonts/Pretendard-OFL.txt`.
 
 ---
 
@@ -15,31 +17,31 @@ All light-theme color values were verified against their applicable WCAG AA targ
 
 | canonical                  | light     | dark      | web-key                            | android-key                |
 | -------------------------- | --------- | --------- | ---------------------------------- | -------------------------- |
-| `bg`                       | `#F3F4F6` | `#0C0D0F` | `--color-bg`                       | `bg`                       |
-| `surface`                  | `#FFFFFF` | `#16181B` | `--color-surface`                  | `surface`                  |
-| `surface-2`                | `#EEF0F2` | `#1C1F23` | `--color-surface-2`                | `surface_2`                |
-| `surface-active`           | `#EEF0F2` | `#1C1F23` | `--color-surface-active`           | `surface_active`           |
-| `border`                   | `#E4E6E9` | `#23262B` | `--color-border`                   | `border`                   |
-| `control-border`           | `#767B80` | `#8B9197` | `--color-control-border`           | `control_border`           |
-| `text`                     | `#1C1E21` | `#E8EAED` | `--color-text`                     | `text`                     |
-| `muted`                    | `#6A7076` | `#8B9197` | `--color-muted`                    | `muted`                    |
-| `accent-text`              | `#0E7A48` | `#42D392` | `--color-accent-text`              | `accent_text`              |
-| `accent-ui`                | `#1A9E5F` | `#42D392` | `--color-accent-ui`                | `accent_ui`                |
-| `accent-on-surface`        | `#0C1A12` | `#0C1A12` | `--color-accent-on-surface`        | `accent_on_surface`        |
-| `priority-high`            | `#BF6C15` | `#F5A95C` | `--color-priority-high`            | `priority_high`            |
-| `priority-max`             | `#E5484D` | `#FF6B6E` | `--color-priority-max`             | `priority_max`             |
-| `priority-urgent`          | `#C7353A` | `#FF6B6E` | `--color-priority-urgent`          | `priority_urgent`          |
+| `bg`                       | `#F2F4F6` | `#17171C` | `--color-bg`                       | `bg`                       |
+| `surface`                  | `#FFFFFF` | `#202027` | `--color-surface`                  | `surface`                  |
+| `surface-2`                | `#F2F4F6` | `#2C2C35` | `--color-surface-2`                | `surface_2`                |
+| `surface-active`           | `#F2F4F6` | `#2C2C35` | `--color-surface-active`           | `surface_active`           |
+| `border`                   | `#E5E8EB` | `#2C2C35` | `--color-border`                   | `border`                   |
+| `control-border`           | `#848E99` | `#7E838F` | `--color-control-border`           | `control_border`           |
+| `text`                     | `#191F28` | `#ECECF0` | `--color-text`                     | `text`                     |
+| `muted`                    | `#636E7B` | `#9EA3AD` | `--color-muted`                    | `muted`                    |
+| `accent-text`              | `#1B64DA` | `#64A8FF` | `--color-accent-text`              | `accent_text`              |
+| `accent-ui`                | `#1D6BE5` | `#2870E6` | `--color-accent-ui`                | `accent_ui`                |
+| `accent-on-surface`        | `#FFFFFF` | `#FFFFFF` | `--color-accent-on-surface`        | `accent_on_surface`        |
+| `priority-high`            | `#C96800` | `#FFA940` | `--color-priority-high`            | `priority_high`            |
+| `priority-max`             | `#E5404D` | `#FF6370` | `--color-priority-max`             | `priority_max`             |
+| `priority-urgent`          | `#D22030` | `#FF6370` | `--color-priority-urgent`          | `priority_urgent`          |
 | `priority-high-on-surface` | `#241403` | `#241403` | `--color-priority-high-on-surface` | `priority_high_on_surface` |
 | `priority-max-on-surface`  | `#1A0E0E` | `#1A0E0E` | `--color-priority-max-on-surface`  | `priority_max_on_surface`  |
-| `meter-ok`                 | `#0E7A48` | `#42D392` | `--color-meter-ok`                 | `meter_ok`                 |
-| `meter-track`              | `#E4E6E9` | `#262A2F` | `--color-meter-track`              | `meter_track`              |
-| `meter-warning`            | `#BF6C15` | `#F5A95C` | `--color-meter-warning`            | `meter_warning`            |
-| `meter-critical`           | `#E5484D` | `#FF6B6E` | `--color-meter-critical`           | `meter_critical`           |
-| `topic-chip-bg`            | `#E1F2EA` | `#143A2D` | `--color-topic-chip-bg`            | `topic_chip_bg`            |
-| `topic-chip-text`          | `#136B43` | `#7CE6B4` | `--color-topic-chip-text`          | `topic_chip_text`          |
-| `button-fill`              | `#F4F5F6` | `#F4F5F6` | `--color-button-fill`              | `button_fill`              |
-| `button-fill-text`         | `#15171A` | `#15171A` | `--color-button-fill-text`         | `button_fill_text`         |
-| `focus-ring`               | `#1A9E5F` | `#42D392` | `--color-focus-ring`               | `focus_ring`               |
+| `meter-ok`                 | `#06804F` | `#2FCA86` | `--color-meter-ok`                 | `meter_ok`                 |
+| `meter-track`              | `#E5E8EB` | `#383842` | `--color-meter-track`              | `meter_track`              |
+| `meter-warning`            | `#C96800` | `#FFA940` | `--color-meter-warning`            | `meter_warning`            |
+| `meter-critical`           | `#E5404D` | `#FF6370` | `--color-meter-critical`           | `meter_critical`           |
+| `topic-chip-bg`            | `#E8F3FF` | `#1B2A44` | `--color-topic-chip-bg`            | `topic_chip_bg`            |
+| `topic-chip-text`          | `#1B64DA` | `#8DBCFF` | `--color-topic-chip-text`          | `topic_chip_text`          |
+| `button-fill`              | `#1D6BE5` | `#1D6BE5` | `--color-button-fill`              | `button_fill`              |
+| `button-fill-text`         | `#FFFFFF` | `#FFFFFF` | `--color-button-fill-text`         | `button_fill_text`         |
+| `focus-ring`               | `#1D6BE5` | `#2870E6` | `--color-focus-ring`               | `focus_ring`               |
 
 ### Accent Sub-Token Decision Table
 
@@ -60,11 +62,11 @@ Example: primary button label sits on the FAB green fill → `text-accent-on-sur
 
 | canonical      | value           | web-key                 | android-key       | usage                                          |
 | -------------- | --------------- | ----------------------- | ----------------- | ---------------------------------------------- |
-| `radius-sm`    | `10px`          | `--radius-sm`           | `radius_sm`       | buttons, inputs                                |
-| `radius-md`    | `16px`          | `--radius-md`           | `radius_md`       | cards, dialogs, empty-state icon tile          |
+| `radius-sm`    | `14px`          | `--radius-sm`           | `radius_sm`       | buttons, inputs                                |
+| `radius-md`    | `20px`          | `--radius-md`           | `radius_md`       | cards, dialogs, empty-state icon tile          |
 | `radius-full`  | `9999px`        | `--radius-full`         | `radius_full`     | chips, pill, avatars, toggles, meter tracks    |
-| `radius-badge` | `6px`           | `--radius-badge`        | `radius_badge`    | priority badge — intentionally squared         |
-| `rounded-card` | `0` (squared)   | `@utility rounded-card` | _(no equivalent)_ | notification card — **fully squared, no radius** (2026-06 change; was `0 16 16 0`) |
+| `radius-badge` | `8px`           | `--radius-badge`        | `radius_badge`    | small badges and chips                         |
+| `rounded-card` | `20px` (= radius-md) | `@utility rounded-card` | `radius_md` | notification card — rounded like every sheet (2026-11 redesign; was squared) |
 
 ---
 
@@ -73,12 +75,12 @@ Example: primary button label sits on the FAB green fill → `text-accent-on-sur
 | canonical       | value                                                   | web-key           | android-key     | usage               |
 | --------------- | ------------------------------------------------------- | ----------------- | --------------- | ------------------- |
 | `shadow-flat`   | `none`                                                  | `--shadow-flat`   | `shadow_flat`   | elev-0: border-only |
-| `shadow-elev-1` | `0 1px 2px rgba(0,0,0,0.4)`                             | `--shadow-elev-1` | `shadow_elev_1` | resting card        |
-| `shadow-elev-2` | `0 1px 2px rgba(0,0,0,0.4), 0 6px 16px rgba(0,0,0,0.3)` | `--shadow-elev-2` | `shadow_elev_2` | hover / dialog      |
+| `shadow-elev-1` | `0 1px 2px rgba(2,32,71,0.05)`                          | `--shadow-elev-1` | `shadow_elev_1` | resting card        |
+| `shadow-elev-2` | `0 8px 28px rgba(2,32,71,0.12)`                         | `--shadow-elev-2` | `shadow_elev_2` | hover / dialog      |
 
 ### Glow Effects (Dark-Only)
 
-These tokens are defined only in `.dark {}` and must NOT be applied in light mode. Use `var(--glow-*, none)` fallback pattern for safety.
+**2026-11: web sets every glow to `none` (both themes).** New Compose screens use no glow. The values below are the old 2026-06 ones, still used only by the legacy XML cards (`values-night/glows.xml`, `GlowSpec.kt`) until step 4 replaces those screens.
 
 | canonical            | dark value                         | web-key                | usage                  |
 | -------------------- | ---------------------------------- | ---------------------- | ---------------------- |
@@ -116,7 +118,7 @@ Android does not use CSS z-index or overlay tokens.
 
 | canonical   | value                                                  | web-key       | android-key |
 | ----------- | ------------------------------------------------------ | ------------- | ----------- |
-| `font-sans` | `'Plus Jakarta Sans', 'Roboto', system-ui, sans-serif` | `--font-sans` | `font_sans` |
+| `font-sans` | `'Pretendard Variable', Pretendard, system-ui, sans-serif` | `--font-sans` | `font_sans` |
 | `font-mono` | `'JetBrains Mono', 'Roboto Mono', monospace`           | `--font-mono` | `font_mono` |
 
 ### Font Sizes

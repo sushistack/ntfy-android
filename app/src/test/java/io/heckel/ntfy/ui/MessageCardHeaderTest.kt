@@ -19,26 +19,26 @@ class MessageCardHeaderTest {
     // ── Badge mapping (AC 1, 2) ──────────────────────────────────────────────
 
     @Test
-    fun `P1 min badge uses surface_2 bg and muted text`() {
+    fun `P1 min badge uses badge_neutral_bg and muted text`() {
         val spec = MessageCardBinder.badgeSpecForPriority(PRIORITY_MIN)
         assertEquals(R.string.notification_card_badge_min,    spec.labelRes)
-        assertEquals(R.color.surface_2, spec.backgroundColorRes)
+        assertEquals(R.color.badge_neutral_bg, spec.backgroundColorRes)
         assertEquals(R.color.muted,     spec.textColorRes)
     }
 
     @Test
-    fun `P2 low badge uses surface_2 bg and muted text`() {
+    fun `P2 low badge uses badge_neutral_bg and muted text`() {
         val spec = MessageCardBinder.badgeSpecForPriority(PRIORITY_LOW)
         assertEquals(R.string.notification_card_badge_low,    spec.labelRes)
-        assertEquals(R.color.surface_2, spec.backgroundColorRes)
+        assertEquals(R.color.badge_neutral_bg, spec.backgroundColorRes)
         assertEquals(R.color.muted,     spec.textColorRes)
     }
 
     @Test
-    fun `P3 normal badge uses surface_2 bg and text color`() {
+    fun `P3 normal badge uses badge_neutral_bg and text color`() {
         val spec = MessageCardBinder.badgeSpecForPriority(PRIORITY_DEFAULT)
         assertEquals(R.string.notification_card_badge_normal, spec.labelRes)
-        assertEquals(R.color.surface_2, spec.backgroundColorRes)
+        assertEquals(R.color.badge_neutral_bg, spec.backgroundColorRes)
         assertEquals(R.color.text,      spec.textColorRes)
     }
 

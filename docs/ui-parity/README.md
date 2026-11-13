@@ -42,7 +42,7 @@ Some `screenshots/` are **pre-redesign and partially stale** (see notes below).
   left edge, colored for **every** priority: min/low **gray**, normal **white**, high **amber**,
   max **coral** (amber/coral get a dark-mode glow).
 - **Accent = emerald green** (`#42D392` dark / `#1A9E5F` light), brand-shared with web.
-- **Type:** Plus Jakarta Sans (UI), JetBrains Mono (mono/values). 4px spacing scale.
+- **Type:** Pretendard (UI), JetBrains Mono (mono/values). 4px spacing scale.
 - **Priority badge** on every card (`Min`/`Low`/`Normal`/`High`/`Urgent`), squared 6dp corners.
 - **Timestamps** are `YYYY-MM-DD HH:mm:ss`, always bottom-right.
 - **Tags** split into topic (emerald, fixed) · service `service:` (slate-blue, fixed) · general
