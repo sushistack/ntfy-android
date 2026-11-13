@@ -42,21 +42,21 @@ import io.heckel.ntfy.incident.Incidents.State
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 // ── Time labels (web useIncidents.js hhmm / when) ─────────────────────────────
 
-private val HHMM = DateTimeFormatter.ofPattern("HH:mm")
-private val WEEKDAY_HHMM = DateTimeFormatter.ofPattern("EEE HH:mm")
-private val WEEKDAY = DateTimeFormatter.ofPattern("EEE")
+// Built per call so an in-app language switch applies without a process restart.
+private fun fmt(pattern: String) = DateTimeFormatter.ofPattern(pattern, Locale.getDefault())
 
 private fun zoned(t: Long) = Instant.ofEpochSecond(t).atZone(ZoneId.systemDefault())
 
-fun hhmm(t: Long): String = HHMM.format(zoned(t))
+fun hhmm(t: Long): String = fmt("HH:mm").format(zoned(t))
 
 /** "14:05" for today, "Wed 21:00" for earlier days. */
-fun whenLabel(t: Long, now: Long): String = if (t >= Incidents.dayStart(now)) hhmm(t) else WEEKDAY_HHMM.format(zoned(t))
+fun whenLabel(t: Long, now: Long): String = if (t >= Incidents.dayStart(now)) hhmm(t) else fmt("EEE HH:mm").format(zoned(t))
 
-fun weekday(t: Long): String = WEEKDAY.format(zoned(t))
+fun weekday(t: Long): String = fmt("EEE").format(zoned(t))
 
 // ── Tick strip (web TickStrip.jsx): one day as 96 fifteen-minute ticks ─────────
 

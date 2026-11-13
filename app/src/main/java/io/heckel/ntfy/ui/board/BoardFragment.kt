@@ -81,7 +81,7 @@ class BoardFragment : Fragment() {
                     onMarkRead = { markRead(it) },
                 )
             }
-            else -> BoardScreen(incidents, now, subs) { selected = it.id }
+            else -> BoardScreen(incidents, now, subs, topic = !all) { selected = it.id }
         }
     }
 

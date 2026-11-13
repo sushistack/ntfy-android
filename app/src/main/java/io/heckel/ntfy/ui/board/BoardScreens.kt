@@ -92,9 +92,9 @@ private fun sentTodayLabel(count: Int) = pluralStringResource(R.plurals.board_se
 // ── Board (web Board.jsx) ─────────────────────────────────────────────────────
 
 @Composable
-fun BoardScreen(incidents: List<Incident>, now: Long, subs: Map<String, Subscription>, onOpen: (Incident) -> Unit) {
+fun BoardScreen(incidents: List<Incident>, now: Long, subs: Map<String, Subscription>, topic: Boolean, onOpen: (Incident) -> Unit) {
     if (incidents.isEmpty()) {
-        EmptyPanel(stringResource(R.string.board_empty), bellOff = true)
+        EmptyPanel(stringResource(if (topic) R.string.board_empty_topic else R.string.board_empty), bellOff = true)
         return
     }
     val today = Incidents.dayStart(now)

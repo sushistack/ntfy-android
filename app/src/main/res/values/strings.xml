@@ -647,6 +647,7 @@
         <item quantity="other">Sent %d times today</item>
     </plurals>
     <string name="board_empty">No notifications</string>
+    <string name="board_empty_topic">No messages in this topic yet. They\'ll appear here as they arrive.</string>
     <string name="board_new_indicator">New notification</string>
     <string name="incident_status_open">Still firing since %s.</string>
     <string name="incident_status_quiet">Stopped firing after %s.</string>

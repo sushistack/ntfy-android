@@ -199,16 +199,21 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
         drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
 
-        // Back press: close drawer if open, then re-enable so next open works
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+        // Back press closes an open drawer first. Callbacks run last-added-first, so the drawer
+        // callback is re-added on every open to sit above screen-level handlers (e.g. incident detail).
+        val drawerBack = object : OnBackPressedCallback(false) {
             override fun handleOnBackPressed() {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                } else {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                    isEnabled = true
-                }
+                drawerLayout.closeDrawer(GravityCompat.START)
+            }
+        }
+        drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+            override fun onDrawerOpened(drawerView: View) {
+                drawerBack.remove()
+                onBackPressedDispatcher.addCallback(this@MainActivity, drawerBack)
+                drawerBack.isEnabled = true
+            }
+            override fun onDrawerClosed(drawerView: View) {
+                drawerBack.isEnabled = false
             }
         })
 
@@ -982,8 +987,8 @@ class MainActivity : AppCompatActivity(), AddFragment.SubscribeListener, Notific
     }
 
     override fun openIncident(subscriptionId: Long, incidentId: String) {
-        val subscription = adapter.currentList.firstOrNull { it.id == subscriptionId }
-        showFeed(subscriptionId, subscription?.let { displayName(appBaseUrl, it) }, incidentId)
+        val subscription = adapter.currentList.firstOrNull { it.id == subscriptionId } ?: return // like web: only if subscribed
+        showFeed(subscriptionId, displayName(appBaseUrl, subscription), incidentId)
     }
 
     override fun onSubscriptionUnsubscribed(subscription: Subscription) {

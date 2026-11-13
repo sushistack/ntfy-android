@@ -357,6 +357,7 @@
         <item quantity="other">오늘 %d번 받았어요</item>
     </plurals>
     <string name="board_empty">알림이 없어요</string>
+    <string name="board_empty_topic">이 토픽에 아직 메시지가 없습니다. 도착하면 바로 보여드릴게요.</string>
     <string name="board_new_indicator">새 알림</string>
     <string name="incident_status_open">%s부터 계속 울리고 있어요.</string>
     <string name="incident_status_quiet">%s 이후로 잠잠해요.</string>
