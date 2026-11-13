@@ -590,13 +590,22 @@ class MessageCardBinder(
     }
 
     private fun addButtonToCard(button: View) {
+        // ntfy-web NotificationActions: first action primary (blue), the rest ghost (surface-2).
+        if (button is MaterialButton && actionsFlow.referencedIds.isNotEmpty()) {
+            button.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(button.context, R.color.surface_2))
+            button.setTextColor(ContextCompat.getColor(button.context, R.color.text))
+        }
         actionsWrapperView.addView(button)
         actionsFlow.addView(button)
     }
 
     private fun createCardButton(context: Context, label: String, onClick: () -> Boolean): View {
-        val button = LayoutInflater.from(context).inflate(R.layout.button_action, null) as MaterialButton
+        val button = LayoutInflater.from(context).inflate(R.layout.button_action, actionsWrapperView, false) as MaterialButton
         button.id = View.generateViewId()
+        // Explicit 32dp (web Button sm h-8); the inflated height alone was not honoured inside the Flow.
+        button.layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.WRAP_CONTENT, context.resources.getDimensionPixelSize(R.dimen.spacing_6),
+        )
         button.text = label
         button.setOnClickListener { onClick() }
         return button
