@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Notify bell logo in full colour (gradients measured from the user-supplied PNG; mean diff 2.7/255). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="32dp" android:height="32dp"
+    android:viewportWidth="420" android:viewportHeight="420">
+    <path android:pathData="M209,32 L209,58" android:strokeWidth="37" android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient android:type="linear" android:startX="209" android:startY="13" android:endX="209" android:endY="60"
+                android:startColor="#FFA27AF0" android:endColor="#FFE0BCD8" />
+        </aapt:attr>
+    </path>
+    <path android:pathData="M342,289 L314,207 L309,173 A99,99 0 0 0 111,173 L106,207 L78,289 Z" android:strokeWidth="40" android:strokeLineJoin="miter">
+        <aapt:attr name="android:strokeColor">
+            <gradient android:type="linear" android:startX="209" android:startY="43" android:endX="279.6" android:endY="325">
+                <item android:offset="0" android:color="#FFF8C9B0" />
+                <item android:offset="0.24" android:color="#FFB88BE1" />
+                <item android:offset="0.40" android:color="#FF8671E7" />
+                <item android:offset="0.50" android:color="#FF6D64E9" />
+                <item android:offset="0.68" android:color="#FF506CE8" />
+                <item android:offset="0.83" android:color="#FF4F8FE2" />
+                <item android:offset="0.95" android:color="#FF4FAEDC" />
+                <item android:offset="1" android:color="#FF4CC3DC" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M209.5,339.5 a32.5,32.5 0 1 1 0,65 a32.5,32.5 0 1 1 0,-65 z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="177" android:startY="340" android:endX="242" android:endY="405"
+                android:startColor="#FF5462E9" android:endColor="#FF4CC3DC" />
+        </aapt:attr>
+    </path>
+</vector>

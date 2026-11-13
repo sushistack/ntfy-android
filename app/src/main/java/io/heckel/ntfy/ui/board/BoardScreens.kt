@@ -29,6 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import io.heckel.ntfy.msg.NotificationService.Companion.ACTION_COPY
+import io.heckel.ntfy.util.formatActionLabel
+import io.heckel.ntfy.ui.runNotificationAction
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.contentDescription
@@ -273,7 +277,10 @@ fun IncidentDetailScreen(
         }
         // Latest message in full, through the same body renderers as the message feed (kv/list/chart/markdown).
         item(key = "body-" + inc.latest.id) {
-            Box(Modifier.padding(top = 12.dp).fillMaxWidth().card().padding(20.dp)) { MessageBody(inc.latest) }
+            Column(Modifier.padding(top = 12.dp).fillMaxWidth().card().padding(20.dp)) {
+                MessageBody(inc.latest)
+                NotificationActions(inc.latest)
+            }
         }
         item {
             Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -336,6 +343,35 @@ private fun ActionButton(label: String, primary: Boolean, modifier: Modifier, on
             label, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
             color = colorResource(if (primary) R.color.button_fill_text else R.color.text),
         )
+    }
+}
+
+/** ntfy-web NotificationActions under the body: divider, then sm buttons (first primary, rest ghost); copy actions hidden. */
+@Composable
+private fun NotificationActions(notification: Notification) {
+    val actions = notification.actions.orEmpty().filter { it.action != ACTION_COPY }
+    if (actions.isEmpty()) return
+    val context = LocalContext.current
+    Box(Modifier.padding(top = 12.dp).fillMaxWidth().height(1.dp).background(colorResource(R.color.border)))
+    FlowRow(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        actions.forEachIndexed { i, action ->
+            val primary = i == 0
+            Box(
+                Modifier
+                    .height(32.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(colorResource(if (primary) R.color.button_fill else R.color.surface_2))
+                    .clickable(role = Role.Button) { runNotificationAction(context, notification, action) }
+                    .padding(horizontal = 12.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    formatActionLabel(action),
+                    style = TextStyle(fontFamily = MaterialTheme.typography.bodyMedium.fontFamily, fontSize = 12.sp, fontWeight = FontWeight.SemiBold),
+                    color = colorResource(if (primary) R.color.button_fill_text else R.color.text),
+                )
+            }
+        }
     }
 }
 

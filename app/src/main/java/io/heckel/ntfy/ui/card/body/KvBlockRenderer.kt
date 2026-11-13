@@ -1,6 +1,8 @@
 package io.heckel.ntfy.ui.card.body
 
 import android.content.res.ColorStateList
+import android.widget.ImageView
+import androidx.core.content.res.ResourcesCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,6 +56,7 @@ class KvBlockRenderer : CardBodyRenderer {
             val rows = spec.rows
             for (index in rows.indices) {
                 val row = rows[index]
+                if (actualColumns == 1 && index > 0) gridView.addView(divider(gridView)) // web: divide-y divide-border
                 val rowView = inflater.inflate(R.layout.view_card_kv_row, gridView, false)
                 bindRow(rowView, row)
 
@@ -94,7 +97,8 @@ class KvBlockRenderer : CardBodyRenderer {
     private fun bindRow(rowView: View, row: KvRow) {
         val context = rowView.context
 
-        val iconView = rowView.findViewById<TextView>(R.id.kv_row_icon)
+        val iconView = rowView.findViewById<ImageView>(R.id.kv_row_icon)
+        val iconDot = rowView.findViewById<View>(R.id.kv_row_icon_dot)
         val keyView = rowView.findViewById<TextView>(R.id.kv_row_key)
         val dotView = rowView.findViewById<View>(R.id.kv_row_status_dot)
         val valueView = rowView.findViewById<TextView>(R.id.kv_row_value)
@@ -106,8 +110,11 @@ class KvBlockRenderer : CardBodyRenderer {
         valueView.setTextColor(ContextCompat.getColor(context, R.color.text))
         meterView.visibility = View.GONE
 
-        // Icon glyph (AC 2)
-        iconView.text = KvIconResolver.resolve(row.key, row.icon)
+        // Line icon in a tile, or a neutral dot for unknown keys (web KvIcon)
+        val path = KvIconResolver.resolve(row.key, row.icon)
+        iconView.setImageDrawable(path?.let { KvIconDrawable(it, ContextCompat.getColor(context, R.color.muted)) })
+        iconView.visibility = if (path != null) View.VISIBLE else View.GONE
+        iconDot.visibility = if (path != null) View.GONE else View.VISIBLE
 
         // Key (AC 1)
         keyView.text = row.key
@@ -148,7 +155,26 @@ class KvBlockRenderer : CardBodyRenderer {
                 )
                 dotView.visibility = View.VISIBLE
             }
+            if (KvIconResolver.looksLikePath(row.value)) styleAsCodeChip(valueView)
         }
+    }
+
+    private fun divider(parent: ViewGroup) = View(parent.context).apply {
+        setBackgroundColor(ContextCompat.getColor(context, R.color.border))
+        layoutParams = GridLayout.LayoutParams(
+            GridLayout.spec(GridLayout.UNDEFINED, 1f),
+            GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f),
+        ).apply { width = 0; height = (context.resources.displayMetrics.density).toInt().coerceAtLeast(1) }
+    }
+
+    /** Path/URL/id values as a mono code chip (web: rounded-badge bg-surface-2 px-1.5 py-0.5 font-mono text-caption). */
+    private fun styleAsCodeChip(valueView: TextView) {
+        val d = valueView.resources.displayMetrics.density
+        valueView.setBackgroundResource(R.drawable.kv_code_chip_bg)
+        valueView.setPadding((6 * d).toInt(), (2 * d).toInt(), (6 * d).toInt(), (2 * d).toInt())
+        valueView.typeface = ResourcesCompat.getFont(valueView.context, R.font.font_mono)
+        valueView.textSize = 12f
+        valueView.layoutParams = (valueView.layoutParams as LinearLayout.LayoutParams).apply { width = LinearLayout.LayoutParams.WRAP_CONTENT; weight = 0f }
     }
 
     companion object {

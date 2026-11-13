@@ -43,11 +43,11 @@ class CardShellContractTest {
     }
 
     @Test
-    fun `card corner radius is zero`() {
+    fun `card corner radius is radius_md like web rounded-card`() {
         val doc = loadShellXml()
         val card = doc.findById("detail_item_card") ?: fail("detail_item_card not found")
         val radius = (card as Element).getAttribute("app:cardCornerRadius")
-        assertEquals("Card corner radius must be 0dp", "0dp", radius)
+        assertEquals("Card corner radius must be radius_md (2026-11 redesign)", "@dimen/radius_md", radius)
     }
 
     @Test

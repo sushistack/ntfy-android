@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ntfy-web NotificationActions: 1px border line above the action row -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="top" android:height="1dp">
+        <shape android:shape="rectangle"><solid android:color="@color/border" /></shape>
+    </item>
+</layer-list>

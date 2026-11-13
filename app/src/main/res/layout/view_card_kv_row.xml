@@ -1,60 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- KV block: one row. Mounted programmatically by KvBlockRenderer inside a GridLayout cell.
-     Layout: [icon] [key (muted)] [status dot?] [value] [meter?]
-     No maxLines or ellipsize — all content must remain fully visible (AC 7). -->
+<!-- KV row, ntfy-web StructuredCard KvRow (narrow layout):
+     [32dp icon tile] [key (caption, muted) above value (body-sm medium, or code chip for paths) + status dot / meter].
+     Dividers between rows are added by KvBlockRenderer. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:paddingTop="@dimen/spacing_1"
-    android:paddingBottom="@dimen/spacing_1">
+    android:paddingTop="@dimen/spacing_3"
+    android:paddingBottom="@dimen/spacing_3">
 
-    <!-- Leading marker/icon glyph — fixed-width column so keys line up across rows -->
-    <TextView
-        android:id="@+id/kv_row_icon"
-        style="@style/TextAppearance.Ntfy.Mono"
-        android:layout_width="@dimen/kv_marker_width"
-        android:layout_height="wrap_content"
-        android:importantForAccessibility="no" />
+    <FrameLayout
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/drawer_tile_bg"
+        android:importantForAccessibility="no">
 
-    <!-- Key label (muted color, body_sm) — min-width column so values align across rows -->
-    <TextView
-        android:id="@+id/kv_row_key"
-        style="@style/TextAppearance.Ntfy.BodySmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="@dimen/kv_key_min_width"
-        android:textColor="@color/muted"
-        android:paddingEnd="@dimen/spacing_2"
-        android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/kv_row_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center" />
 
-    <!-- Status dot (visible only for ok/warn/error with no finite meter) -->
-    <View
-        android:id="@+id/kv_row_status_dot"
-        android:layout_width="@dimen/kv_status_dot_size"
-        android:layout_height="@dimen/kv_status_dot_size"
-        android:background="@drawable/kv_status_dot"
-        android:visibility="gone"
-        android:layout_marginEnd="@dimen/spacing_2"
-        android:importantForAccessibility="no" />
+        <View
+            android:id="@+id/kv_row_icon_dot"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_gravity="center"
+            android:background="@drawable/kv_status_dot"
+            android:backgroundTint="@color/muted"
+            android:visibility="gone" />
+    </FrameLayout>
 
-    <!-- Value text (default @color/text; error → @color/priority_urgent) -->
-    <TextView
-        android:id="@+id/kv_row_value"
-        style="@style/TextAppearance.Ntfy.BodySmall"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textColor="@color/text"
-        android:paddingEnd="@dimen/spacing_2" />
+        android:layout_marginStart="@dimen/spacing_3"
+        android:paddingTop="6dp"
+        android:orientation="vertical">
 
-    <!-- Inline meter (Story 3.2; visible only when finite meter value present) -->
-    <io.heckel.ntfy.ui.structured.InlineMeterView
-        android:id="@+id/kv_row_meter"
-        android:layout_width="80dp"
-        android:layout_height="@dimen/meter_track_height"
-        android:visibility="gone"
-        android:layout_gravity="center_vertical" />
+        <TextView
+            android:id="@+id/kv_row_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/font_sans"
+            android:textSize="@dimen/text_caption"
+            android:textColor="@color/muted"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal">
+
+            <View
+                android:id="@+id/kv_row_status_dot"
+                android:layout_width="@dimen/kv_status_dot_size"
+                android:layout_height="@dimen/kv_status_dot_size"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/kv_status_dot"
+                android:visibility="gone"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:id="@+id/kv_row_value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/font_sans"
+                android:textSize="@dimen/text_body_sm"
+                android:lineSpacingMultiplier="1.15"
+                android:textFontWeight="500"
+                android:fontFeatureSettings="tnum"
+                android:textColor="@color/text" />
+
+            <io.heckel.ntfy.ui.structured.InlineMeterView
+                android:id="@+id/kv_row_meter"
+                android:layout_width="80dp"
+                android:layout_height="@dimen/meter_track_height"
+                android:layout_marginTop="6dp"
+                android:layout_marginStart="6dp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>
