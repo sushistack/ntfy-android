@@ -1,0 +1,1326 @@
+{
+  "about": "Shared parity fixtures for incident grouping. Source of truth: ntfy-web src/app/incidents.fixtures.json; ntfy-android copies it byte-for-byte to app/src/test/resources/incidents.fixtures.json. Times are unix seconds. `today` is given explicitly (local midnight is the caller's job) and drives todaySlots/sentToday (the board's count, matching its tick strip).",
+  "constants": {
+    "SLOT_SECONDS": 900,
+    "SLOTS_PER_DAY": 96,
+    "QUIET_AFTER_SECONDS": 2100,
+    "RUN_GAP_SECONDS": 3600
+  },
+  "normalizeTitle": [
+    {
+      "in": "Karakeep  DOWN",
+      "out": "karakeep"
+    },
+    {
+      "in": "Karakeep UP",
+      "out": "karakeep"
+    },
+    {
+      "in": "k3s-cp-1 disk at 82%",
+      "out": "k#s-cp-# disk at #%"
+    },
+    {
+      "in": "  Mixed   Case\tTabs  ",
+      "out": "mixed case tabs"
+    },
+    {
+      "in": "v1.2.3 released",
+      "out": "v#.# released"
+    },
+    {
+      "in": "1,234 errors",
+      "out": "# errors"
+    },
+    {
+      "in": "Node DOWN",
+      "out": "node"
+    },
+    {
+      "in": "Disk ８０%",
+      "out": "disk ８０%"
+    },
+    {
+      "in": "Setup",
+      "out": "setup"
+    },
+    {
+      "in": "서버 응답 없음 3회",
+      "out": "서버 응답 없음 #회"
+    }
+  ],
+  "incidentId": [
+    {
+      "key": "sub-a|karakeep",
+      "id": "gne1i1"
+    },
+    {
+      "key": "sub-a|disk at #%",
+      "id": "dti2fb"
+    },
+    {
+      "key": "1|🥪 backup stale: anytype",
+      "id": "mjpof9"
+    },
+    {
+      "key": "2|서버 응답 없음 #회",
+      "id": "1ywybjm"
+    },
+    {
+      "key": "",
+      "id": "ztntfp"
+    }
+  ],
+  "cases": [
+    {
+      "name": "repeated firings collapse into one open incident",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n1",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "🥪 Backup stale: anytype",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n2",
+          "subscriptionId": "sub-a",
+          "time": 1799999100,
+          "title": "🥪 Backup stale: anytype",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n3",
+          "subscriptionId": "sub-a",
+          "time": 1799998200,
+          "title": "🥪 Backup stale: anytype",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1we8lds",
+          "key": "sub-a|🥪 backup stale: anytype",
+          "subscriptionId": "sub-a",
+          "title": "🥪 Backup stale: anytype",
+          "state": "open",
+          "firings": [1799998200, 1799999100, 1800000000],
+          "first": 1799998200,
+          "since": 1799998200,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n1",
+          "notificationIds": ["n1", "n2", "n3"],
+          "todaySlots": [30, 31, 32],
+          "sentToday": 3
+        }
+      ]
+    },
+    {
+      "name": "since starts at the latest unbroken run",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n4",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "Disk at 81%",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n5",
+          "subscriptionId": "sub-a",
+          "time": 1799999100,
+          "title": "Disk at 80%",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n6",
+          "subscriptionId": "sub-a",
+          "time": 1799913600,
+          "title": "Disk at 80%",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "dti2fb",
+          "key": "sub-a|disk at #%",
+          "subscriptionId": "sub-a",
+          "title": "Disk at 81%",
+          "state": "open",
+          "firings": [1799913600, 1799999100, 1800000000],
+          "first": 1799913600,
+          "since": 1799999100,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n4",
+          "notificationIds": ["n4", "n5", "n6"],
+          "todaySlots": [31, 32],
+          "sentToday": 2
+        }
+      ]
+    },
+    {
+      "name": "gap of exactly RUN_GAP keeps the run",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n7",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "Run gap edge",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n8",
+          "subscriptionId": "sub-a",
+          "time": 1799996400,
+          "title": "Run gap edge",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "45ut5j",
+          "key": "sub-a|run gap edge",
+          "subscriptionId": "sub-a",
+          "title": "Run gap edge",
+          "state": "open",
+          "firings": [1799996400, 1800000000],
+          "first": 1799996400,
+          "since": 1799996400,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n7",
+          "notificationIds": ["n7", "n8"],
+          "todaySlots": [28, 32],
+          "sentToday": 2
+        }
+      ]
+    },
+    {
+      "name": "gap of RUN_GAP + 1 starts a new run",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n9",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "Run gap over",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n10",
+          "subscriptionId": "sub-a",
+          "time": 1799996399,
+          "title": "Run gap over",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "jhr90k",
+          "key": "sub-a|run gap over",
+          "subscriptionId": "sub-a",
+          "title": "Run gap over",
+          "state": "open",
+          "firings": [1799996399, 1800000000],
+          "first": 1799996399,
+          "since": 1800000000,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n9",
+          "notificationIds": ["n9", "n10"],
+          "todaySlots": [27, 32],
+          "sentToday": 2
+        }
+      ]
+    },
+    {
+      "name": "quiet once it stops re-firing",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n11",
+          "subscriptionId": "sub-a",
+          "time": 1799997840,
+          "title": "Backup stale: anytype",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "b9ksom",
+          "key": "sub-a|backup stale: anytype",
+          "subscriptionId": "sub-a",
+          "title": "Backup stale: anytype",
+          "state": "quiet",
+          "firings": [1799997840],
+          "first": 1799997840,
+          "since": 1799997840,
+          "last": 1799997840,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n11",
+          "notificationIds": ["n11"],
+          "todaySlots": [29],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "exactly QUIET_AFTER is still open",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n12",
+          "subscriptionId": "sub-a",
+          "time": 1799997900,
+          "title": "Quiet edge",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "zju6os",
+          "key": "sub-a|quiet edge",
+          "subscriptionId": "sub-a",
+          "title": "Quiet edge",
+          "state": "open",
+          "firings": [1799997900],
+          "first": 1799997900,
+          "since": 1799997900,
+          "last": 1799997900,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n12",
+          "notificationIds": ["n12"],
+          "todaySlots": [29],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "QUIET_AFTER + 1 is quiet",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n13",
+          "subscriptionId": "sub-a",
+          "time": 1799997899,
+          "title": "Quiet edge plus",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1rjwcfo",
+          "key": "sub-a|quiet edge plus",
+          "subscriptionId": "sub-a",
+          "title": "Quiet edge plus",
+          "state": "quiet",
+          "firings": [1799997899],
+          "first": 1799997899,
+          "since": 1799997899,
+          "last": 1799997899,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n13",
+          "notificationIds": ["n13"],
+          "todaySlots": [29],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "Kuma DOWN then UP resolves and keeps the DOWN title",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n14",
+          "subscriptionId": "sub-a",
+          "time": 1799999400,
+          "title": "Karakeep DOWN",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n15",
+          "subscriptionId": "sub-a",
+          "time": 1799999700,
+          "title": "Karakeep UP",
+          "message": "",
+          "priority": 3,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "gne1i1",
+          "key": "sub-a|karakeep",
+          "subscriptionId": "sub-a",
+          "title": "Karakeep DOWN",
+          "state": "resolved",
+          "firings": [1799999400],
+          "first": 1799999400,
+          "since": 1799999400,
+          "last": 1799999400,
+          "resolvedAt": 1799999700,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n14",
+          "notificationIds": ["n15", "n14"],
+          "todaySlots": [31],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "same-second UP listed first still resolves",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n16",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "Webapp UP",
+          "message": "",
+          "priority": 3,
+          "new": 0
+        },
+        {
+          "id": "n17",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "Webapp DOWN",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "cmg56o",
+          "key": "sub-a|webapp",
+          "subscriptionId": "sub-a",
+          "title": "Webapp DOWN",
+          "state": "resolved",
+          "firings": [1800000000],
+          "first": 1800000000,
+          "since": 1800000000,
+          "last": 1800000000,
+          "resolvedAt": 1800000000,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n17",
+          "notificationIds": ["n16", "n17"],
+          "todaySlots": [32],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "same-second DOWN listed first still resolves",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n18",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "Webapp2 DOWN",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n19",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "Webapp2 UP",
+          "message": "",
+          "priority": 3,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "ji76h",
+          "key": "sub-a|webapp#",
+          "subscriptionId": "sub-a",
+          "title": "Webapp2 DOWN",
+          "state": "resolved",
+          "firings": [1800000000],
+          "first": 1800000000,
+          "since": 1800000000,
+          "last": 1800000000,
+          "resolvedAt": 1800000000,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n18",
+          "notificationIds": ["n19", "n18"],
+          "todaySlots": [32],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "DOWN after UP reopens",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n20",
+          "subscriptionId": "sub-a",
+          "time": 1799997000,
+          "title": "Gitea DOWN",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n21",
+          "subscriptionId": "sub-a",
+          "time": 1799997600,
+          "title": "Gitea UP",
+          "message": "",
+          "priority": 3,
+          "new": 0
+        },
+        {
+          "id": "n22",
+          "subscriptionId": "sub-a",
+          "time": 1799999400,
+          "title": "Gitea DOWN",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1f6frq9",
+          "key": "sub-a|gitea",
+          "subscriptionId": "sub-a",
+          "title": "Gitea DOWN",
+          "state": "open",
+          "firings": [1799997000, 1799999400],
+          "first": 1799997000,
+          "since": 1799997000,
+          "last": 1799999400,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n22",
+          "notificationIds": ["n22", "n21", "n20"],
+          "todaySlots": [28, 31],
+          "sentToday": 2
+        }
+      ]
+    },
+    {
+      "name": "UP with no DOWN is resolved with no firings",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n23",
+          "subscriptionId": "sub-a",
+          "time": 1799999880,
+          "title": "Lonely UP",
+          "message": "",
+          "priority": 3,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "12y87gy",
+          "key": "sub-a|lonely",
+          "subscriptionId": "sub-a",
+          "title": "Lonely UP",
+          "state": "resolved",
+          "firings": [],
+          "first": 1799999880,
+          "since": 1799999880,
+          "last": 1799999880,
+          "resolvedAt": 1799999880,
+          "priority": 3,
+          "unread": 0,
+          "latestId": "n23",
+          "notificationIds": ["n23"],
+          "todaySlots": [],
+          "sentToday": 0
+        }
+      ]
+    },
+    {
+      "name": "low-priority one-off is info",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n24",
+          "subscriptionId": "sub-a",
+          "time": 1799999940,
+          "title": "Daily summary",
+          "message": "",
+          "priority": 3,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1vjl2ba",
+          "key": "sub-a|daily summary",
+          "subscriptionId": "sub-a",
+          "title": "Daily summary",
+          "state": "info",
+          "firings": [1799999940],
+          "first": 1799999940,
+          "since": 1799999940,
+          "last": 1799999940,
+          "resolvedAt": null,
+          "priority": 3,
+          "unread": 0,
+          "latestId": "n24",
+          "notificationIds": ["n24"],
+          "todaySlots": [31],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "low-priority repeats without a pair stay info",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n25",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "Hourly report",
+          "message": "",
+          "priority": 3,
+          "new": 0
+        },
+        {
+          "id": "n26",
+          "subscriptionId": "sub-a",
+          "time": 1799996400,
+          "title": "Hourly report",
+          "message": "",
+          "priority": 2,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "xuzsa",
+          "key": "sub-a|hourly report",
+          "subscriptionId": "sub-a",
+          "title": "Hourly report",
+          "state": "info",
+          "firings": [1799996400, 1800000000],
+          "first": 1799996400,
+          "since": 1799996400,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 3,
+          "unread": 0,
+          "latestId": "n25",
+          "notificationIds": ["n25", "n26"],
+          "todaySlots": [28, 32],
+          "sentToday": 2
+        }
+      ]
+    },
+    {
+      "name": "low-priority Kuma DOWN is not info",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n27",
+          "subscriptionId": "sub-a",
+          "time": 1799999940,
+          "title": "Blog DOWN",
+          "message": "",
+          "priority": 3,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1vvlild",
+          "key": "sub-a|blog",
+          "subscriptionId": "sub-a",
+          "title": "Blog DOWN",
+          "state": "open",
+          "firings": [1799999940],
+          "first": 1799999940,
+          "since": 1799999940,
+          "last": 1799999940,
+          "resolvedAt": null,
+          "priority": 3,
+          "unread": 0,
+          "latestId": "n27",
+          "notificationIds": ["n27"],
+          "todaySlots": [31],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "priority 4 one-off is open",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n28",
+          "subscriptionId": "sub-a",
+          "time": 1799999940,
+          "title": "Cert expires soon",
+          "message": "",
+          "priority": 4,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1jtkwi2",
+          "key": "sub-a|cert expires soon",
+          "subscriptionId": "sub-a",
+          "title": "Cert expires soon",
+          "state": "open",
+          "firings": [1799999940],
+          "first": 1799999940,
+          "since": 1799999940,
+          "last": 1799999940,
+          "resolvedAt": null,
+          "priority": 4,
+          "unread": 0,
+          "latestId": "n28",
+          "notificationIds": ["n28"],
+          "todaySlots": [31],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "same title on different topics stays apart",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n29",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "Disk at 80%",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n30",
+          "subscriptionId": "sub-b",
+          "time": 1800000000,
+          "title": "Disk at 80%",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "dti2fb",
+          "key": "sub-a|disk at #%",
+          "subscriptionId": "sub-a",
+          "title": "Disk at 80%",
+          "state": "open",
+          "firings": [1800000000],
+          "first": 1800000000,
+          "since": 1800000000,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n29",
+          "notificationIds": ["n29"],
+          "todaySlots": [32],
+          "sentToday": 1
+        },
+        {
+          "id": "1jmli6g",
+          "key": "sub-b|disk at #%",
+          "subscriptionId": "sub-b",
+          "title": "Disk at 80%",
+          "state": "open",
+          "firings": [1800000000],
+          "first": 1800000000,
+          "since": 1800000000,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n30",
+          "notificationIds": ["n30"],
+          "todaySlots": [32],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "no title falls back to the first message line",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n31",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "",
+          "message": "hello\nworld",
+          "priority": 3,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "zwmerf",
+          "key": "sub-a|hello",
+          "subscriptionId": "sub-a",
+          "title": "hello",
+          "state": "info",
+          "firings": [1800000000],
+          "first": 1800000000,
+          "since": 1800000000,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 3,
+          "unread": 0,
+          "latestId": "n31",
+          "notificationIds": ["n31"],
+          "todaySlots": [32],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "whitespace-only title does not fall back",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n32",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "   ",
+          "message": "body line",
+          "priority": 3,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1jdax11",
+          "key": "sub-a|",
+          "subscriptionId": "sub-a",
+          "title": "",
+          "state": "info",
+          "firings": [1800000000],
+          "first": 1800000000,
+          "since": 1800000000,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 3,
+          "unread": 0,
+          "latestId": "n32",
+          "notificationIds": ["n32"],
+          "todaySlots": [32],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "counts unread",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n33",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "X",
+          "message": "",
+          "priority": 5,
+          "new": 1
+        },
+        {
+          "id": "n34",
+          "subscriptionId": "sub-a",
+          "time": 1799999100,
+          "title": "X",
+          "message": "",
+          "priority": 5,
+          "new": 1
+        },
+        {
+          "id": "n35",
+          "subscriptionId": "sub-a",
+          "time": 1799998200,
+          "title": "X",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1v3jh6f",
+          "key": "sub-a|x",
+          "subscriptionId": "sub-a",
+          "title": "X",
+          "state": "open",
+          "firings": [1799998200, 1799999100, 1800000000],
+          "first": 1799998200,
+          "since": 1799998200,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 2,
+          "latestId": "n33",
+          "notificationIds": ["n33", "n34", "n35"],
+          "todaySlots": [30, 31, 32],
+          "sentToday": 3
+        }
+      ]
+    },
+    {
+      "name": "numbers in titles group (ints, decimals, comma decimals)",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n36",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "CPU 82% on node 3",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n37",
+          "subscriptionId": "sub-a",
+          "time": 1799999100,
+          "title": "CPU 91.5% on node 4",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n38",
+          "subscriptionId": "sub-a",
+          "time": 1799998200,
+          "title": "CPU 7,5% on node 12",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1oaztlx",
+          "key": "sub-a|cpu #% on node #",
+          "subscriptionId": "sub-a",
+          "title": "CPU 82% on node 3",
+          "state": "open",
+          "firings": [1799998200, 1799999100, 1800000000],
+          "first": 1799998200,
+          "since": 1799998200,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n36",
+          "notificationIds": ["n36", "n37", "n38"],
+          "todaySlots": [30, 31, 32],
+          "sentToday": 3
+        }
+      ]
+    },
+    {
+      "name": "suffix match is case-insensitive and needs a space",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n39",
+          "subscriptionId": "sub-a",
+          "time": 1799999700,
+          "title": "api down",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n40",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "api Up",
+          "message": "",
+          "priority": 3,
+          "new": 0
+        },
+        {
+          "id": "n41",
+          "subscriptionId": "sub-a",
+          "time": 1799999940,
+          "title": "Backup",
+          "message": "",
+          "priority": 4,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1n3tqnr",
+          "key": "sub-a|api",
+          "subscriptionId": "sub-a",
+          "title": "api down",
+          "state": "resolved",
+          "firings": [1799999700],
+          "first": 1799999700,
+          "since": 1799999700,
+          "last": 1799999700,
+          "resolvedAt": 1800000000,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n39",
+          "notificationIds": ["n40", "n39"],
+          "todaySlots": [31],
+          "sentToday": 1
+        },
+        {
+          "id": "lbo3rj",
+          "key": "sub-a|backup",
+          "subscriptionId": "sub-a",
+          "title": "Backup",
+          "state": "open",
+          "firings": [1799999940],
+          "first": 1799999940,
+          "since": 1799999940,
+          "last": 1799999940,
+          "resolvedAt": null,
+          "priority": 4,
+          "unread": 0,
+          "latestId": "n41",
+          "notificationIds": ["n41"],
+          "todaySlots": [31],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "sorted newest-first across groups",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n42",
+          "subscriptionId": "sub-a",
+          "time": 1799998800,
+          "title": "Older alert",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n43",
+          "subscriptionId": "sub-a",
+          "time": 1799999990,
+          "title": "Newest alert",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n44",
+          "subscriptionId": "sub-a",
+          "time": 1799999400,
+          "title": "Middle alert",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "1uno0ud",
+          "key": "sub-a|newest alert",
+          "subscriptionId": "sub-a",
+          "title": "Newest alert",
+          "state": "open",
+          "firings": [1799999990],
+          "first": 1799999990,
+          "since": 1799999990,
+          "last": 1799999990,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n43",
+          "notificationIds": ["n43"],
+          "todaySlots": [31],
+          "sentToday": 1
+        },
+        {
+          "id": "fxajw6",
+          "key": "sub-a|middle alert",
+          "subscriptionId": "sub-a",
+          "title": "Middle alert",
+          "state": "open",
+          "firings": [1799999400],
+          "first": 1799999400,
+          "since": 1799999400,
+          "last": 1799999400,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n44",
+          "notificationIds": ["n44"],
+          "todaySlots": [31],
+          "sentToday": 1
+        },
+        {
+          "id": "n0q91j",
+          "key": "sub-a|older alert",
+          "subscriptionId": "sub-a",
+          "title": "Older alert",
+          "state": "open",
+          "firings": [1799998800],
+          "first": 1799998800,
+          "since": 1799998800,
+          "last": 1799998800,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n42",
+          "notificationIds": ["n42"],
+          "todaySlots": [30],
+          "sentToday": 1
+        }
+      ]
+    },
+    {
+      "name": "today count and slots ignore yesterday",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n45",
+          "subscriptionId": "sub-a",
+          "time": 1800000000,
+          "title": "Overnight disk",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n46",
+          "subscriptionId": "sub-a",
+          "time": 1799999100,
+          "title": "Overnight disk",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n47",
+          "subscriptionId": "sub-a",
+          "time": 1799970300,
+          "title": "Overnight disk",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n48",
+          "subscriptionId": "sub-a",
+          "time": 1799969400,
+          "title": "Overnight disk",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "r9s25g",
+          "key": "sub-a|overnight disk",
+          "subscriptionId": "sub-a",
+          "title": "Overnight disk",
+          "state": "open",
+          "firings": [1799969400, 1799970300, 1799999100, 1800000000],
+          "first": 1799969400,
+          "since": 1799999100,
+          "last": 1800000000,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n45",
+          "notificationIds": ["n45", "n46", "n47", "n48"],
+          "todaySlots": [31, 32],
+          "sentToday": 2
+        }
+      ]
+    },
+    {
+      "name": "unicode: NBSP, fullwidth digits, 120-char cap",
+      "now": 1800000000,
+      "today": 1799971200,
+      "notifications": [
+        {
+          "id": "n49",
+          "subscriptionId": "sub-a",
+          "time": 1799999700,
+          "title": "Node DOWN",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n50",
+          "subscriptionId": "sub-a",
+          "time": 1799999800,
+          "title": "Node UP",
+          "message": "",
+          "priority": 3,
+          "new": 0
+        },
+        {
+          "id": "n51",
+          "subscriptionId": "sub-a",
+          "time": 1799999900,
+          "title": "Disk ８０% full",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        },
+        {
+          "id": "n52",
+          "subscriptionId": "sub-a",
+          "time": 1799999950,
+          "title": "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+          "message": "",
+          "priority": 5,
+          "new": 0
+        }
+      ],
+      "expected": [
+        {
+          "id": "woyfxx",
+          "key": "sub-a|llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll",
+          "subscriptionId": "sub-a",
+          "title": "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
+          "state": "open",
+          "firings": [1799999950],
+          "first": 1799999950,
+          "since": 1799999950,
+          "last": 1799999950,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n52",
+          "notificationIds": ["n52"],
+          "todaySlots": [31],
+          "sentToday": 1
+        },
+        {
+          "id": "n3yb7k",
+          "key": "sub-a|disk ８０% full",
+          "subscriptionId": "sub-a",
+          "title": "Disk ８０% full",
+          "state": "open",
+          "firings": [1799999900],
+          "first": 1799999900,
+          "since": 1799999900,
+          "last": 1799999900,
+          "resolvedAt": null,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n51",
+          "notificationIds": ["n51"],
+          "todaySlots": [31],
+          "sentToday": 1
+        },
+        {
+          "id": "1krpy65",
+          "key": "sub-a|node",
+          "subscriptionId": "sub-a",
+          "title": "Node DOWN",
+          "state": "resolved",
+          "firings": [1799999700],
+          "first": 1799999700,
+          "since": 1799999700,
+          "last": 1799999700,
+          "resolvedAt": 1799999800,
+          "priority": 5,
+          "unread": 0,
+          "latestId": "n49",
+          "notificationIds": ["n50", "n49"],
+          "todaySlots": [31],
+          "sentToday": 1
+        }
+      ]
+    }
+  ]
+}
