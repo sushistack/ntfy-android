@@ -5,6 +5,7 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -88,6 +89,9 @@ class FirebaseService : FirebaseMessagingService() {
                 PollWorker.INPUT_DATA_TOPIC to topic
             ))
             .setConstraints(constraints)
+            // Battery saver defers normal connectivity jobs for up to ~30 min. A high-priority FCM
+            // message grants expedited quota, so run now; falls back to normal work if out of quota.
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .build()
         Log.d(TAG, "Poll request for ${topicShortUrl(baseUrl, topic)} received, scheduling unique poll worker with name $workName")
 
