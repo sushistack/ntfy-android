@@ -55,25 +55,12 @@ class Colors {
             }
         }
 
-        fun shouldUseLightStatusBar(dynamicColors: Boolean, darkMode: Boolean): Boolean {
-            // Use light status bar (dark icons) when dynamic colors are enabled in light mode
-            return dynamicColors && !darkMode
-        }
+        // The app bar sits on the page background (ntfy-web AppBar) in both themes, so its text/icons and
+        // the status bar icons simply follow light/dark.
+        fun shouldUseLightStatusBar(dynamicColors: Boolean, darkMode: Boolean): Boolean = !darkMode
 
-        fun toolbarTextColor(context: Context, dynamicColors: Boolean, darkMode: Boolean): Int {
-            return if (dynamicColors) {
-                // Use colorOnSurface (dark on light, light on dark) when dynamic colors are enabled
-                MaterialColors.getColor(context, R.attr.colorOnSurface, Color.BLACK)
-            } else {
-                if (darkMode) {
-                    // In dark mode, toolbar is gray (surfaceContainer), so use light text
-                    MaterialColors.getColor(context, R.attr.colorOnSurface, Color.WHITE)
-                } else {
-                    // In light mode, toolbar is teal (primary), so use white text
-                    MaterialColors.getColor(context, R.attr.colorOnPrimary, Color.WHITE)
-                }
-            }
-        }
+        fun toolbarTextColor(context: Context, dynamicColors: Boolean, darkMode: Boolean): Int =
+            MaterialColors.getColor(context, R.attr.colorOnSurface, if (darkMode) Color.WHITE else Color.BLACK)
 
         fun dangerText(context: Context): Int {
             return MaterialColors.getColor(context, R.attr.colorError, Color.RED)

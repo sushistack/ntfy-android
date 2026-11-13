@@ -57,4 +57,10 @@
         <item name="android:lineHeight">@dimen/leading_mono</item>
         <item name="android:fontFamily">@font/font_mono</item>
     </style>
+
+    <!-- ntfy-web AppBar title: text-body, bold, tight tracking -->
+    <style name="TextAppearance.Ntfy.AppBarTitle" parent="TextAppearance.Ntfy.Body">
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
 </resources>

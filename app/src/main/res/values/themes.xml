@@ -109,13 +109,19 @@
     </style>
 
     <!-- Banner style with reduced corner radius -->
-    <style name="BannerCardStyle" parent="Widget.Material3.CardView.Elevated">
+    <!-- Battery / websocket banners as compact cards on the page (ntfy-web card look). -->
+    <style name="BannerCardStyle" parent="Widget.Material3.CardView.Filled">
         <item name="shapeAppearanceOverlay">@style/BannerShapeAppearance</item>
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="cardElevation">0dp</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:layout_marginTop">8dp</item>
     </style>
 
     <style name="BannerShapeAppearance">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">0dp</item>
+        <item name="cornerSize">@dimen/radius_md</item>
     </style>
 
     <!-- Full-screen dialog style for Material 3 compliance -->
