@@ -597,10 +597,10 @@ interface NotificationDao {
     @Query("SELECT * FROM notification")
     suspend fun list(): List<Notification>
 
-    @Query("SELECT * FROM notification WHERE subscriptionId = :subscriptionId AND deleted != 1 ORDER BY CAST(sequenceId AS INTEGER) DESC, timestamp DESC, id DESC")
+    @Query("SELECT * FROM notification WHERE subscriptionId = :subscriptionId AND deleted != 1 ORDER BY timestamp DESC, id DESC")
     fun listFlow(subscriptionId: Long): Flow<List<Notification>>
 
-    @Query("SELECT * FROM notification WHERE deleted != 1 ORDER BY CAST(sequenceId AS INTEGER) DESC, timestamp DESC, id DESC")
+    @Query("SELECT * FROM notification WHERE deleted != 1 ORDER BY timestamp DESC, id DESC")
     fun listAllFlow(): Flow<List<Notification>>
 
     @Query("""
@@ -612,14 +612,14 @@ interface NotificationDao {
             OR message LIKE '%' || :query || '%' COLLATE NOCASE
             OR tags LIKE '%' || :query || '%' COLLATE NOCASE
         )
-        ORDER BY CAST(sequenceId AS INTEGER) DESC, timestamp DESC, id DESC
+        ORDER BY timestamp DESC, id DESC
     """)
     fun listFlowFiltered(subscriptionId: Long, query: String): Flow<List<Notification>>
 
     @Query("""
         SELECT * FROM notification
         WHERE subscriptionId = :subscriptionId AND deleted != 1
-        ORDER BY CAST(sequenceId AS INTEGER) DESC, timestamp DESC, id DESC
+        ORDER BY timestamp DESC, id DESC
         LIMIT :limit OFFSET :offset
     """)
     suspend fun listPaged(subscriptionId: Long, limit: Int, offset: Int): List<Notification>
@@ -627,7 +627,7 @@ interface NotificationDao {
     @Query("""
         SELECT * FROM notification
         WHERE deleted != 1
-        ORDER BY CAST(sequenceId AS INTEGER) DESC, timestamp DESC, id DESC
+        ORDER BY timestamp DESC, id DESC
         LIMIT :limit OFFSET :offset
     """)
     suspend fun listAllPaged(limit: Int, offset: Int): List<Notification>
